@@ -1,0 +1,244 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_dohdrtest_View.Page_Render();
+
+	// Check action result
+	if (s_dohdrtest_View.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_dohdrtest.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "view";
+var fs_dohdrtestview = currentForm = new ew.Form("fs_dohdrtestview", "view");
+
+// Form_CustomValidate event
+fs_dohdrtestview.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_dohdrtestview.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_dohdrtestview.lists["x_dbcode"] = @Html.Raw(s_dohdrtest_View.dbcode.Lookup.ToClientList());
+fs_dohdrtestview.lists["x_dbcode"].options = @Html.Raw(ConvertToJson(s_dohdrtest_View.dbcode.LookupOptions));
+fs_dohdrtestview.autoSuggests["x_dbcode"] = @Html.Raw(ConvertToJson(new Dictionary<string, string> { {"data", "ajax=autosuggest"} }));
+fs_dohdrtestview.lists["x_CurrencyCode"] = @Html.Raw(s_dohdrtest_View.CurrencyCode.Lookup.ToClientList());
+fs_dohdrtestview.lists["x_CurrencyCode"].options = @Html.Raw(ConvertToJson(s_dohdrtest_View.CurrencyCode.LookupOptions));
+fs_dohdrtestview.autoSuggests["x_CurrencyCode"] = @Html.Raw(ConvertToJson(new Dictionary<string, string> { {"data", "ajax=autosuggest"} }));
+
+// Form object for search
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_dohdrtest.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+	@s_dohdrtest_View.ExportOptions.RenderBody()
+	@s_dohdrtest_View.OtherOptions.RenderBody()
+	<div class="clearfix"></div>
+</div>
+}
+@s_dohdrtest_View.ShowPageHeader()
+@s_dohdrtest_View.ShowMessages()
+<form name="fs_dohdrtestview" id="fs_dohdrtestview" class="form-inline ew-form ew-view-form" method="post">
+@if (s_dohdrtest_View.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="modal" value="@ConvertToInt(s_dohdrtest_View.IsModal)">
+<table class="table table-striped table-sm ew-view-table">
+@if (s_dohdrtest.TrxId.Visible) { @* s_dohdrtest.TrxId.Visible (begin) *@
+	<tr id="r_TrxId">
+		<td class="@s_dohdrtest_View.TableLeftColumnClass"><span id="elh_s_dohdrtest_TrxId">@Html.Raw(s_dohdrtest.TrxId.Caption)</span></td>
+		<td data-name="TrxId" @Html.Raw(s_dohdrtest.TrxId.CellAttributes)>
+<span id="el_s_dohdrtest_TrxId">
+<span @Html.Raw(s_dohdrtest.TrxId.ViewAttributes)>
+@Html.Raw(s_dohdrtest.TrxId.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_dohdrtest.TrxId.Visible (end) *@
+@if (s_dohdrtest.dt_rec.Visible) { @* s_dohdrtest.dt_rec.Visible (begin) *@
+	<tr id="r_dt_rec">
+		<td class="@s_dohdrtest_View.TableLeftColumnClass"><span id="elh_s_dohdrtest_dt_rec">@Html.Raw(s_dohdrtest.dt_rec.Caption)</span></td>
+		<td data-name="dt_rec" @Html.Raw(s_dohdrtest.dt_rec.CellAttributes)>
+<span id="el_s_dohdrtest_dt_rec">
+<span @Html.Raw(s_dohdrtest.dt_rec.ViewAttributes)>
+@Html.Raw(s_dohdrtest.dt_rec.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_dohdrtest.dt_rec.Visible (end) *@
+@if (s_dohdrtest.do_no.Visible) { @* s_dohdrtest.do_no.Visible (begin) *@
+	<tr id="r_do_no">
+		<td class="@s_dohdrtest_View.TableLeftColumnClass"><span id="elh_s_dohdrtest_do_no">@Html.Raw(s_dohdrtest.do_no.Caption)</span></td>
+		<td data-name="do_no" @Html.Raw(s_dohdrtest.do_no.CellAttributes)>
+<span id="el_s_dohdrtest_do_no">
+<span @Html.Raw(s_dohdrtest.do_no.ViewAttributes)>
+@Html.Raw(s_dohdrtest.do_no.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_dohdrtest.do_no.Visible (end) *@
+@if (s_dohdrtest.dbcode.Visible) { @* s_dohdrtest.dbcode.Visible (begin) *@
+	<tr id="r_dbcode">
+		<td class="@s_dohdrtest_View.TableLeftColumnClass"><span id="elh_s_dohdrtest_dbcode">@Html.Raw(s_dohdrtest.dbcode.Caption)</span></td>
+		<td data-name="dbcode" @Html.Raw(s_dohdrtest.dbcode.CellAttributes)>
+<span id="el_s_dohdrtest_dbcode">
+<span @Html.Raw(s_dohdrtest.dbcode.ViewAttributes)>
+@Html.Raw(s_dohdrtest.dbcode.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_dohdrtest.dbcode.Visible (end) *@
+@if (s_dohdrtest.slsman.Visible) { @* s_dohdrtest.slsman.Visible (begin) *@
+	<tr id="r_slsman">
+		<td class="@s_dohdrtest_View.TableLeftColumnClass"><span id="elh_s_dohdrtest_slsman">@Html.Raw(s_dohdrtest.slsman.Caption)</span></td>
+		<td data-name="slsman" @Html.Raw(s_dohdrtest.slsman.CellAttributes)>
+<span id="el_s_dohdrtest_slsman">
+<span @Html.Raw(s_dohdrtest.slsman.ViewAttributes)>
+@Html.Raw(s_dohdrtest.slsman.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_dohdrtest.slsman.Visible (end) *@
+@if (s_dohdrtest.fileno.Visible) { @* s_dohdrtest.fileno.Visible (begin) *@
+	<tr id="r_fileno">
+		<td class="@s_dohdrtest_View.TableLeftColumnClass"><span id="elh_s_dohdrtest_fileno">@Html.Raw(s_dohdrtest.fileno.Caption)</span></td>
+		<td data-name="fileno" @Html.Raw(s_dohdrtest.fileno.CellAttributes)>
+<span id="el_s_dohdrtest_fileno">
+<span @Html.Raw(s_dohdrtest.fileno.ViewAttributes)>
+@Html.Raw(s_dohdrtest.fileno.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_dohdrtest.fileno.Visible (end) *@
+@if (s_dohdrtest.TrxUserId.Visible) { @* s_dohdrtest.TrxUserId.Visible (begin) *@
+	<tr id="r_TrxUserId">
+		<td class="@s_dohdrtest_View.TableLeftColumnClass"><span id="elh_s_dohdrtest_TrxUserId">@Html.Raw(s_dohdrtest.TrxUserId.Caption)</span></td>
+		<td data-name="TrxUserId" @Html.Raw(s_dohdrtest.TrxUserId.CellAttributes)>
+<span id="el_s_dohdrtest_TrxUserId">
+<span @Html.Raw(s_dohdrtest.TrxUserId.ViewAttributes)>
+@Html.Raw(s_dohdrtest.TrxUserId.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_dohdrtest.TrxUserId.Visible (end) *@
+@if (s_dohdrtest.CurrencyCode.Visible) { @* s_dohdrtest.CurrencyCode.Visible (begin) *@
+	<tr id="r_CurrencyCode">
+		<td class="@s_dohdrtest_View.TableLeftColumnClass"><span id="elh_s_dohdrtest_CurrencyCode">@Html.Raw(s_dohdrtest.CurrencyCode.Caption)</span></td>
+		<td data-name="CurrencyCode" @Html.Raw(s_dohdrtest.CurrencyCode.CellAttributes)>
+<span id="el_s_dohdrtest_CurrencyCode">
+<span @Html.Raw(s_dohdrtest.CurrencyCode.ViewAttributes)>
+@Html.Raw(s_dohdrtest.CurrencyCode.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_dohdrtest.CurrencyCode.Visible (end) *@
+@if (s_dohdrtest.ex_rate.Visible) { @* s_dohdrtest.ex_rate.Visible (begin) *@
+	<tr id="r_ex_rate">
+		<td class="@s_dohdrtest_View.TableLeftColumnClass"><span id="elh_s_dohdrtest_ex_rate">@Html.Raw(s_dohdrtest.ex_rate.Caption)</span></td>
+		<td data-name="ex_rate" @Html.Raw(s_dohdrtest.ex_rate.CellAttributes)>
+<span id="el_s_dohdrtest_ex_rate">
+<span @Html.Raw(s_dohdrtest.ex_rate.ViewAttributes)>
+@Html.Raw(s_dohdrtest.ex_rate.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_dohdrtest.ex_rate.Visible (end) *@
+@if (s_dohdrtest.do_amount_original.Visible) { @* s_dohdrtest.do_amount_original.Visible (begin) *@
+	<tr id="r_do_amount_original">
+		<td class="@s_dohdrtest_View.TableLeftColumnClass"><span id="elh_s_dohdrtest_do_amount_original">@Html.Raw(s_dohdrtest.do_amount_original.Caption)</span></td>
+		<td data-name="do_amount_original" @Html.Raw(s_dohdrtest.do_amount_original.CellAttributes)>
+<span id="el_s_dohdrtest_do_amount_original">
+<span @Html.Raw(s_dohdrtest.do_amount_original.ViewAttributes)>
+@Html.Raw(s_dohdrtest.do_amount_original.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_dohdrtest.do_amount_original.Visible (end) *@
+@if (s_dohdrtest.do_amount_loca.Visible) { @* s_dohdrtest.do_amount_loca.Visible (begin) *@
+	<tr id="r_do_amount_loca">
+		<td class="@s_dohdrtest_View.TableLeftColumnClass"><span id="elh_s_dohdrtest_do_amount_loca">@Html.Raw(s_dohdrtest.do_amount_loca.Caption)</span></td>
+		<td data-name="do_amount_loca" @Html.Raw(s_dohdrtest.do_amount_loca.CellAttributes)>
+<span id="el_s_dohdrtest_do_amount_loca">
+<span @Html.Raw(s_dohdrtest.do_amount_loca.ViewAttributes)>
+@Html.Raw(s_dohdrtest.do_amount_loca.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_dohdrtest.do_amount_loca.Visible (end) *@
+@if (s_dohdrtest.rounding_adj.Visible) { @* s_dohdrtest.rounding_adj.Visible (begin) *@
+	<tr id="r_rounding_adj">
+		<td class="@s_dohdrtest_View.TableLeftColumnClass"><span id="elh_s_dohdrtest_rounding_adj">@Html.Raw(s_dohdrtest.rounding_adj.Caption)</span></td>
+		<td data-name="rounding_adj" @Html.Raw(s_dohdrtest.rounding_adj.CellAttributes)>
+<span id="el_s_dohdrtest_rounding_adj">
+<span @Html.Raw(s_dohdrtest.rounding_adj.ViewAttributes)>
+@Html.Raw(s_dohdrtest.rounding_adj.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_dohdrtest.rounding_adj.Visible (end) *@
+@if (s_dohdrtest.ar_gl_acct.Visible) { @* s_dohdrtest.ar_gl_acct.Visible (begin) *@
+	<tr id="r_ar_gl_acct">
+		<td class="@s_dohdrtest_View.TableLeftColumnClass"><span id="elh_s_dohdrtest_ar_gl_acct">@Html.Raw(s_dohdrtest.ar_gl_acct.Caption)</span></td>
+		<td data-name="ar_gl_acct" @Html.Raw(s_dohdrtest.ar_gl_acct.CellAttributes)>
+<span id="el_s_dohdrtest_ar_gl_acct">
+<span @Html.Raw(s_dohdrtest.ar_gl_acct.ViewAttributes)>
+@Html.Raw(s_dohdrtest.ar_gl_acct.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_dohdrtest.ar_gl_acct.Visible (end) *@
+</table>
+@{ s_dohdrtest_View.CloseRecordset(); }
+@if (s_dohdrtest_View.CurrentDetailTables.Contains("s_dodetltest") && s_dodetltest.DetailView) {
+	if (!Empty(s_dohdrtest_View.CurrentDetailTable)) {
+		<h4 class="ew-detail-caption">@Html.Raw(Language.TablePhrase("s_dodetltest", "TblCaption"))</h4>
+	}
+		@await Html.PartialAsync("s_dodetltestgrid")
+	View = this;
+}
+</form>
+@s_dohdrtest_View.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_dohdrtest.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

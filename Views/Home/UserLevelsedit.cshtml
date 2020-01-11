@@ -1,0 +1,179 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	UserLevels_Edit.Page_Render();
+
+	// Check action result
+	if (UserLevels_Edit.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "edit";
+var fUserLevelsedit = currentForm = new ew.Form("fUserLevelsedit", "edit");
+
+// Validate form
+fUserLevelsedit.validate = function() {
+	if (!this.validateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.getForm(), $fobj = $(fobj);
+	if ($fobj.find("#confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.formKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = ["insert", "gridinsert"].includes($fobj.find("#action").val()) && $k[0];
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+	@if (UserLevels_Edit.UserLevelID.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_UserLevelID");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(UserLevels.UserLevelID.RequiredErrorMessage.Replace("%s", UserLevels.UserLevelID.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_UserLevelID");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(UserLevels.UserLevelID.ErrorMessage))");
+	@if (UserLevels_Edit.UserLevelName.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_UserLevelName");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(UserLevels.UserLevelName.RequiredErrorMessage.Replace("%s", UserLevels.UserLevelName.Caption)))");
+		</text>
+	}
+		var elId = fobj.elements["x" + infix + "_UserLevelID"];
+		var elName = fobj.elements["x" + infix + "_UserLevelID"];
+		if (elId && elName) {
+			elId.value = $.trim(elId.value);
+			elName.value = $.trim(elName.value);
+			if (elId && !ew.checkInteger(elId.value))
+				return this.onError(elId, ew.language.phrase("UserLevelIDInteger"));
+			var level = parseInt(elId.value, 10);
+			if (level == 0 && !ew.sameText(elName.value, "Default")) {
+					return this.onError(elName, ew.language.phrase("UserLevelDefaultName"));
+			} else if (level == -1 && !ew.sameText(elName.value, "Administrator")) {
+					return this.onError(elName, ew.language.phrase("UserLevelAdministratorName"));
+			} else if (level == -2 && !ew.sameText(elName.value, "Anonymous")) {
+					return this.onError(elName, ew.language.phrase("UserLevelAnonymousName"));
+			} else if (level < -2) {
+				return this.onError(elId, ew.language.phrase("UserLevelIDIncorrect"));
+			} else if (level > 0 && ["anonymous", "administrator", "default"].includes(elName.value.toLowerCase())) {
+				return this.onError(elName, ew.language.phrase("UserLevelNameIncorrect"));
+			}
+		}
+
+		// Fire Form_CustomValidate event
+		if (!this.Form_CustomValidate(fobj))
+			return false;
+	}
+
+	// Process detail forms
+	var dfs = $fobj.find("input[name='detailpage']").get();
+	for (var i = 0; i < dfs.length; i++) {
+		var df = dfs[i], val = df.value;
+		if (val && ew.forms[val])
+			if (!ew.forms[val].validate())
+				return false;
+	}
+	return true;
+}
+
+// Form_CustomValidate event
+fUserLevelsedit.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fUserLevelsedit.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@UserLevels_Edit.ShowPageHeader()
+@UserLevels_Edit.ShowMessages()
+<form name="fUserLevelsedit" id="fUserLevelsedit" class="@UserLevels_Edit.FormClassName" action="@AppPath(CurrentPageName())" method="post">
+@if (UserLevels_Edit.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="update">
+@if (UserLevels_Edit.IsModal) {
+<input type="hidden" name="modal" value="@ConvertToInt(UserLevels_Edit.IsModal)">
+}
+<div class="ew-edit-div"><!-- page* -->
+@if (UserLevels.UserLevelID.Visible) { // UserLevelID.Visible (begin)
+	<div id="r_UserLevelID" class="form-group row">
+		<label id="elh_UserLevels_UserLevelID" for="x_UserLevelID" class="@UserLevels_Edit.LeftColumnClass">@Html.Raw(UserLevels.UserLevelID.Caption)@Html.Raw(UserLevels.UserLevelID.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@UserLevels_Edit.RightColumnClass"><div @Html.Raw(UserLevels.UserLevelID.CellAttributes)>
+<span id="el_UserLevels_UserLevelID">
+<span @Html.Raw(UserLevels.UserLevelID.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(UserLevels.UserLevelID.EditValue))"></span>
+</span>
+<input type="hidden" data-table="UserLevels" data-field="x_UserLevelID" name="x_UserLevelID" id="x_UserLevelID" value="@UserLevels.UserLevelID.CurrentValue">
+@Html.Raw(UserLevels.UserLevelID.CustomMessage)</div></div>
+	</div>
+} @* UserLevelID.Visible (end) *@
+@if (UserLevels.UserLevelName.Visible) { // UserLevelName.Visible (begin)
+	<div id="r_UserLevelName" class="form-group row">
+		<label id="elh_UserLevels_UserLevelName" for="x_UserLevelName" class="@UserLevels_Edit.LeftColumnClass">@Html.Raw(UserLevels.UserLevelName.Caption)@Html.Raw(UserLevels.UserLevelName.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@UserLevels_Edit.RightColumnClass"><div @Html.Raw(UserLevels.UserLevelName.CellAttributes)>
+<span id="el_UserLevels_UserLevelName">
+<input type="text" data-table="UserLevels" data-field="x_UserLevelName" name="x_UserLevelName" id="x_UserLevelName" size="30" maxlength="255" placeholder="@UserLevels.UserLevelName.PlaceHolder" value="@UserLevels.UserLevelName.EditValue" @Html.Raw(UserLevels.UserLevelName.EditAttributes)>
+</span>
+@Html.Raw(UserLevels.UserLevelName.CustomMessage)</div></div>
+	</div>
+} @* UserLevelName.Visible (end) *@
+</div><!-- /page* -->
+@{ UserLevels_Edit.CloseRecordset(); }
+@if (!UserLevels_Edit.IsModal) {
+@:<div class="form-group row"><!-- buttons .form-group -->
+	@:<div class="@UserLevels_Edit.OffsetColumnClass"><!-- buttons offset -->
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("SaveBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(UserLevels_Edit.ReturnUrl)">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+	@:</div><!-- /buttons offset -->
+@:</div><!-- /buttons .form-group -->
+}
+</form>
+@UserLevels_Edit.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

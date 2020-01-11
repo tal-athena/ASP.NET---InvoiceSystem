@@ -1,0 +1,140 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	UserLevels_Delete.Page_Render();
+
+	// Check action result
+	if (UserLevels_Delete.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "delete";
+var fUserLevelsdelete = currentForm = new ew.Form("fUserLevelsdelete", "delete");
+
+// Form_CustomValidate event
+fUserLevelsdelete.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fUserLevelsdelete.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@UserLevels_Delete.ShowPageHeader()
+@UserLevels_Delete.ShowMessages()
+<form name="fUserLevelsdelete" id="fUserLevelsdelete" class="form-inline ew-form ew-delete-form" action="@AppPath(CurrentPageName())" method="post">
+@if (UserLevels_Delete.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="delete">
+@foreach (string key in UserLevels_Delete.RecordKeys) {
+<input type="hidden" name="key_m" value="@key">
+}
+<div class="card ew-card ew-grid">
+<div class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+<table class="table ew-table">
+	<thead>
+	<tr class="ew-table-header">
+@if (UserLevels.UserLevelID.Visible) { // UserLevelID (begin)
+		<th class="@Html.Raw(UserLevels.UserLevelID.HeaderCellClass)"><span id="elh_UserLevels_UserLevelID" class="UserLevels_UserLevelID">@Html.Raw(UserLevels.UserLevelID.Caption)</span></th>
+} @* UserLevelID.Visible (end) *@
+@if (UserLevels.UserLevelName.Visible) { // UserLevelName (begin)
+		<th class="@Html.Raw(UserLevels.UserLevelName.HeaderCellClass)"><span id="elh_UserLevels_UserLevelName" class="UserLevels_UserLevelName">@Html.Raw(UserLevels.UserLevelName.Caption)</span></th>
+} @* UserLevelName.Visible (end) *@
+	</tr>
+	</thead>
+	<tbody>
+@{ UserLevels_Delete.RecordCount = 0; }
+@while (UserLevels_Delete.Recordset != null && await UserLevels_Delete.Recordset.ReadAsync()) { // DN
+	UserLevels_Delete.RecordCount++;
+	UserLevels_Delete.RowCnt++;
+
+	// Set row properties
+	UserLevels_Delete.ResetAttributes();
+	UserLevels_Delete.RowType = Config.RowTypeView; // View
+
+	// Get the field contents
+	await UserLevels_Delete.LoadRowValues(UserLevels_Delete.Recordset);
+
+	// Render row
+	await UserLevels_Delete.RenderRow();
+	<tr @Html.Raw(UserLevels_Delete.RowAttributes)>
+@if (UserLevels.UserLevelID.Visible) { // UserLevelID (begin)
+		<td @Html.Raw(UserLevels.UserLevelID.CellAttributes)>
+<span id="el@(UserLevels_Delete.RowCnt)_UserLevels_UserLevelID" class="UserLevels_UserLevelID">
+<span @Html.Raw(UserLevels.UserLevelID.ViewAttributes)>
+@Html.Raw(UserLevels.UserLevelID.GetViewValue())</span>
+</span>
+</td>
+} @* UserLevelID.Visible (end) *@
+@if (UserLevels.UserLevelName.Visible) { // UserLevelName (begin)
+		<td @Html.Raw(UserLevels.UserLevelName.CellAttributes)>
+<span id="el@(UserLevels_Delete.RowCnt)_UserLevels_UserLevelName" class="UserLevels_UserLevelName">
+<span @Html.Raw(UserLevels.UserLevelName.ViewAttributes)>
+@Html.Raw(UserLevels.UserLevelName.GetViewValue())</span>
+</span>
+</td>
+} @* UserLevelName.Visible (end) *@
+	</tr>
+}
+@{ UserLevels_Delete.CloseRecordset(); }
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<div class="divconfirmdelete">
+  <div>
+	<label>
+		@Html.Raw(Language.Phrase("askconfirmdelete"))
+	</label>
+  </div>
+</div>
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("DeleteBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(UserLevels_Delete.ReturnUrl)">@Language.Phrase("CancelBtn")</button>
+</div>
+</form>
+@UserLevels_Delete.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

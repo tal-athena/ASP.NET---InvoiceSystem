@@ -1,0 +1,325 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_currency_Edit.Page_Render();
+
+	// Check action result
+	if (s_currency_Edit.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "edit";
+var fs_currencyedit = currentForm = new ew.Form("fs_currencyedit", "edit");
+
+// Validate form
+fs_currencyedit.validate = function() {
+	if (!this.validateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.getForm(), $fobj = $(fobj);
+	if ($fobj.find("#confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.formKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = ["insert", "gridinsert"].includes($fobj.find("#action").val()) && $k[0];
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+	@if (s_currency_Edit.Id.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Id");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.Id.RequiredErrorMessage.Replace("%s", s_currency.Id.Caption)))");
+		</text>
+	}
+	@if (s_currency_Edit.CurrencyCode.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_CurrencyCode");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.CurrencyCode.RequiredErrorMessage.Replace("%s", s_currency.CurrencyCode.Caption)))");
+		</text>
+	}
+	@if (s_currency_Edit.CurrencyName.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_CurrencyName");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.CurrencyName.RequiredErrorMessage.Replace("%s", s_currency.CurrencyName.Caption)))");
+		</text>
+	}
+	@if (s_currency_Edit.PrimaryCurrency.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_PrimaryCurrency");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.PrimaryCurrency.RequiredErrorMessage.Replace("%s", s_currency.PrimaryCurrency.Caption)))");
+		</text>
+	}
+	@if (s_currency_Edit.Rate.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Rate");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.Rate.RequiredErrorMessage.Replace("%s", s_currency.Rate.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_Rate");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.Rate.ErrorMessage))");
+	@if (s_currency_Edit.DisplayLocale.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_DisplayLocale");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.DisplayLocale.RequiredErrorMessage.Replace("%s", s_currency.DisplayLocale.Caption)))");
+		</text>
+	}
+	@if (s_currency_Edit.CustomFormatting.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_CustomFormatting");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.CustomFormatting.RequiredErrorMessage.Replace("%s", s_currency.CustomFormatting.Caption)))");
+		</text>
+	}
+	@if (s_currency_Edit.Published.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Published");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.Published.RequiredErrorMessage.Replace("%s", s_currency.Published.Caption)))");
+		</text>
+	}
+	@if (s_currency_Edit.UpdatedOnUtc.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_UpdatedOnUtc");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.UpdatedOnUtc.RequiredErrorMessage.Replace("%s", s_currency.UpdatedOnUtc.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_UpdatedOnUtc");
+		if (elm && !ew.checkDateDef(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.UpdatedOnUtc.ErrorMessage))");
+	@if (s_currency_Edit.RoundingTypeId.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_RoundingTypeId");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.RoundingTypeId.RequiredErrorMessage.Replace("%s", s_currency.RoundingTypeId.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_RoundingTypeId");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.RoundingTypeId.ErrorMessage))");
+	@if (s_currency_Edit.DisplayOrder.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_DisplayOrder");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.DisplayOrder.RequiredErrorMessage.Replace("%s", s_currency.DisplayOrder.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_DisplayOrder");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_currency.DisplayOrder.ErrorMessage))");
+
+		// Fire Form_CustomValidate event
+		if (!this.Form_CustomValidate(fobj))
+			return false;
+	}
+
+	// Process detail forms
+	var dfs = $fobj.find("input[name='detailpage']").get();
+	for (var i = 0; i < dfs.length; i++) {
+		var df = dfs[i], val = df.value;
+		if (val && ew.forms[val])
+			if (!ew.forms[val].validate())
+				return false;
+	}
+	return true;
+}
+
+// Form_CustomValidate event
+fs_currencyedit.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_currencyedit.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_currencyedit.lists["x_PrimaryCurrency"] = @Html.Raw(s_currency_Edit.PrimaryCurrency.Lookup.ToClientList());
+fs_currencyedit.lists["x_PrimaryCurrency"].options = @Html.Raw(ConvertToJson(s_currency_Edit.PrimaryCurrency.Options(false))); // DN
+fs_currencyedit.lists["x_Published"] = @Html.Raw(s_currency_Edit.Published.Lookup.ToClientList());
+fs_currencyedit.lists["x_Published"].options = @Html.Raw(ConvertToJson(s_currency_Edit.Published.Options(false))); // DN
+
+// Form object for search
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_currency_Edit.ShowPageHeader()
+@s_currency_Edit.ShowMessages()
+<form name="fs_currencyedit" id="fs_currencyedit" class="@s_currency_Edit.FormClassName" action="@AppPath(CurrentPageName())" method="post">
+@if (s_currency_Edit.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="update">
+@if (s_currency_Edit.IsModal) {
+<input type="hidden" name="modal" value="@ConvertToInt(s_currency_Edit.IsModal)">
+}
+<div class="ew-edit-div"><!-- page* -->
+@if (s_currency.Id.Visible) { // Id.Visible (begin)
+	<div id="r_Id" class="form-group row">
+		<label id="elh_s_currency_Id" class="@s_currency_Edit.LeftColumnClass">@Html.Raw(s_currency.Id.Caption)@Html.Raw(s_currency.Id.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_currency_Edit.RightColumnClass"><div @Html.Raw(s_currency.Id.CellAttributes)>
+<span id="el_s_currency_Id">
+<span @Html.Raw(s_currency.Id.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_currency.Id.EditValue))"></span>
+</span>
+<input type="hidden" data-table="s_currency" data-field="x_Id" name="x_Id" id="x_Id" value="@s_currency.Id.CurrentValue">
+@Html.Raw(s_currency.Id.CustomMessage)</div></div>
+	</div>
+} @* Id.Visible (end) *@
+@if (s_currency.CurrencyCode.Visible) { // CurrencyCode.Visible (begin)
+	<div id="r_CurrencyCode" class="form-group row">
+		<label id="elh_s_currency_CurrencyCode" for="x_CurrencyCode" class="@s_currency_Edit.LeftColumnClass">@Html.Raw(s_currency.CurrencyCode.Caption)@Html.Raw(s_currency.CurrencyCode.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_currency_Edit.RightColumnClass"><div @Html.Raw(s_currency.CurrencyCode.CellAttributes)>
+<span id="el_s_currency_CurrencyCode">
+<input type="text" data-table="s_currency" data-field="x_CurrencyCode" name="x_CurrencyCode" id="x_CurrencyCode" size="30" maxlength="5" placeholder="@s_currency.CurrencyCode.PlaceHolder" value="@s_currency.CurrencyCode.EditValue" @Html.Raw(s_currency.CurrencyCode.EditAttributes)>
+</span>
+@Html.Raw(s_currency.CurrencyCode.CustomMessage)</div></div>
+	</div>
+} @* CurrencyCode.Visible (end) *@
+@if (s_currency.CurrencyName.Visible) { // CurrencyName.Visible (begin)
+	<div id="r_CurrencyName" class="form-group row">
+		<label id="elh_s_currency_CurrencyName" for="x_CurrencyName" class="@s_currency_Edit.LeftColumnClass">@Html.Raw(s_currency.CurrencyName.Caption)@Html.Raw(s_currency.CurrencyName.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_currency_Edit.RightColumnClass"><div @Html.Raw(s_currency.CurrencyName.CellAttributes)>
+<span id="el_s_currency_CurrencyName">
+<input type="text" data-table="s_currency" data-field="x_CurrencyName" name="x_CurrencyName" id="x_CurrencyName" size="30" maxlength="50" placeholder="@s_currency.CurrencyName.PlaceHolder" value="@s_currency.CurrencyName.EditValue" @Html.Raw(s_currency.CurrencyName.EditAttributes)>
+</span>
+@Html.Raw(s_currency.CurrencyName.CustomMessage)</div></div>
+	</div>
+} @* CurrencyName.Visible (end) *@
+@if (s_currency.PrimaryCurrency.Visible) { // PrimaryCurrency.Visible (begin)
+	<div id="r_PrimaryCurrency" class="form-group row">
+		<label id="elh_s_currency_PrimaryCurrency" class="@s_currency_Edit.LeftColumnClass">@Html.Raw(s_currency.PrimaryCurrency.Caption)@Html.Raw(s_currency.PrimaryCurrency.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_currency_Edit.RightColumnClass"><div @Html.Raw(s_currency.PrimaryCurrency.CellAttributes)>
+<span id="el_s_currency_PrimaryCurrency">
+<input type="checkbox" data-table="s_currency" data-field="x_PrimaryCurrency" name="x_PrimaryCurrency" id="x_PrimaryCurrency" value="1" checked="@ConvertToBool(s_currency.PrimaryCurrency.CurrentValue)" @Html.Raw(s_currency.PrimaryCurrency.EditAttributes)>
+</span>
+@Html.Raw(s_currency.PrimaryCurrency.CustomMessage)</div></div>
+	</div>
+} @* PrimaryCurrency.Visible (end) *@
+@if (s_currency.Rate.Visible) { // Rate.Visible (begin)
+	<div id="r_Rate" class="form-group row">
+		<label id="elh_s_currency_Rate" for="x_Rate" class="@s_currency_Edit.LeftColumnClass">@Html.Raw(s_currency.Rate.Caption)@Html.Raw(s_currency.Rate.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_currency_Edit.RightColumnClass"><div @Html.Raw(s_currency.Rate.CellAttributes)>
+<span id="el_s_currency_Rate">
+<input type="text" data-table="s_currency" data-field="x_Rate" name="x_Rate" id="x_Rate" size="30" placeholder="@s_currency.Rate.PlaceHolder" value="@s_currency.Rate.EditValue" @Html.Raw(s_currency.Rate.EditAttributes)>
+</span>
+@Html.Raw(s_currency.Rate.CustomMessage)</div></div>
+	</div>
+} @* Rate.Visible (end) *@
+@if (s_currency.DisplayLocale.Visible) { // DisplayLocale.Visible (begin)
+	<div id="r_DisplayLocale" class="form-group row">
+		<label id="elh_s_currency_DisplayLocale" for="x_DisplayLocale" class="@s_currency_Edit.LeftColumnClass">@Html.Raw(s_currency.DisplayLocale.Caption)@Html.Raw(s_currency.DisplayLocale.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_currency_Edit.RightColumnClass"><div @Html.Raw(s_currency.DisplayLocale.CellAttributes)>
+<span id="el_s_currency_DisplayLocale">
+<input type="text" data-table="s_currency" data-field="x_DisplayLocale" name="x_DisplayLocale" id="x_DisplayLocale" size="30" maxlength="50" placeholder="@s_currency.DisplayLocale.PlaceHolder" value="@s_currency.DisplayLocale.EditValue" @Html.Raw(s_currency.DisplayLocale.EditAttributes)>
+</span>
+@Html.Raw(s_currency.DisplayLocale.CustomMessage)</div></div>
+	</div>
+} @* DisplayLocale.Visible (end) *@
+@if (s_currency.CustomFormatting.Visible) { // CustomFormatting.Visible (begin)
+	<div id="r_CustomFormatting" class="form-group row">
+		<label id="elh_s_currency_CustomFormatting" for="x_CustomFormatting" class="@s_currency_Edit.LeftColumnClass">@Html.Raw(s_currency.CustomFormatting.Caption)@Html.Raw(s_currency.CustomFormatting.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_currency_Edit.RightColumnClass"><div @Html.Raw(s_currency.CustomFormatting.CellAttributes)>
+<span id="el_s_currency_CustomFormatting">
+<input type="text" data-table="s_currency" data-field="x_CustomFormatting" name="x_CustomFormatting" id="x_CustomFormatting" size="30" maxlength="50" placeholder="@s_currency.CustomFormatting.PlaceHolder" value="@s_currency.CustomFormatting.EditValue" @Html.Raw(s_currency.CustomFormatting.EditAttributes)>
+</span>
+@Html.Raw(s_currency.CustomFormatting.CustomMessage)</div></div>
+	</div>
+} @* CustomFormatting.Visible (end) *@
+@if (s_currency.Published.Visible) { // Published.Visible (begin)
+	<div id="r_Published" class="form-group row">
+		<label id="elh_s_currency_Published" class="@s_currency_Edit.LeftColumnClass">@Html.Raw(s_currency.Published.Caption)@Html.Raw(s_currency.Published.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_currency_Edit.RightColumnClass"><div @Html.Raw(s_currency.Published.CellAttributes)>
+<span id="el_s_currency_Published">
+<input type="checkbox" data-table="s_currency" data-field="x_Published" name="x_Published" id="x_Published" value="1" checked="@ConvertToBool(s_currency.Published.CurrentValue)" @Html.Raw(s_currency.Published.EditAttributes)>
+</span>
+@Html.Raw(s_currency.Published.CustomMessage)</div></div>
+	</div>
+} @* Published.Visible (end) *@
+@if (s_currency.UpdatedOnUtc.Visible) { // UpdatedOnUtc.Visible (begin)
+	<div id="r_UpdatedOnUtc" class="form-group row">
+		<label id="elh_s_currency_UpdatedOnUtc" for="x_UpdatedOnUtc" class="@s_currency_Edit.LeftColumnClass">@Html.Raw(s_currency.UpdatedOnUtc.Caption)@Html.Raw(s_currency.UpdatedOnUtc.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_currency_Edit.RightColumnClass"><div @Html.Raw(s_currency.UpdatedOnUtc.CellAttributes)>
+<span id="el_s_currency_UpdatedOnUtc">
+<input type="text" data-table="s_currency" data-field="x_UpdatedOnUtc" name="x_UpdatedOnUtc" id="x_UpdatedOnUtc" placeholder="@s_currency.UpdatedOnUtc.PlaceHolder" value="@s_currency.UpdatedOnUtc.EditValue" @Html.Raw(s_currency.UpdatedOnUtc.EditAttributes)>
+</span>
+@Html.Raw(s_currency.UpdatedOnUtc.CustomMessage)</div></div>
+	</div>
+} @* UpdatedOnUtc.Visible (end) *@
+@if (s_currency.RoundingTypeId.Visible) { // RoundingTypeId.Visible (begin)
+	<div id="r_RoundingTypeId" class="form-group row">
+		<label id="elh_s_currency_RoundingTypeId" for="x_RoundingTypeId" class="@s_currency_Edit.LeftColumnClass">@Html.Raw(s_currency.RoundingTypeId.Caption)@Html.Raw(s_currency.RoundingTypeId.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_currency_Edit.RightColumnClass"><div @Html.Raw(s_currency.RoundingTypeId.CellAttributes)>
+<span id="el_s_currency_RoundingTypeId">
+<input type="text" data-table="s_currency" data-field="x_RoundingTypeId" name="x_RoundingTypeId" id="x_RoundingTypeId" size="30" placeholder="@s_currency.RoundingTypeId.PlaceHolder" value="@s_currency.RoundingTypeId.EditValue" @Html.Raw(s_currency.RoundingTypeId.EditAttributes)>
+</span>
+@Html.Raw(s_currency.RoundingTypeId.CustomMessage)</div></div>
+	</div>
+} @* RoundingTypeId.Visible (end) *@
+@if (s_currency.DisplayOrder.Visible) { // DisplayOrder.Visible (begin)
+	<div id="r_DisplayOrder" class="form-group row">
+		<label id="elh_s_currency_DisplayOrder" for="x_DisplayOrder" class="@s_currency_Edit.LeftColumnClass">@Html.Raw(s_currency.DisplayOrder.Caption)@Html.Raw(s_currency.DisplayOrder.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_currency_Edit.RightColumnClass"><div @Html.Raw(s_currency.DisplayOrder.CellAttributes)>
+<span id="el_s_currency_DisplayOrder">
+<input type="text" data-table="s_currency" data-field="x_DisplayOrder" name="x_DisplayOrder" id="x_DisplayOrder" size="30" placeholder="@s_currency.DisplayOrder.PlaceHolder" value="@s_currency.DisplayOrder.EditValue" @Html.Raw(s_currency.DisplayOrder.EditAttributes)>
+</span>
+@Html.Raw(s_currency.DisplayOrder.CustomMessage)</div></div>
+	</div>
+} @* DisplayOrder.Visible (end) *@
+</div><!-- /page* -->
+@{ s_currency_Edit.CloseRecordset(); }
+@if (!s_currency_Edit.IsModal) {
+@:<div class="form-group row"><!-- buttons .form-group -->
+	@:<div class="@s_currency_Edit.OffsetColumnClass"><!-- buttons offset -->
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("SaveBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_currency_Edit.ReturnUrl)">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+	@:</div><!-- /buttons offset -->
+@:</div><!-- /buttons .form-group -->
+}
+</form>
+@s_currency_Edit.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

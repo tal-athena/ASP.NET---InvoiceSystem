@@ -1,0 +1,500 @@
+/* */
+/* Wilson 2019 06 08*/
+/* Style.CSS */
+/* Override some of the standard CSS */
+
+/*Change body font*/
+body {
+    font-family: "@Arial Unicode MS", "Arial", "sans-serif", "Apple Color Emoji",
+				 "Helvetica Neue",Helvetica,Arial,sans-serif;
+    
+	font-size: 1rem;
+    
+	line-height: 1rem;
+	color: #495057;
+		
+} 
+
+body, html {
+height: 100%;
+}
+
+.ew-desktop {
+    width: inherit;
+}
+ 
+.ew-view-form {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/*text box overflow end text show ellipsis (...) */
+.md-form .form-control {
+	text-overflow: ellipsis;
+	font-size: 1rem;
+}
+
+/*Input text line after*/
+.md-form {
+	padding-bottom: 2px;
+}
+.navbar-expand {
+  position: fixed !important;
+  width: -webkit-fill-available;
+}
+
+/* Navigator and Side bar font*/ 
+.navbar.navbar-dark .breadcrumb .nav-item .nav-link, .navbar.navbar-dark .navbar-nav .nav-item .nav-link {
+	font-size: 1rem;
+}
+
+/*Change main Nav backgroud color*/
+.bg-success {
+    background-color:  #91c5ec !important; 
+}
+
+/*Indent sidebar menu expand tree and font*/
+.nav-sidebar .nav-treeview {
+	padding-left: 14px;
+	font-size: medium;
+}
+
+.nav-sidebar {
+	font-size: medium;
+}
+
+/* Nav dropdown menu */ 
+.dropdown .dropdown-menu {
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -ms-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+
+    max-height: 0;
+    display: block;
+    overflow: hidden;
+    opacity: 0;
+}
+
+.dropdown.show .dropdown-menu {
+    max-height: 200px;
+	min-width:15rem;	 
+    opacity: 1;
+}
+
+.dropdown-item.active, .dropdown-item:active {
+    color: #fff;
+    text-decoration: underline;
+    background-color:  #91c5ec !important;
+}
+
+/*Upper right top Brand area*/
+.brand-link {
+    padding: .83594rem .5rem;
+    font-size: 1.09375rem;
+    display: block;
+    line-height: 4.5;
+    white-space: nowrap;
+}
+
+/*set custom-template width in View Page to 100%*/
+.ew-custom-template, .ew-custom-template-page, .ew-custom-template-search {
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+/*Main content backgroud color*/
+.content-wrapper {
+  background-color:#FAF9F9; }
+
+/*Page Header caption*/
+.content-header h1 {
+	font-size: 1.5rem;
+	margin: 0;
+	padding-top: 12px;
+}
+
+.content-header {
+    padding: -1px .5rem;
+    padding-right: 20px;
+	height: 85px;
+}
+
+/*top pager "+" and pager option */
+.ew-add-edit-option {
+    margin-top: 0px;
+    margin-left: 8px;
+}
+
+/*Grid in List Page*/
+.ew-grid {
+	padding: 0;
+	border: 1px solid #aca899;
+	border-top: 1px solid #aca899;
+	margin-bottom: 1rem;
+	display: contents;
+	width: auto !important;
+}
+
+/*Pager bar in Grid in List Page*/
+.ew-grid-upper-panel.card-header {  
+    background-color: gainsboro;  /*#b7d8dc;*/  
+	display: inherit;
+	height: 50px;  
+ } 
+ 
+/*Table header*/
+.ew-table-header, .ew-table-header, .ew-table-header-btn, .ewjtable-column-header-container {
+	font-weight: bold;
+	background-color: gainsboro; /*#b7d8dc;*/
+	padding: 0.5rem;
+}
+/*Grid Table header*/
+.ew-grid .ew-table > thead > tr > th, .ew-grid .ew-table > thead > tr > td {
+	background-color: gainsboro; /*#b7d8dc;*/
+}
+
+/*The pager text box*/
+.ew-pager .input-group>input.form-control[name=pageno] {
+    width: 6em;
+    margin-top: 6px;
+}
+
+/*Table bottom row border*/
+.ew-grid .ew-table>tbody:last-child>tr:last-child>td, .ew-grid .ew-table>tfoot>tr:last-child>td, .ew-grid .ew-table td.ew-table-last-row {
+    border-bottom: 1;
+}
+
+/*Grid input color */
+.ew-grid .ew-table .ew-table-edit-row > td {
+	background-color: #f8f9fa;
+	color: inherit;
+}
+.ew-grid .ew-table .ew-table-select-row > td {
+	background-color: rgba(0,0,0,.15);
+	color: #fff;
+}
+/* Select/dropdown box in Add/Edit*/
+.input-group > .custom-file, .input-group > .custom-select, .input-group > .form-control {
+    position: relative;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    width: 1%;
+    margin-bottom: 0;
+    background-color:  Transparent;
+}
+
+/*Grid Input row/column*/
+.ew-form.ew-horizontal .ew-table .form-group {
+	margin-left: 0;
+	margin-right: 0;
+	margin-bottom: -7px;
+}
+
+/* Add/Edit Page to use up 100% width */
+ @media(min-width:576px) and (min-width:768px) {
+	.offset-sm-2 {
+    margin-left: 5%;
+	}
+	.ew-form:not(.ew-list-form):not(.ew-pager-form), table.ew-master-table.ew-vertical {
+		/*width: 800px*/
+		width: 100% ;
+	}	
+}
+
+
+@media (min-width: 576px) {
+	.form-inline .form-control {
+		display: inline-block;
+		width: -webkit-fill-available;
+		vertical-align: middle;
+	}
+}
+/* Custome template card body, adjust display to fill all spaces */
+ @media(min-width:1200px){
+  .container {
+    max-width: 100%;
+  }
+}
+
+/* Custome template card body, adjust display to fill all spaces */
+@media (min-width: 768px){
+  .container {
+    max-width: 100%;
+  }
+  
+  .breadcrumb {
+	margin-top:40px;
+  }
+
+  .col-md-6 {
+		margin-bottom: 0rem;
+	}
+	
+	/*adjust row to fit responsive an mobile layout*/
+	.row {	
+		margin-right: -25px;
+		margin-left: -18px;
+	}
+}
+
+@media only screen and (max-width: 400px) {
+   .card-body {
+    display: contents;
+  }	
+   .breadcrumb {
+	margin-top:12px;
+  }
+}
+ 
+.container-fluid {
+    width: 100%;
+    padding-right: 7.5px;
+    padding-left: 7.5px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 35px;
+    /* display: contents; */
+}
+
+/*table colomn width for List Options */
+.ew-list-option-body{
+  min-width:25px;
+  max-width:30px;
+  
+}
+
+/* Text box's attribute View Page */
+.viewtextbox {
+	margin-top: 8px;
+	margin-bottom: 12px;
+	margin-left: 5px;
+	border-bottom-color: #dddddd;
+	border-bottom-width: 1px;
+	border-bottom-style: dashed;
+}
+
+/* Add/Edit/View Page adjust card body top higher */
+.coltopadj {
+	margin-top: -1px !important;
+}
+
+
+/* Add/Edit/View Page adjust card column top higher */
+.rowtopadj {
+	margin-top: -1px !important;
+}
+
+/* Text box's attribute View Page */
+.rowpt5topadj{
+	 padding-top: 1rem !important;
+}
+
+/* Font Awesome adjust */ 
+/* .fa { */
+	/* display: inline-block; */
+	/* font: normal normal normal 14px/1 FontAwesome; */
+	/* font-size: auto; */
+	/* text-rendering: auto; */
+	/* -webkit-font-smoothing: antialiased; */
+	/* -moz-osx-font-smoothing: grayscale; */
+/* }  */
+
+.fa-asterisk:before {
+    content: "\f069";
+	font: normal normal normal 9px/1 FontAwesome;
+}
+
+
+/*pager form */
+.ew-pager .input-group>input.form-control[name=pageno] {
+    width: 6em;
+    margin-top: 6px;
+}
+
+.ew-grid .ew-table>tbody>tr>td, .ew-grid .ew-table>tfoot>tr>td {
+    padding: .1rem;
+    border-bottom: 1px solid;
+    border-top: 0;
+    border-left: 0;
+    border-right: 1px solid;
+    border-color: #c2d4da;
+    line-height: 30px;
+ }
+
+ .ew-btn-dropdown {
+    min-width: calc(0.25rem * 2 + 1rem + 0.3em * 2 + 2px);
+    padding: -1.7rem;
+}
+/* Dropdown button link in list-form */
+.ew-list-option-body .btn-group>.btn {
+    float: none;
+    width: fit-content;
+}
+ 
+/* command button */
+.btn-group .btn {
+    margin: 5px;
+    height: 28px;
+    width: 31px;
+}
+ .btn-group>.btn:not(:last-child):not(.dropdown-toggle), .btn-group>.btn-group:not(:last-child)>.btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    /* margin: 2px; */
+    margin-right: 5px;
+    }
+
+.input-group > .input-group-append > .btn, .input-group > .input-group-append > .input-group-text, .input-group > .input-group-prepend:first-child > .btn:not(:first-child), .input-group > .input-group-prepend:first-child > .input-group-text:not(:first-child), .input-group > .input-group-prepend:not(:first-child) > .btn, .input-group > .input-group-prepend:not(:first-child) > .input-group-text {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    width: 28px;
+    height: 24px;
+}
+.input-group > .input-group-append:last-child > .btn:not(:last-child):not(.dropdown-toggle), .input-group > .input-group-append:last-child > .input-group-text:not(:last-child), .input-group > .input-group-append:not(:last-child) > .btn, .input-group > .input-group-append:not(:last-child) > .input-group-text, .input-group > .input-group-prepend > .btn, .input-group > .input-group-prepend > .input-group-text {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+	   width: 28px;
+    height: 24px;
+}
+
+/*make pager size small*/
+.ew-pager .input-group>input.form-control[name=pageno] {
+    width: 3em;
+    margin-top: 4px;
+    font-size: small;
+}
+.ew-pager {
+    padding-right: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    width: auto;
+    align-items: center;
+    direction: ltr;
+	font-size: small;
+}
+ 
+/*the filter toolbar*/
+.btn-toolbar {
+    height: 42px;
+}
+
+/* command button */
+.btn-group .btn {
+    margin: 5px;
+    height: 28px;
+    width: auto;
+}
+ .btn-group>.btn:not(:last-child):not(.dropdown-toggle), .btn-group>.btn-group:not(:last-child)>.btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    /* margin: 2px; */
+    margin-right: 5px;
+    }
+
+/*Custom dropdown style*/	
+.input-group > .custom-file, .input-group > .custom-select, .input-group > .form-control {
+    position: relative;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    width: 1%;
+    margin-bottom: 5px;
+    background-color: Transparent;
+    border: none;
+    border-bottom-color: #dddddd;
+	border-bottom-width: 1px;
+	border-bottom-style: dashed;
+}
+
+/*added div in delete page before DELETE/CANCEL button*/
+.divconfirmdelete {
+	margin-top: 15px;
+	font-size: 15px;
+	color:red;
+	height:38px;
+	
+}
+
+/*Search button*/
+button#btn-submit {
+    width: auto;
+    height: auto;
+}
+
+/*Dropdown toggle (beside search button)*/
+button.btn.btn-primary.dropdown-toggle.dropdown-toggle-split {
+    height: auto;
+    width: auto;	
+}
+
+/*Date picker*/
+.input-group.date {
+    width: fit-content;
+}
+
+button.btn.btn-default.datepickerbutton {
+    padding-left: 7px;
+    margin-top: -3px;
+}
+
+/*button lookup*/
+button.ew-lookup-btn.btn.btn-default {
+    padding-left: 7px;
+    padding-top: 4px;
+}
+
+/*Field label at ADD/Edit/View Pages*/
+.captionstyle{
+	font-style: italic;
+	font-size: 0.8rem;
+	color: gray;
+}
+
+/*Check box, make it larger*/
+input[type=checkbox], input[type=radio] {
+  
+    width: 20px;
+	height: 20px;
+
+}
+
+/* radio/check box outter div style */
+.checkboxgroupdiv {
+	margin-top: 0px;
+	padding-block-start: 15px;
+	margin-bottom: 5px;
+	border-color: #dddddd;
+	border-width: 1px;
+	border-style: dashed;
+}
+
+.checkboxgroupdivtext-header {
+	margin-top: -30px;
+	margin-left: -18px;
+}
+
+/*image icon in list page*/
+.img_view {
+    vertical-align: middle;
+    border-style: none;
+	margin-left: 5px;
+	margin-top:-2px;
+	width: 20px;
+	height:20px;
+}
+
+/*fa check list page*/
+.green-fa-check {
+	/* content: "fa fa-check-circle"; */
+    margin-left: 10px;
+	margin-top:-2px;
+	font-size:22px;
+	color:green;
+}
+
+.rgba-gradient {
+	background: -moz-linear-gradient(45deg, rgba(213, 15, 61, 0.6), rgba(13, 17, 198, 0.69) 100%);
+	background: -webkit-linear-gradient(45deg, rgba(213, 15, 61, 0.6), rgba(13, 17, 198, 0.69) 100%);
+	background: linear-gradient(to 45deg, rgba(213, 15, 61, 0.6), rgba(13, 17, 198, 0.69) 100%);
+}

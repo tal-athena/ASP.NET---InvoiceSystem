@@ -1,0 +1,151 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	UserLevelPermissions_Delete.Page_Render();
+
+	// Check action result
+	if (UserLevelPermissions_Delete.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "delete";
+var fUserLevelPermissionsdelete = currentForm = new ew.Form("fUserLevelPermissionsdelete", "delete");
+
+// Form_CustomValidate event
+fUserLevelPermissionsdelete.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fUserLevelPermissionsdelete.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@UserLevelPermissions_Delete.ShowPageHeader()
+@UserLevelPermissions_Delete.ShowMessages()
+<form name="fUserLevelPermissionsdelete" id="fUserLevelPermissionsdelete" class="form-inline ew-form ew-delete-form" action="@AppPath(CurrentPageName())" method="post">
+@if (UserLevelPermissions_Delete.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="delete">
+@foreach (string[] key in UserLevelPermissions_Delete.RecordKeys) {
+<input type="hidden" name="key_m" value="@String.Join(Config.CompositeKeySeparator, key)">
+}
+<div class="card ew-card ew-grid">
+<div class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+<table class="table ew-table">
+	<thead>
+	<tr class="ew-table-header">
+@if (UserLevelPermissions.UserLevelID.Visible) { // UserLevelID (begin)
+		<th class="@Html.Raw(UserLevelPermissions.UserLevelID.HeaderCellClass)"><span id="elh_UserLevelPermissions_UserLevelID" class="UserLevelPermissions_UserLevelID">@Html.Raw(UserLevelPermissions.UserLevelID.Caption)</span></th>
+} @* UserLevelID.Visible (end) *@
+@if (UserLevelPermissions._TableName.Visible) { // TableName (begin)
+		<th class="@Html.Raw(UserLevelPermissions._TableName.HeaderCellClass)"><span id="elh_UserLevelPermissions__TableName" class="UserLevelPermissions__TableName">@Html.Raw(UserLevelPermissions._TableName.Caption)</span></th>
+} @* _TableName.Visible (end) *@
+@if (UserLevelPermissions.Permission.Visible) { // Permission (begin)
+		<th class="@Html.Raw(UserLevelPermissions.Permission.HeaderCellClass)"><span id="elh_UserLevelPermissions_Permission" class="UserLevelPermissions_Permission">@Html.Raw(UserLevelPermissions.Permission.Caption)</span></th>
+} @* Permission.Visible (end) *@
+	</tr>
+	</thead>
+	<tbody>
+@{ UserLevelPermissions_Delete.RecordCount = 0; }
+@while (UserLevelPermissions_Delete.Recordset != null && await UserLevelPermissions_Delete.Recordset.ReadAsync()) { // DN
+	UserLevelPermissions_Delete.RecordCount++;
+	UserLevelPermissions_Delete.RowCnt++;
+
+	// Set row properties
+	UserLevelPermissions_Delete.ResetAttributes();
+	UserLevelPermissions_Delete.RowType = Config.RowTypeView; // View
+
+	// Get the field contents
+	await UserLevelPermissions_Delete.LoadRowValues(UserLevelPermissions_Delete.Recordset);
+
+	// Render row
+	await UserLevelPermissions_Delete.RenderRow();
+	<tr @Html.Raw(UserLevelPermissions_Delete.RowAttributes)>
+@if (UserLevelPermissions.UserLevelID.Visible) { // UserLevelID (begin)
+		<td @Html.Raw(UserLevelPermissions.UserLevelID.CellAttributes)>
+<span id="el@(UserLevelPermissions_Delete.RowCnt)_UserLevelPermissions_UserLevelID" class="UserLevelPermissions_UserLevelID">
+<span @Html.Raw(UserLevelPermissions.UserLevelID.ViewAttributes)>
+@Html.Raw(UserLevelPermissions.UserLevelID.GetViewValue())</span>
+</span>
+</td>
+} @* UserLevelID.Visible (end) *@
+@if (UserLevelPermissions._TableName.Visible) { // TableName (begin)
+		<td @Html.Raw(UserLevelPermissions._TableName.CellAttributes)>
+<span id="el@(UserLevelPermissions_Delete.RowCnt)_UserLevelPermissions__TableName" class="UserLevelPermissions__TableName">
+<span @Html.Raw(UserLevelPermissions._TableName.ViewAttributes)>
+@Html.Raw(UserLevelPermissions._TableName.GetViewValue())</span>
+</span>
+</td>
+} @* _TableName.Visible (end) *@
+@if (UserLevelPermissions.Permission.Visible) { // Permission (begin)
+		<td @Html.Raw(UserLevelPermissions.Permission.CellAttributes)>
+<span id="el@(UserLevelPermissions_Delete.RowCnt)_UserLevelPermissions_Permission" class="UserLevelPermissions_Permission">
+<span @Html.Raw(UserLevelPermissions.Permission.ViewAttributes)>
+@Html.Raw(UserLevelPermissions.Permission.GetViewValue())</span>
+</span>
+</td>
+} @* Permission.Visible (end) *@
+	</tr>
+}
+@{ UserLevelPermissions_Delete.CloseRecordset(); }
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<div class="divconfirmdelete">
+  <div>
+	<label>
+		@Html.Raw(Language.Phrase("askconfirmdelete"))
+	</label>
+  </div>
+</div>
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("DeleteBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(UserLevelPermissions_Delete.ReturnUrl)">@Language.Phrase("CancelBtn")</button>
+</div>
+</form>
+@UserLevelPermissions_Delete.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

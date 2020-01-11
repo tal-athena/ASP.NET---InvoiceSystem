@@ -1,0 +1,396 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_services_List.Page_Render();
+
+	// Check action result
+	if (s_services_List.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_services.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "list";
+var fs_serviceslist = currentForm = new ew.Form("fs_serviceslist", "list");
+fs_serviceslist.formKeyCountName = "@s_services_List.FormKeyCountName";
+
+// Form_CustomValidate event
+fs_serviceslist.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_serviceslist.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+var fs_serviceslistsrch = currentSearchForm = new ew.Form("fs_serviceslistsrch");
+
+// Filters
+fs_serviceslistsrch.filterList = @Html.Raw(await s_services_List.GetFilterList());
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_services.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+@if (s_services_List.TotalRecords > 0 && s_services_List.ExportOptions.Visible) {
+	s_services_List.ExportOptions.Render("body");
+}
+@if (s_services_List.ImportOptions.Visible) {
+	s_services_List.ImportOptions.Render("body");
+}
+@if (s_services_List.SearchOptions.Visible) {
+	s_services_List.SearchOptions.Render("body");
+}
+@if (s_services_List.FilterOptions.Visible) {
+	s_services_List.FilterOptions.Render("body");
+}
+<div class="clearfix"></div>
+</div>
+}
+@{ s_services_List.RenderOtherOptions(); }
+@if (Security.CanSearch) {
+if (!s_services_List.IsExport() && Empty(s_services_List.CurrentAction)) { // Begin search form
+<form name="fs_serviceslistsrch" id="fs_serviceslistsrch" class="form-inline ew-form ew-ext-search-form" action="@AppPath(CurrentPageName())">
+<div id="fs_serviceslistsrch-search-panel" class="ew-search-panel collapse@(!Empty(s_services_List.SearchWhere) ? " show" : " show")">
+<input type="hidden" name="cmd" value="search">
+<div class="ew-basic-search">
+<div id="xsr_1" class="ew-row d-sm-flex">
+	<div class="ew-quick-search input-group">
+	<input type="text" name="@Config.TableBasicSearch" id="@Config.TableBasicSearch" class="form-control" value="@s_services_List.BasicSearch.SessionKeyword" placeholder="@Language.Phrase("Search")">
+	<input type="hidden" name="@Config.TableBasicSearchType" id="@Config.TableBasicSearchType" value="@s_services_List.BasicSearch.SessionType">
+	<div class="input-group-append">
+		<button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit">@Html.Raw(Language.Phrase("SearchBtn"))</button>
+		<button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype">@Html.Raw(s_services_List.BasicSearch.TypeNameShort)</span></button>
+		<div class="dropdown-menu dropdown-menu-right">
+			<a class="dropdown-item @((s_services_List.BasicSearch.SessionType == "") ? " active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this)">@Html.Raw(Language.Phrase("QuickSearchAuto"))</a>
+			<a class="dropdown-item @((s_services_List.BasicSearch.SessionType == "=") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'=')">@Html.Raw(Language.Phrase("QuickSearchExact"))</a>
+			<a class="dropdown-item @((s_services_List.BasicSearch.SessionType == "AND") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'AND')">@Html.Raw(Language.Phrase("QuickSearchAll"))</a>
+			<a class="dropdown-item @((s_services_List.BasicSearch.SessionType == "OR") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'OR')">@Html.Raw(Language.Phrase("QuickSearchAny"))</a>
+		</div>
+	</div>
+	</div>
+</div>
+</div>
+</div>
+</form>
+} @* End search form *@
+}
+@s_services_List.ShowPageHeader()
+@s_services_List.ShowMessages()
+@if (s_services_List.TotalRecords > 0 || s_services_List.CurrentAction != "") {
+<div class="card ew-card ew-grid@(s_services_List.IsAddOrEdit ? " ew-grid-add-edit" : "") s_services">
+<form name="fs_serviceslist" id="fs_serviceslist" class="form-inline ew-form ew-list-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_services_List.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<div id="gmp_s_services" class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+@if (s_services_List.TotalRecords > 0 || s_services.IsGridEdit) { // Begin If TotalRecords > 0
+<table id="tbl_s_serviceslist" class="table ew-table"><!-- .ew-table -->
+<thead>
+	<tr class="ew-table-header">
+@{
+
+	// Header row
+	s_services_List.RowType = Config.RowTypeHeader;
+
+	// Render list options
+	await s_services_List.RenderListOptions();
+
+	// Render list options (header, left)
+	s_services_List.ListOptions.Render("header", "left");
+}
+@if (s_services.Id.Visible) { // Id.Visible (begin)
+	if (s_services_List.SortUrl(s_services.Id) == "") {
+		<th data-name="Id" class="@s_services.Id.HeaderCellClass"><div id="elh_s_services_Id" class="s_services_Id"><div class="ew-table-header-caption">@Html.Raw(s_services.Id.Caption)</div></div></th>
+	} else {
+		<th data-name="Id" class="@s_services.Id.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_services.SortUrl(s_services.Id))',1);"><div id="elh_s_services_Id" class="s_services_Id">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_services.Id.Caption)</span><span class="ew-table-header-sort">@if (s_services.Id.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_services.Id.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* Id.Visible (end) *@
+@if (s_services.service_code.Visible) { // service_code.Visible (begin)
+	if (s_services_List.SortUrl(s_services.service_code) == "") {
+		<th data-name="service_code" class="@s_services.service_code.HeaderCellClass"><div id="elh_s_services_service_code" class="s_services_service_code"><div class="ew-table-header-caption">@Html.Raw(s_services.service_code.Caption)</div></div></th>
+	} else {
+		<th data-name="service_code" class="@s_services.service_code.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_services.SortUrl(s_services.service_code))',1);"><div id="elh_s_services_service_code" class="s_services_service_code">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_services.service_code.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_services.service_code.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_services.service_code.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* service_code.Visible (end) *@
+@if (s_services.Description.Visible) { // Description.Visible (begin)
+	if (s_services_List.SortUrl(s_services.Description) == "") {
+		<th data-name="Description" class="@s_services.Description.HeaderCellClass"><div id="elh_s_services_Description" class="s_services_Description"><div class="ew-table-header-caption">@Html.Raw(s_services.Description.Caption)</div></div></th>
+	} else {
+		<th data-name="Description" class="@s_services.Description.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_services.SortUrl(s_services.Description))',1);"><div id="elh_s_services_Description" class="s_services_Description">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_services.Description.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_services.Description.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_services.Description.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* Description.Visible (end) *@
+@if (s_services.ShortDescription.Visible) { // ShortDescription.Visible (begin)
+	if (s_services_List.SortUrl(s_services.ShortDescription) == "") {
+		<th data-name="ShortDescription" class="@s_services.ShortDescription.HeaderCellClass"><div id="elh_s_services_ShortDescription" class="s_services_ShortDescription"><div class="ew-table-header-caption">@Html.Raw(s_services.ShortDescription.Caption)</div></div></th>
+	} else {
+		<th data-name="ShortDescription" class="@s_services.ShortDescription.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_services.SortUrl(s_services.ShortDescription))',1);"><div id="elh_s_services_ShortDescription" class="s_services_ShortDescription">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_services.ShortDescription.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_services.ShortDescription.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_services.ShortDescription.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* ShortDescription.Visible (end) *@
+@if (s_services.service_type.Visible) { // service_type.Visible (begin)
+	if (s_services_List.SortUrl(s_services.service_type) == "") {
+		<th data-name="service_type" class="@s_services.service_type.HeaderCellClass"><div id="elh_s_services_service_type" class="s_services_service_type"><div class="ew-table-header-caption">@Html.Raw(s_services.service_type.Caption)</div></div></th>
+	} else {
+		<th data-name="service_type" class="@s_services.service_type.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_services.SortUrl(s_services.service_type))',1);"><div id="elh_s_services_service_type" class="s_services_service_type">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_services.service_type.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_services.service_type.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_services.service_type.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* service_type.Visible (end) *@
+@if (s_services.SST.Visible) { // SST.Visible (begin)
+	if (s_services_List.SortUrl(s_services.SST) == "") {
+		<th data-name="SST" class="@s_services.SST.HeaderCellClass"><div id="elh_s_services_SST" class="s_services_SST"><div class="ew-table-header-caption">@Html.Raw(s_services.SST.Caption)</div></div></th>
+	} else {
+		<th data-name="SST" class="@s_services.SST.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_services.SortUrl(s_services.SST))',1);"><div id="elh_s_services_SST" class="s_services_SST">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_services.SST.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_services.SST.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_services.SST.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* SST.Visible (end) *@
+@if (s_services.tax_code.Visible) { // tax_code.Visible (begin)
+	if (s_services_List.SortUrl(s_services.tax_code) == "") {
+		<th data-name="tax_code" class="@s_services.tax_code.HeaderCellClass"><div id="elh_s_services_tax_code" class="s_services_tax_code"><div class="ew-table-header-caption">@Html.Raw(s_services.tax_code.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_code" class="@s_services.tax_code.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_services.SortUrl(s_services.tax_code))',1);"><div id="elh_s_services_tax_code" class="s_services_tax_code">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_services.tax_code.Caption)</span><span class="ew-table-header-sort">@if (s_services.tax_code.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_services.tax_code.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_code.Visible (end) *@
+@if (s_services.acct_code.Visible) { // acct_code.Visible (begin)
+	if (s_services_List.SortUrl(s_services.acct_code) == "") {
+		<th data-name="acct_code" class="@s_services.acct_code.HeaderCellClass"><div id="elh_s_services_acct_code" class="s_services_acct_code"><div class="ew-table-header-caption">@Html.Raw(s_services.acct_code.Caption)</div></div></th>
+	} else {
+		<th data-name="acct_code" class="@s_services.acct_code.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_services.SortUrl(s_services.acct_code))',1);"><div id="elh_s_services_acct_code" class="s_services_acct_code">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_services.acct_code.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_services.acct_code.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_services.acct_code.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* acct_code.Visible (end) *@
+@{
+
+	// Render list options (header, right)
+	s_services_List.ListOptions.Render("header", "right");
+}
+	</tr>
+</thead>
+<tbody>
+@{ // Begin Code
+if (s_services_List.ExportAll && s_services_List.IsExport()) {
+	s_services_List.StopRecord = s_services_List.TotalRecords;
+} else {
+
+	// Set the last record to display
+	if (s_services_List.TotalRecords > s_services_List.StartRecord + s_services_List.DisplayRecords - 1) {
+		s_services_List.StopRecord = s_services_List.StartRecord + s_services_List.DisplayRecords - 1;
+	} else {
+		s_services_List.StopRecord = s_services_List.TotalRecords;
+	}
+}
+if (s_services_List.Recordset != null && s_services_List.Recordset.HasRows) {
+	if (!s_services_List.Connection.SelectOffset) { // DN
+		for (var i = 1; i <= s_services_List.StartRecord - 1; i++) { // Move to first record
+			if (await s_services_List.Recordset.ReadAsync()) {
+				s_services_List.RecordCount++;
+			}
+		}
+	} else {
+		s_services_List.RecordCount = s_services_List.StartRecord - 1;
+	}
+} else if (!s_services_List.AllowAddDeleteRow && s_services_List.StopRecord == 0) {
+	s_services_List.StopRecord = s_services_List.GridAddRowCount;
+}
+
+// Initialize aggregate
+s_services_List.RowType = Config.RowTypeAggregateInit;
+s_services_List.ResetAttributes();
+await s_services_List.RenderRow();
+
+// Output data rows
+bool eof = (s_services_List.Recordset == null); // DN
+while (s_services_List.RecordCount < s_services_List.StopRecord) { // Begin While
+	if (!s_services_List.IsGridAdd && !eof) { // DN
+		eof = !await s_services_List.Recordset.ReadAsync();
+	}
+	s_services_List.RecordCount++;
+	if (s_services_List.RecordCount >= s_services_List.StartRecord) {
+		s_services_List.RowCnt++;
+
+		// Set up key count
+		s_services_List.KeyCount = ConvertToInt(s_services_List.RowIndex);
+
+		// Init row class and style
+		s_services_List.ResetAttributes();
+		s_services_List.CssClass = "";
+		if (s_services_List.IsGridAdd) {
+		} else {
+			await s_services_List.LoadRowValues(s_services_List.Recordset); // Load row values
+		}
+		s_services_List.RowType = Config.RowTypeView; // Render view
+
+		// Set up row id / data-rowindex
+		s_services_List.RowAttrs.Add("data-rowindex", Convert.ToString(s_services_List.RowCnt));
+		s_services_List.RowAttrs.Add("id", "r" + Convert.ToString(s_services_List.RowCnt) + "_s_services");
+		s_services_List.RowAttrs.Add("data-rowtype", Convert.ToString(s_services_List.RowType));
+
+		// Render row
+		await s_services_List.RenderRow();
+
+		// Render list options
+		await s_services_List.RenderListOptions();
+	<tr @Html.Raw(s_services_List.RowAttributes)>
+	@{
+
+		// Render list options (body, left)
+		s_services_List.ListOptions.Render("body", "left", s_services_List.RowCnt);
+	}
+	@if (s_services.Id.Visible) { // Id.Visible (begin)
+		<td data-name="Id"@Html.Raw(s_services.Id.CellAttributes)>
+<span id="el@(s_services_List.RowCnt)_s_services_Id" class="s_services_Id">
+<span @Html.Raw(s_services.Id.ViewAttributes)>
+@Html.Raw(s_services.Id.GetViewValue())</span>
+</span>
+</td>
+	} @* Id.Visible (end) *@
+	@if (s_services.service_code.Visible) { // service_code.Visible (begin)
+		<td data-name="service_code"@Html.Raw(s_services.service_code.CellAttributes)>
+<span id="el@(s_services_List.RowCnt)_s_services_service_code" class="s_services_service_code">
+<span @Html.Raw(s_services.service_code.ViewAttributes)>
+@Html.Raw(s_services.service_code.GetViewValue())</span>
+</span>
+</td>
+	} @* service_code.Visible (end) *@
+	@if (s_services.Description.Visible) { // Description.Visible (begin)
+		<td data-name="Description"@Html.Raw(s_services.Description.CellAttributes)>
+<span id="el@(s_services_List.RowCnt)_s_services_Description" class="s_services_Description">
+<span @Html.Raw(s_services.Description.ViewAttributes)>
+@Html.Raw(s_services.Description.GetViewValue())</span>
+</span>
+</td>
+	} @* Description.Visible (end) *@
+	@if (s_services.ShortDescription.Visible) { // ShortDescription.Visible (begin)
+		<td data-name="ShortDescription"@Html.Raw(s_services.ShortDescription.CellAttributes)>
+<span id="el@(s_services_List.RowCnt)_s_services_ShortDescription" class="s_services_ShortDescription">
+<span @Html.Raw(s_services.ShortDescription.ViewAttributes)>
+@Html.Raw(s_services.ShortDescription.GetViewValue())</span>
+</span>
+</td>
+	} @* ShortDescription.Visible (end) *@
+	@if (s_services.service_type.Visible) { // service_type.Visible (begin)
+		<td data-name="service_type"@Html.Raw(s_services.service_type.CellAttributes)>
+<span id="el@(s_services_List.RowCnt)_s_services_service_type" class="s_services_service_type">
+<span @Html.Raw(s_services.service_type.ViewAttributes)>
+@Html.Raw(s_services.service_type.GetViewValue())</span>
+</span>
+</td>
+	} @* service_type.Visible (end) *@
+	@if (s_services.SST.Visible) { // SST.Visible (begin)
+		<td data-name="SST"@Html.Raw(s_services.SST.CellAttributes)>
+<span id="el@(s_services_List.RowCnt)_s_services_SST" class="s_services_SST">
+<span @Html.Raw(s_services.SST.ViewAttributes)>
+@Html.Raw(s_services.SST.GetViewValue())</span>
+</span>
+</td>
+	} @* SST.Visible (end) *@
+	@if (s_services.tax_code.Visible) { // tax_code.Visible (begin)
+		<td data-name="tax_code"@Html.Raw(s_services.tax_code.CellAttributes)>
+<span id="el@(s_services_List.RowCnt)_s_services_tax_code" class="s_services_tax_code">
+<span @Html.Raw(s_services.tax_code.ViewAttributes)>
+@Html.Raw(s_services.tax_code.GetViewValue())</span>
+</span>
+</td>
+	} @* tax_code.Visible (end) *@
+	@if (s_services.acct_code.Visible) { // acct_code.Visible (begin)
+		<td data-name="acct_code"@Html.Raw(s_services.acct_code.CellAttributes)>
+<span id="el@(s_services_List.RowCnt)_s_services_acct_code" class="s_services_acct_code">
+<span @Html.Raw(s_services.acct_code.ViewAttributes)>
+@Html.Raw(s_services.acct_code.GetViewValue())</span>
+</span>
+</td>
+	} @* acct_code.Visible (end) *@
+	@{
+
+		// Render list options (body, right)
+		s_services_List.ListOptions.Render("body", "right", s_services_List.RowCnt);
+	}
+	</tr>
+	} @* End if *@
+} @* End While *@
+} @* End Code *@
+</tbody>
+</table><!-- /.ew-table -->
+} @* End If TotalRecords > 0 *@
+@if (Empty(s_services_List.CurrentAction)) {
+<input type="hidden" name="action" id="action" value="">
+}
+</div><!-- /.ew-grid-middle-panel -->
+</form><!-- /.ew-list-form -->
+@{ s_services_List.CloseRecordset(); }
+		@if (!s_services.IsExport()) {
+		<div class="card-footer ew-grid-lower-panel">
+		<div class="ew-list-other-options">
+		@s_services_List.OtherOptions.RenderBody("bottom")
+		</div>
+		@if (!s_services_List.IsGridAdd) {
+			<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="@AppPath(CurrentPageName())">
+			@s_services_List.Pager.Render()
+			</form>
+		}
+		<div class="clearfix"></div>
+		</div>
+		}
+</div><!-- /.ew-grid -->
+}
+@if (s_services_List.TotalRecords <= 0 && s_services_List.CurrentAction == "") { // Show other options
+<div class="ew-list-other-options">
+@s_services_List.OtherOptions.ForEach(opt => opt.ButtonClass = "").RenderBody()
+</div>
+<div class="clearfix"></div>
+}
+@s_services_List.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_services.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

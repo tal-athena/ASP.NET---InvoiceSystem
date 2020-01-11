@@ -1,0 +1,244 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_glhistory_Edit.Page_Render();
+
+	// Check action result
+	if (s_glhistory_Edit.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "edit";
+var fs_glhistoryedit = currentForm = new ew.Form("fs_glhistoryedit", "edit");
+
+// Validate form
+fs_glhistoryedit.validate = function() {
+	if (!this.validateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.getForm(), $fobj = $(fobj);
+	if ($fobj.find("#confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.formKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = ["insert", "gridinsert"].includes($fobj.find("#action").val()) && $k[0];
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+	@if (s_glhistory_Edit.Id.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Id");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glhistory.Id.RequiredErrorMessage.Replace("%s", s_glhistory.Id.Caption)))");
+		</text>
+	}
+	@if (s_glhistory_Edit.month.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_month");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glhistory.month.RequiredErrorMessage.Replace("%s", s_glhistory.month.Caption)))");
+		</text>
+	}
+	@if (s_glhistory_Edit.acct_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_acct_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glhistory.acct_code.RequiredErrorMessage.Replace("%s", s_glhistory.acct_code.Caption)))");
+		</text>
+	}
+	@if (s_glhistory_Edit.dept_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_dept_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glhistory.dept_code.RequiredErrorMessage.Replace("%s", s_glhistory.dept_code.Caption)))");
+		</text>
+	}
+	@if (s_glhistory_Edit.project_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_project_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glhistory.project_code.RequiredErrorMessage.Replace("%s", s_glhistory.project_code.Caption)))");
+		</text>
+	}
+	@if (s_glhistory_Edit.fileno.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_fileno");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glhistory.fileno.RequiredErrorMessage.Replace("%s", s_glhistory.fileno.Caption)))");
+		</text>
+	}
+	@if (s_glhistory_Edit.mth_bal.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_mth_bal");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glhistory.mth_bal.RequiredErrorMessage.Replace("%s", s_glhistory.mth_bal.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_mth_bal");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glhistory.mth_bal.ErrorMessage))");
+
+		// Fire Form_CustomValidate event
+		if (!this.Form_CustomValidate(fobj))
+			return false;
+	}
+
+	// Process detail forms
+	var dfs = $fobj.find("input[name='detailpage']").get();
+	for (var i = 0; i < dfs.length; i++) {
+		var df = dfs[i], val = df.value;
+		if (val && ew.forms[val])
+			if (!ew.forms[val].validate())
+				return false;
+	}
+	return true;
+}
+
+// Form_CustomValidate event
+fs_glhistoryedit.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_glhistoryedit.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_glhistory_Edit.ShowPageHeader()
+@s_glhistory_Edit.ShowMessages()
+<form name="fs_glhistoryedit" id="fs_glhistoryedit" class="@s_glhistory_Edit.FormClassName" action="@AppPath(CurrentPageName())" method="post">
+@if (s_glhistory_Edit.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="update">
+@if (s_glhistory_Edit.IsModal) {
+<input type="hidden" name="modal" value="@ConvertToInt(s_glhistory_Edit.IsModal)">
+}
+<div class="ew-edit-div"><!-- page* -->
+@if (s_glhistory.Id.Visible) { // Id.Visible (begin)
+	<div id="r_Id" class="form-group row">
+		<label id="elh_s_glhistory_Id" class="@s_glhistory_Edit.LeftColumnClass">@Html.Raw(s_glhistory.Id.Caption)@Html.Raw(s_glhistory.Id.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glhistory_Edit.RightColumnClass"><div @Html.Raw(s_glhistory.Id.CellAttributes)>
+<span id="el_s_glhistory_Id">
+<span @Html.Raw(s_glhistory.Id.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_glhistory.Id.EditValue))"></span>
+</span>
+<input type="hidden" data-table="s_glhistory" data-field="x_Id" name="x_Id" id="x_Id" value="@s_glhistory.Id.CurrentValue">
+@Html.Raw(s_glhistory.Id.CustomMessage)</div></div>
+	</div>
+} @* Id.Visible (end) *@
+@if (s_glhistory.month.Visible) { // month.Visible (begin)
+	<div id="r_month" class="form-group row">
+		<label id="elh_s_glhistory_month" for="x_month" class="@s_glhistory_Edit.LeftColumnClass">@Html.Raw(s_glhistory.month.Caption)@Html.Raw(s_glhistory.month.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glhistory_Edit.RightColumnClass"><div @Html.Raw(s_glhistory.month.CellAttributes)>
+<span id="el_s_glhistory_month">
+<input type="text" data-table="s_glhistory" data-field="x_month" name="x_month" id="x_month" size="30" maxlength="6" placeholder="@s_glhistory.month.PlaceHolder" value="@s_glhistory.month.EditValue" @Html.Raw(s_glhistory.month.EditAttributes)>
+</span>
+@Html.Raw(s_glhistory.month.CustomMessage)</div></div>
+	</div>
+} @* month.Visible (end) *@
+@if (s_glhistory.acct_code.Visible) { // acct_code.Visible (begin)
+	<div id="r_acct_code" class="form-group row">
+		<label id="elh_s_glhistory_acct_code" for="x_acct_code" class="@s_glhistory_Edit.LeftColumnClass">@Html.Raw(s_glhistory.acct_code.Caption)@Html.Raw(s_glhistory.acct_code.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glhistory_Edit.RightColumnClass"><div @Html.Raw(s_glhistory.acct_code.CellAttributes)>
+<span id="el_s_glhistory_acct_code">
+<input type="text" data-table="s_glhistory" data-field="x_acct_code" name="x_acct_code" id="x_acct_code" size="30" maxlength="50" placeholder="@s_glhistory.acct_code.PlaceHolder" value="@s_glhistory.acct_code.EditValue" @Html.Raw(s_glhistory.acct_code.EditAttributes)>
+</span>
+@Html.Raw(s_glhistory.acct_code.CustomMessage)</div></div>
+	</div>
+} @* acct_code.Visible (end) *@
+@if (s_glhistory.dept_code.Visible) { // dept_code.Visible (begin)
+	<div id="r_dept_code" class="form-group row">
+		<label id="elh_s_glhistory_dept_code" for="x_dept_code" class="@s_glhistory_Edit.LeftColumnClass">@Html.Raw(s_glhistory.dept_code.Caption)@Html.Raw(s_glhistory.dept_code.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glhistory_Edit.RightColumnClass"><div @Html.Raw(s_glhistory.dept_code.CellAttributes)>
+<span id="el_s_glhistory_dept_code">
+<input type="text" data-table="s_glhistory" data-field="x_dept_code" name="x_dept_code" id="x_dept_code" size="30" maxlength="50" placeholder="@s_glhistory.dept_code.PlaceHolder" value="@s_glhistory.dept_code.EditValue" @Html.Raw(s_glhistory.dept_code.EditAttributes)>
+</span>
+@Html.Raw(s_glhistory.dept_code.CustomMessage)</div></div>
+	</div>
+} @* dept_code.Visible (end) *@
+@if (s_glhistory.project_code.Visible) { // project_code.Visible (begin)
+	<div id="r_project_code" class="form-group row">
+		<label id="elh_s_glhistory_project_code" for="x_project_code" class="@s_glhistory_Edit.LeftColumnClass">@Html.Raw(s_glhistory.project_code.Caption)@Html.Raw(s_glhistory.project_code.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glhistory_Edit.RightColumnClass"><div @Html.Raw(s_glhistory.project_code.CellAttributes)>
+<span id="el_s_glhistory_project_code">
+<input type="text" data-table="s_glhistory" data-field="x_project_code" name="x_project_code" id="x_project_code" size="30" maxlength="20" placeholder="@s_glhistory.project_code.PlaceHolder" value="@s_glhistory.project_code.EditValue" @Html.Raw(s_glhistory.project_code.EditAttributes)>
+</span>
+@Html.Raw(s_glhistory.project_code.CustomMessage)</div></div>
+	</div>
+} @* project_code.Visible (end) *@
+@if (s_glhistory.fileno.Visible) { // fileno.Visible (begin)
+	<div id="r_fileno" class="form-group row">
+		<label id="elh_s_glhistory_fileno" for="x_fileno" class="@s_glhistory_Edit.LeftColumnClass">@Html.Raw(s_glhistory.fileno.Caption)@Html.Raw(s_glhistory.fileno.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glhistory_Edit.RightColumnClass"><div @Html.Raw(s_glhistory.fileno.CellAttributes)>
+<span id="el_s_glhistory_fileno">
+<input type="text" data-table="s_glhistory" data-field="x_fileno" name="x_fileno" id="x_fileno" size="30" maxlength="20" placeholder="@s_glhistory.fileno.PlaceHolder" value="@s_glhistory.fileno.EditValue" @Html.Raw(s_glhistory.fileno.EditAttributes)>
+</span>
+@Html.Raw(s_glhistory.fileno.CustomMessage)</div></div>
+	</div>
+} @* fileno.Visible (end) *@
+@if (s_glhistory.mth_bal.Visible) { // mth_bal.Visible (begin)
+	<div id="r_mth_bal" class="form-group row">
+		<label id="elh_s_glhistory_mth_bal" for="x_mth_bal" class="@s_glhistory_Edit.LeftColumnClass">@Html.Raw(s_glhistory.mth_bal.Caption)@Html.Raw(s_glhistory.mth_bal.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glhistory_Edit.RightColumnClass"><div @Html.Raw(s_glhistory.mth_bal.CellAttributes)>
+<span id="el_s_glhistory_mth_bal">
+<input type="text" data-table="s_glhistory" data-field="x_mth_bal" name="x_mth_bal" id="x_mth_bal" size="30" placeholder="@s_glhistory.mth_bal.PlaceHolder" value="@s_glhistory.mth_bal.EditValue" @Html.Raw(s_glhistory.mth_bal.EditAttributes)>
+</span>
+@Html.Raw(s_glhistory.mth_bal.CustomMessage)</div></div>
+	</div>
+} @* mth_bal.Visible (end) *@
+</div><!-- /page* -->
+@{ s_glhistory_Edit.CloseRecordset(); }
+@if (!s_glhistory_Edit.IsModal) {
+@:<div class="form-group row"><!-- buttons .form-group -->
+	@:<div class="@s_glhistory_Edit.OffsetColumnClass"><!-- buttons offset -->
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("SaveBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_glhistory_Edit.ReturnUrl)">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+	@:</div><!-- /buttons offset -->
+@:</div><!-- /buttons .form-group -->
+}
+</form>
+@s_glhistory_Edit.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

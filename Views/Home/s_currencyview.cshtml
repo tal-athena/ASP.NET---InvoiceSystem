@@ -1,0 +1,213 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_currency_View.Page_Render();
+
+	// Check action result
+	if (s_currency_View.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_currency.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "view";
+var fs_currencyview = currentForm = new ew.Form("fs_currencyview", "view");
+
+// Form_CustomValidate event
+fs_currencyview.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_currencyview.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_currencyview.lists["x_PrimaryCurrency"] = @Html.Raw(s_currency_View.PrimaryCurrency.Lookup.ToClientList());
+fs_currencyview.lists["x_PrimaryCurrency"].options = @Html.Raw(ConvertToJson(s_currency_View.PrimaryCurrency.Options(false))); // DN
+fs_currencyview.lists["x_Published"] = @Html.Raw(s_currency_View.Published.Lookup.ToClientList());
+fs_currencyview.lists["x_Published"].options = @Html.Raw(ConvertToJson(s_currency_View.Published.Options(false))); // DN
+
+// Form object for search
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_currency.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+	@s_currency_View.ExportOptions.RenderBody()
+	@s_currency_View.OtherOptions.RenderBody()
+	<div class="clearfix"></div>
+</div>
+}
+@s_currency_View.ShowPageHeader()
+@s_currency_View.ShowMessages()
+<form name="fs_currencyview" id="fs_currencyview" class="form-inline ew-form ew-view-form" method="post">
+@if (s_currency_View.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="modal" value="@ConvertToInt(s_currency_View.IsModal)">
+<table class="table table-striped table-sm ew-view-table">
+@if (s_currency.Id.Visible) { @* s_currency.Id.Visible (begin) *@
+	<tr id="r_Id">
+		<td class="@s_currency_View.TableLeftColumnClass"><span id="elh_s_currency_Id">@Html.Raw(s_currency.Id.Caption)</span></td>
+		<td data-name="Id" @Html.Raw(s_currency.Id.CellAttributes)>
+<span id="el_s_currency_Id">
+<span @Html.Raw(s_currency.Id.ViewAttributes)>
+@Html.Raw(s_currency.Id.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_currency.Id.Visible (end) *@
+@if (s_currency.CurrencyCode.Visible) { @* s_currency.CurrencyCode.Visible (begin) *@
+	<tr id="r_CurrencyCode">
+		<td class="@s_currency_View.TableLeftColumnClass"><span id="elh_s_currency_CurrencyCode">@Html.Raw(s_currency.CurrencyCode.Caption)</span></td>
+		<td data-name="CurrencyCode" @Html.Raw(s_currency.CurrencyCode.CellAttributes)>
+<span id="el_s_currency_CurrencyCode">
+<span @Html.Raw(s_currency.CurrencyCode.ViewAttributes)>
+@Html.Raw(s_currency.CurrencyCode.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_currency.CurrencyCode.Visible (end) *@
+@if (s_currency.CurrencyName.Visible) { @* s_currency.CurrencyName.Visible (begin) *@
+	<tr id="r_CurrencyName">
+		<td class="@s_currency_View.TableLeftColumnClass"><span id="elh_s_currency_CurrencyName">@Html.Raw(s_currency.CurrencyName.Caption)</span></td>
+		<td data-name="CurrencyName" @Html.Raw(s_currency.CurrencyName.CellAttributes)>
+<span id="el_s_currency_CurrencyName">
+<span @Html.Raw(s_currency.CurrencyName.ViewAttributes)>
+@Html.Raw(s_currency.CurrencyName.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_currency.CurrencyName.Visible (end) *@
+@if (s_currency.PrimaryCurrency.Visible) { @* s_currency.PrimaryCurrency.Visible (begin) *@
+	<tr id="r_PrimaryCurrency">
+		<td class="@s_currency_View.TableLeftColumnClass"><span id="elh_s_currency_PrimaryCurrency">@Html.Raw(s_currency.PrimaryCurrency.Caption)</span></td>
+		<td data-name="PrimaryCurrency" @Html.Raw(s_currency.PrimaryCurrency.CellAttributes)>
+<span id="el_s_currency_PrimaryCurrency">
+<span @Html.Raw(s_currency.PrimaryCurrency.ViewAttributes)>
+<input type="checkbox" value="@s_currency.PrimaryCurrency.GetViewValue()" disabled checked="@ConvertToBool(s_currency.PrimaryCurrency.CurrentValue)"></span>
+</span>
+</td>
+	</tr>
+} @* s_currency.PrimaryCurrency.Visible (end) *@
+@if (s_currency.Rate.Visible) { @* s_currency.Rate.Visible (begin) *@
+	<tr id="r_Rate">
+		<td class="@s_currency_View.TableLeftColumnClass"><span id="elh_s_currency_Rate">@Html.Raw(s_currency.Rate.Caption)</span></td>
+		<td data-name="Rate" @Html.Raw(s_currency.Rate.CellAttributes)>
+<span id="el_s_currency_Rate">
+<span @Html.Raw(s_currency.Rate.ViewAttributes)>
+@Html.Raw(s_currency.Rate.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_currency.Rate.Visible (end) *@
+@if (s_currency.DisplayLocale.Visible) { @* s_currency.DisplayLocale.Visible (begin) *@
+	<tr id="r_DisplayLocale">
+		<td class="@s_currency_View.TableLeftColumnClass"><span id="elh_s_currency_DisplayLocale">@Html.Raw(s_currency.DisplayLocale.Caption)</span></td>
+		<td data-name="DisplayLocale" @Html.Raw(s_currency.DisplayLocale.CellAttributes)>
+<span id="el_s_currency_DisplayLocale">
+<span @Html.Raw(s_currency.DisplayLocale.ViewAttributes)>
+@Html.Raw(s_currency.DisplayLocale.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_currency.DisplayLocale.Visible (end) *@
+@if (s_currency.CustomFormatting.Visible) { @* s_currency.CustomFormatting.Visible (begin) *@
+	<tr id="r_CustomFormatting">
+		<td class="@s_currency_View.TableLeftColumnClass"><span id="elh_s_currency_CustomFormatting">@Html.Raw(s_currency.CustomFormatting.Caption)</span></td>
+		<td data-name="CustomFormatting" @Html.Raw(s_currency.CustomFormatting.CellAttributes)>
+<span id="el_s_currency_CustomFormatting">
+<span @Html.Raw(s_currency.CustomFormatting.ViewAttributes)>
+@Html.Raw(s_currency.CustomFormatting.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_currency.CustomFormatting.Visible (end) *@
+@if (s_currency.Published.Visible) { @* s_currency.Published.Visible (begin) *@
+	<tr id="r_Published">
+		<td class="@s_currency_View.TableLeftColumnClass"><span id="elh_s_currency_Published">@Html.Raw(s_currency.Published.Caption)</span></td>
+		<td data-name="Published" @Html.Raw(s_currency.Published.CellAttributes)>
+<span id="el_s_currency_Published">
+<span @Html.Raw(s_currency.Published.ViewAttributes)>
+<input type="checkbox" value="@s_currency.Published.GetViewValue()" disabled checked="@ConvertToBool(s_currency.Published.CurrentValue)"></span>
+</span>
+</td>
+	</tr>
+} @* s_currency.Published.Visible (end) *@
+@if (s_currency.UpdatedOnUtc.Visible) { @* s_currency.UpdatedOnUtc.Visible (begin) *@
+	<tr id="r_UpdatedOnUtc">
+		<td class="@s_currency_View.TableLeftColumnClass"><span id="elh_s_currency_UpdatedOnUtc">@Html.Raw(s_currency.UpdatedOnUtc.Caption)</span></td>
+		<td data-name="UpdatedOnUtc" @Html.Raw(s_currency.UpdatedOnUtc.CellAttributes)>
+<span id="el_s_currency_UpdatedOnUtc">
+<span @Html.Raw(s_currency.UpdatedOnUtc.ViewAttributes)>
+@Html.Raw(s_currency.UpdatedOnUtc.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_currency.UpdatedOnUtc.Visible (end) *@
+@if (s_currency.RoundingTypeId.Visible) { @* s_currency.RoundingTypeId.Visible (begin) *@
+	<tr id="r_RoundingTypeId">
+		<td class="@s_currency_View.TableLeftColumnClass"><span id="elh_s_currency_RoundingTypeId">@Html.Raw(s_currency.RoundingTypeId.Caption)</span></td>
+		<td data-name="RoundingTypeId" @Html.Raw(s_currency.RoundingTypeId.CellAttributes)>
+<span id="el_s_currency_RoundingTypeId">
+<span @Html.Raw(s_currency.RoundingTypeId.ViewAttributes)>
+@Html.Raw(s_currency.RoundingTypeId.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_currency.RoundingTypeId.Visible (end) *@
+@if (s_currency.DisplayOrder.Visible) { @* s_currency.DisplayOrder.Visible (begin) *@
+	<tr id="r_DisplayOrder">
+		<td class="@s_currency_View.TableLeftColumnClass"><span id="elh_s_currency_DisplayOrder">@Html.Raw(s_currency.DisplayOrder.Caption)</span></td>
+		<td data-name="DisplayOrder" @Html.Raw(s_currency.DisplayOrder.CellAttributes)>
+<span id="el_s_currency_DisplayOrder">
+<span @Html.Raw(s_currency.DisplayOrder.ViewAttributes)>
+@Html.Raw(s_currency.DisplayOrder.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_currency.DisplayOrder.Visible (end) *@
+</table>
+@{ s_currency_View.CloseRecordset(); }
+</form>
+@s_currency_View.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_currency.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

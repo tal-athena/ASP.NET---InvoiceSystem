@@ -1,0 +1,173 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_servicetype_Delete.Page_Render();
+
+	// Check action result
+	if (s_servicetype_Delete.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "delete";
+var fs_servicetypedelete = currentForm = new ew.Form("fs_servicetypedelete", "delete");
+
+// Form_CustomValidate event
+fs_servicetypedelete.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_servicetypedelete.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_servicetype_Delete.ShowPageHeader()
+@s_servicetype_Delete.ShowMessages()
+<form name="fs_servicetypedelete" id="fs_servicetypedelete" class="form-inline ew-form ew-delete-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_servicetype_Delete.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="delete">
+@foreach (string key in s_servicetype_Delete.RecordKeys) {
+<input type="hidden" name="key_m" value="@key">
+}
+<div class="card ew-card ew-grid">
+<div class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+<table class="table ew-table">
+	<thead>
+	<tr class="ew-table-header">
+@if (s_servicetype.Id.Visible) { // Id (begin)
+		<th class="@Html.Raw(s_servicetype.Id.HeaderCellClass)"><span id="elh_s_servicetype_Id" class="s_servicetype_Id">@Html.Raw(s_servicetype.Id.Caption)</span></th>
+} @* Id.Visible (end) *@
+@if (s_servicetype.service_type.Visible) { // service_type (begin)
+		<th class="@Html.Raw(s_servicetype.service_type.HeaderCellClass)"><span id="elh_s_servicetype_service_type" class="s_servicetype_service_type">@Html.Raw(s_servicetype.service_type.Caption)</span></th>
+} @* service_type.Visible (end) *@
+@if (s_servicetype.description.Visible) { // description (begin)
+		<th class="@Html.Raw(s_servicetype.description.HeaderCellClass)"><span id="elh_s_servicetype_description" class="s_servicetype_description">@Html.Raw(s_servicetype.description.Caption)</span></th>
+} @* description.Visible (end) *@
+@if (s_servicetype.dt_upd.Visible) { // dt_upd (begin)
+		<th class="@Html.Raw(s_servicetype.dt_upd.HeaderCellClass)"><span id="elh_s_servicetype_dt_upd" class="s_servicetype_dt_upd">@Html.Raw(s_servicetype.dt_upd.Caption)</span></th>
+} @* dt_upd.Visible (end) *@
+@if (s_servicetype.id_upd.Visible) { // id_upd (begin)
+		<th class="@Html.Raw(s_servicetype.id_upd.HeaderCellClass)"><span id="elh_s_servicetype_id_upd" class="s_servicetype_id_upd">@Html.Raw(s_servicetype.id_upd.Caption)</span></th>
+} @* id_upd.Visible (end) *@
+	</tr>
+	</thead>
+	<tbody>
+@{ s_servicetype_Delete.RecordCount = 0; }
+@while (s_servicetype_Delete.Recordset != null && await s_servicetype_Delete.Recordset.ReadAsync()) { // DN
+	s_servicetype_Delete.RecordCount++;
+	s_servicetype_Delete.RowCnt++;
+
+	// Set row properties
+	s_servicetype_Delete.ResetAttributes();
+	s_servicetype_Delete.RowType = Config.RowTypeView; // View
+
+	// Get the field contents
+	await s_servicetype_Delete.LoadRowValues(s_servicetype_Delete.Recordset);
+
+	// Render row
+	await s_servicetype_Delete.RenderRow();
+	<tr @Html.Raw(s_servicetype_Delete.RowAttributes)>
+@if (s_servicetype.Id.Visible) { // Id (begin)
+		<td @Html.Raw(s_servicetype.Id.CellAttributes)>
+<span id="el@(s_servicetype_Delete.RowCnt)_s_servicetype_Id" class="s_servicetype_Id">
+<span @Html.Raw(s_servicetype.Id.ViewAttributes)>
+@Html.Raw(s_servicetype.Id.GetViewValue())</span>
+</span>
+</td>
+} @* Id.Visible (end) *@
+@if (s_servicetype.service_type.Visible) { // service_type (begin)
+		<td @Html.Raw(s_servicetype.service_type.CellAttributes)>
+<span id="el@(s_servicetype_Delete.RowCnt)_s_servicetype_service_type" class="s_servicetype_service_type">
+<span @Html.Raw(s_servicetype.service_type.ViewAttributes)>
+@Html.Raw(s_servicetype.service_type.GetViewValue())</span>
+</span>
+</td>
+} @* service_type.Visible (end) *@
+@if (s_servicetype.description.Visible) { // description (begin)
+		<td @Html.Raw(s_servicetype.description.CellAttributes)>
+<span id="el@(s_servicetype_Delete.RowCnt)_s_servicetype_description" class="s_servicetype_description">
+<span @Html.Raw(s_servicetype.description.ViewAttributes)>
+@Html.Raw(s_servicetype.description.GetViewValue())</span>
+</span>
+</td>
+} @* description.Visible (end) *@
+@if (s_servicetype.dt_upd.Visible) { // dt_upd (begin)
+		<td @Html.Raw(s_servicetype.dt_upd.CellAttributes)>
+<span id="el@(s_servicetype_Delete.RowCnt)_s_servicetype_dt_upd" class="s_servicetype_dt_upd">
+<span @Html.Raw(s_servicetype.dt_upd.ViewAttributes)>
+@Html.Raw(s_servicetype.dt_upd.GetViewValue())</span>
+</span>
+</td>
+} @* dt_upd.Visible (end) *@
+@if (s_servicetype.id_upd.Visible) { // id_upd (begin)
+		<td @Html.Raw(s_servicetype.id_upd.CellAttributes)>
+<span id="el@(s_servicetype_Delete.RowCnt)_s_servicetype_id_upd" class="s_servicetype_id_upd">
+<span @Html.Raw(s_servicetype.id_upd.ViewAttributes)>
+@Html.Raw(s_servicetype.id_upd.GetViewValue())</span>
+</span>
+</td>
+} @* id_upd.Visible (end) *@
+	</tr>
+}
+@{ s_servicetype_Delete.CloseRecordset(); }
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<div class="divconfirmdelete">
+  <div>
+	<label>
+		@Html.Raw(Language.Phrase("askconfirmdelete"))
+	</label>
+  </div>
+</div>
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("DeleteBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_servicetype_Delete.ReturnUrl)">@Language.Phrase("CancelBtn")</button>
+</div>
+</form>
+@s_servicetype_Delete.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

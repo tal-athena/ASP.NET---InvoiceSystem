@@ -1,0 +1,220 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_glchart_View.Page_Render();
+
+	// Check action result
+	if (s_glchart_View.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_glchart.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "view";
+var fs_glchartview = currentForm = new ew.Form("fs_glchartview", "view");
+
+// Form_CustomValidate event
+fs_glchartview.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_glchartview.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_glchart.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+	@s_glchart_View.ExportOptions.RenderBody()
+	@s_glchart_View.OtherOptions.RenderBody()
+	<div class="clearfix"></div>
+</div>
+}
+@s_glchart_View.ShowPageHeader()
+@s_glchart_View.ShowMessages()
+<form name="fs_glchartview" id="fs_glchartview" class="form-inline ew-form ew-view-form" method="post">
+@if (s_glchart_View.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="modal" value="@ConvertToInt(s_glchart_View.IsModal)">
+<table class="table table-striped table-sm ew-view-table">
+@if (s_glchart.Id.Visible) { @* s_glchart.Id.Visible (begin) *@
+	<tr id="r_Id">
+		<td class="@s_glchart_View.TableLeftColumnClass"><span id="elh_s_glchart_Id">@Html.Raw(s_glchart.Id.Caption)</span></td>
+		<td data-name="Id" @Html.Raw(s_glchart.Id.CellAttributes)>
+<span id="el_s_glchart_Id">
+<span @Html.Raw(s_glchart.Id.ViewAttributes)>
+@Html.Raw(s_glchart.Id.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glchart.Id.Visible (end) *@
+@if (s_glchart.acct_code.Visible) { @* s_glchart.acct_code.Visible (begin) *@
+	<tr id="r_acct_code">
+		<td class="@s_glchart_View.TableLeftColumnClass"><span id="elh_s_glchart_acct_code">@Html.Raw(s_glchart.acct_code.Caption)</span></td>
+		<td data-name="acct_code" @Html.Raw(s_glchart.acct_code.CellAttributes)>
+<span id="el_s_glchart_acct_code">
+<span @Html.Raw(s_glchart.acct_code.ViewAttributes)>
+@Html.Raw(s_glchart.acct_code.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glchart.acct_code.Visible (end) *@
+@if (s_glchart.description.Visible) { @* s_glchart.description.Visible (begin) *@
+	<tr id="r_description">
+		<td class="@s_glchart_View.TableLeftColumnClass"><span id="elh_s_glchart_description">@Html.Raw(s_glchart.description.Caption)</span></td>
+		<td data-name="description" @Html.Raw(s_glchart.description.CellAttributes)>
+<span id="el_s_glchart_description">
+<span @Html.Raw(s_glchart.description.ViewAttributes)>
+@Html.Raw(s_glchart.description.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glchart.description.Visible (end) *@
+@if (s_glchart.report_type.Visible) { @* s_glchart.report_type.Visible (begin) *@
+	<tr id="r_report_type">
+		<td class="@s_glchart_View.TableLeftColumnClass"><span id="elh_s_glchart_report_type">@Html.Raw(s_glchart.report_type.Caption)</span></td>
+		<td data-name="report_type" @Html.Raw(s_glchart.report_type.CellAttributes)>
+<span id="el_s_glchart_report_type">
+<span @Html.Raw(s_glchart.report_type.ViewAttributes)>
+@Html.Raw(s_glchart.report_type.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glchart.report_type.Visible (end) *@
+@if (s_glchart.acct_group.Visible) { @* s_glchart.acct_group.Visible (begin) *@
+	<tr id="r_acct_group">
+		<td class="@s_glchart_View.TableLeftColumnClass"><span id="elh_s_glchart_acct_group">@Html.Raw(s_glchart.acct_group.Caption)</span></td>
+		<td data-name="acct_group" @Html.Raw(s_glchart.acct_group.CellAttributes)>
+<span id="el_s_glchart_acct_group">
+<span @Html.Raw(s_glchart.acct_group.ViewAttributes)>
+@Html.Raw(s_glchart.acct_group.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glchart.acct_group.Visible (end) *@
+@if (s_glchart.acct_type.Visible) { @* s_glchart.acct_type.Visible (begin) *@
+	<tr id="r_acct_type">
+		<td class="@s_glchart_View.TableLeftColumnClass"><span id="elh_s_glchart_acct_type">@Html.Raw(s_glchart.acct_type.Caption)</span></td>
+		<td data-name="acct_type" @Html.Raw(s_glchart.acct_type.CellAttributes)>
+<span id="el_s_glchart_acct_type">
+<span @Html.Raw(s_glchart.acct_type.ViewAttributes)>
+@Html.Raw(s_glchart.acct_type.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glchart.acct_type.Visible (end) *@
+@if (s_glchart.CurrencyCode.Visible) { @* s_glchart.CurrencyCode.Visible (begin) *@
+	<tr id="r_CurrencyCode">
+		<td class="@s_glchart_View.TableLeftColumnClass"><span id="elh_s_glchart_CurrencyCode">@Html.Raw(s_glchart.CurrencyCode.Caption)</span></td>
+		<td data-name="CurrencyCode" @Html.Raw(s_glchart.CurrencyCode.CellAttributes)>
+<span id="el_s_glchart_CurrencyCode">
+<span @Html.Raw(s_glchart.CurrencyCode.ViewAttributes)>
+@Html.Raw(s_glchart.CurrencyCode.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glchart.CurrencyCode.Visible (end) *@
+@if (s_glchart.opn_debit.Visible) { @* s_glchart.opn_debit.Visible (begin) *@
+	<tr id="r_opn_debit">
+		<td class="@s_glchart_View.TableLeftColumnClass"><span id="elh_s_glchart_opn_debit">@Html.Raw(s_glchart.opn_debit.Caption)</span></td>
+		<td data-name="opn_debit" @Html.Raw(s_glchart.opn_debit.CellAttributes)>
+<span id="el_s_glchart_opn_debit">
+<span @Html.Raw(s_glchart.opn_debit.ViewAttributes)>
+@Html.Raw(s_glchart.opn_debit.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glchart.opn_debit.Visible (end) *@
+@if (s_glchart.opn_credit.Visible) { @* s_glchart.opn_credit.Visible (begin) *@
+	<tr id="r_opn_credit">
+		<td class="@s_glchart_View.TableLeftColumnClass"><span id="elh_s_glchart_opn_credit">@Html.Raw(s_glchart.opn_credit.Caption)</span></td>
+		<td data-name="opn_credit" @Html.Raw(s_glchart.opn_credit.CellAttributes)>
+<span id="el_s_glchart_opn_credit">
+<span @Html.Raw(s_glchart.opn_credit.ViewAttributes)>
+@Html.Raw(s_glchart.opn_credit.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glchart.opn_credit.Visible (end) *@
+@if (s_glchart.bal_mtd.Visible) { @* s_glchart.bal_mtd.Visible (begin) *@
+	<tr id="r_bal_mtd">
+		<td class="@s_glchart_View.TableLeftColumnClass"><span id="elh_s_glchart_bal_mtd">@Html.Raw(s_glchart.bal_mtd.Caption)</span></td>
+		<td data-name="bal_mtd" @Html.Raw(s_glchart.bal_mtd.CellAttributes)>
+<span id="el_s_glchart_bal_mtd">
+<span @Html.Raw(s_glchart.bal_mtd.ViewAttributes)>
+@Html.Raw(s_glchart.bal_mtd.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glchart.bal_mtd.Visible (end) *@
+@if (s_glchart.bal_ytd.Visible) { @* s_glchart.bal_ytd.Visible (begin) *@
+	<tr id="r_bal_ytd">
+		<td class="@s_glchart_View.TableLeftColumnClass"><span id="elh_s_glchart_bal_ytd">@Html.Raw(s_glchart.bal_ytd.Caption)</span></td>
+		<td data-name="bal_ytd" @Html.Raw(s_glchart.bal_ytd.CellAttributes)>
+<span id="el_s_glchart_bal_ytd">
+<span @Html.Raw(s_glchart.bal_ytd.ViewAttributes)>
+@Html.Raw(s_glchart.bal_ytd.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glchart.bal_ytd.Visible (end) *@
+@if (s_glchart.remark.Visible) { @* s_glchart.remark.Visible (begin) *@
+	<tr id="r_remark">
+		<td class="@s_glchart_View.TableLeftColumnClass"><span id="elh_s_glchart_remark">@Html.Raw(s_glchart.remark.Caption)</span></td>
+		<td data-name="remark" @Html.Raw(s_glchart.remark.CellAttributes)>
+<span id="el_s_glchart_remark">
+<span @Html.Raw(s_glchart.remark.ViewAttributes)>
+@Html.Raw(s_glchart.remark.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glchart.remark.Visible (end) *@
+</table>
+@{ s_glchart_View.CloseRecordset(); }
+</form>
+@s_glchart_View.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_glchart.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

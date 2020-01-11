@@ -1,0 +1,1172 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_armaster_Add.Page_Render();
+
+	// Check action result
+	if (s_armaster_Add.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "add";
+var fs_armasteradd = currentForm = new ew.Form("fs_armasteradd", "add");
+
+// Validate form
+fs_armasteradd.validate = function() {
+	if (!this.validateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.getForm(), $fobj = $(fobj);
+	if ($fobj.find("#confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.formKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = ["insert", "gridinsert"].includes($fobj.find("#action").val()) && $k[0];
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+	@if (s_armaster_Add.dbcode.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_dbcode");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.dbcode.RequiredErrorMessage.Replace("%s", s_armaster.dbcode.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.name.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_name");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.name.RequiredErrorMessage.Replace("%s", s_armaster.name.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.name2.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_name2");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.name2.RequiredErrorMessage.Replace("%s", s_armaster.name2.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.short_name.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_short_name");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.short_name.RequiredErrorMessage.Replace("%s", s_armaster.short_name.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.add1.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_add1");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.add1.RequiredErrorMessage.Replace("%s", s_armaster.add1.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.add2.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_add2");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.add2.RequiredErrorMessage.Replace("%s", s_armaster.add2.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.add3.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_add3");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.add3.RequiredErrorMessage.Replace("%s", s_armaster.add3.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.add4.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_add4");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.add4.RequiredErrorMessage.Replace("%s", s_armaster.add4.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.area.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_area");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.area.RequiredErrorMessage.Replace("%s", s_armaster.area.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.postcode.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_postcode");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.postcode.RequiredErrorMessage.Replace("%s", s_armaster.postcode.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.state.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_state");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.state.RequiredErrorMessage.Replace("%s", s_armaster.state.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.country.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_country");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.country.RequiredErrorMessage.Replace("%s", s_armaster.country.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.tel1.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tel1");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.tel1.RequiredErrorMessage.Replace("%s", s_armaster.tel1.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.tel2.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tel2");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.tel2.RequiredErrorMessage.Replace("%s", s_armaster.tel2.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.phone1.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_phone1");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.phone1.RequiredErrorMessage.Replace("%s", s_armaster.phone1.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.phone2.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_phone2");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.phone2.RequiredErrorMessage.Replace("%s", s_armaster.phone2.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.fax.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_fax");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.fax.RequiredErrorMessage.Replace("%s", s_armaster.fax.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add._email.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "__email");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster._email.RequiredErrorMessage.Replace("%s", s_armaster._email.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.ptc1.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_ptc1");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.ptc1.RequiredErrorMessage.Replace("%s", s_armaster.ptc1.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.ptc.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_ptc");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.ptc.RequiredErrorMessage.Replace("%s", s_armaster.ptc.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.ptc2.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_ptc2");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.ptc2.RequiredErrorMessage.Replace("%s", s_armaster.ptc2.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.ar_grp.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_ar_grp");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.ar_grp.RequiredErrorMessage.Replace("%s", s_armaster.ar_grp.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.term_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_term_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.term_code.RequiredErrorMessage.Replace("%s", s_armaster.term_code.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.pterm_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_pterm_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.pterm_code.RequiredErrorMessage.Replace("%s", s_armaster.pterm_code.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.cr_limit.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_cr_limit");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.cr_limit.RequiredErrorMessage.Replace("%s", s_armaster.cr_limit.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_cr_limit");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.cr_limit.ErrorMessage))");
+	@if (s_armaster_Add.CurrencyCode.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_CurrencyCode");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.CurrencyCode.RequiredErrorMessage.Replace("%s", s_armaster.CurrencyCode.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.slsman.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_slsman");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.slsman.RequiredErrorMessage.Replace("%s", s_armaster.slsman.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.ytd_sale.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_ytd_sale");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.ytd_sale.RequiredErrorMessage.Replace("%s", s_armaster.ytd_sale.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_ytd_sale");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.ytd_sale.ErrorMessage))");
+	@if (s_armaster_Add.ytd_cost.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_ytd_cost");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.ytd_cost.RequiredErrorMessage.Replace("%s", s_armaster.ytd_cost.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_ytd_cost");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.ytd_cost.ErrorMessage))");
+	@if (s_armaster_Add.ytd_disc.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_ytd_disc");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.ytd_disc.RequiredErrorMessage.Replace("%s", s_armaster.ytd_disc.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_ytd_disc");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.ytd_disc.ErrorMessage))");
+	@if (s_armaster_Add.ctrl_acct.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_ctrl_acct");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.ctrl_acct.RequiredErrorMessage.Replace("%s", s_armaster.ctrl_acct.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.ctrl_dept.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_ctrl_dept");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.ctrl_dept.RequiredErrorMessage.Replace("%s", s_armaster.ctrl_dept.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.acct_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_acct_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.acct_code.RequiredErrorMessage.Replace("%s", s_armaster.acct_code.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.acct_dept.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_acct_dept");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.acct_dept.RequiredErrorMessage.Replace("%s", s_armaster.acct_dept.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.skip_stmt.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_skip_stmt");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.skip_stmt.RequiredErrorMessage.Replace("%s", s_armaster.skip_stmt.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.stop_sale.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_stop_sale");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.stop_sale.RequiredErrorMessage.Replace("%s", s_armaster.stop_sale.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.opn_item.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_opn_item");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.opn_item.RequiredErrorMessage.Replace("%s", s_armaster.opn_item.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.status.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_status");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.status.RequiredErrorMessage.Replace("%s", s_armaster.status.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.tax_desc.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tax_desc");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.tax_desc.RequiredErrorMessage.Replace("%s", s_armaster.tax_desc.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.stax.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_stax");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.stax.RequiredErrorMessage.Replace("%s", s_armaster.stax.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.remark.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_remark");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.remark.RequiredErrorMessage.Replace("%s", s_armaster.remark.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.inv_fmt.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_inv_fmt");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.inv_fmt.RequiredErrorMessage.Replace("%s", s_armaster.inv_fmt.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.do_fmt.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_do_fmt");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.do_fmt.RequiredErrorMessage.Replace("%s", s_armaster.do_fmt.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.Ship_Code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Ship_Code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.Ship_Code.RequiredErrorMessage.Replace("%s", s_armaster.Ship_Code.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.custtype.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_custtype");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.custtype.RequiredErrorMessage.Replace("%s", s_armaster.custtype.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.Acct_BillAcct.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Acct_BillAcct");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.Acct_BillAcct.RequiredErrorMessage.Replace("%s", s_armaster.Acct_BillAcct.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.bill_flag.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_bill_flag");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.bill_flag.RequiredErrorMessage.Replace("%s", s_armaster.bill_flag.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.payment_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_payment_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.payment_code.RequiredErrorMessage.Replace("%s", s_armaster.payment_code.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.stax_pct.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_stax_pct");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.stax_pct.RequiredErrorMessage.Replace("%s", s_armaster.stax_pct.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_stax_pct");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.stax_pct.ErrorMessage))");
+	@if (s_armaster_Add.db_part.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_db_part");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.db_part.RequiredErrorMessage.Replace("%s", s_armaster.db_part.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.b_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_b_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.b_code.RequiredErrorMessage.Replace("%s", s_armaster.b_code.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.lmw_no.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_lmw_no");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.lmw_no.RequiredErrorMessage.Replace("%s", s_armaster.lmw_no.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.cs_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_cs_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.cs_code.RequiredErrorMessage.Replace("%s", s_armaster.cs_code.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.approved.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_approved");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.approved.RequiredErrorMessage.Replace("%s", s_armaster.approved.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.oversea.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_oversea");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.oversea.RequiredErrorMessage.Replace("%s", s_armaster.oversea.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.defa_disc_pct.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_defa_disc_pct");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.defa_disc_pct.RequiredErrorMessage.Replace("%s", s_armaster.defa_disc_pct.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_defa_disc_pct");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.defa_disc_pct.ErrorMessage))");
+	@if (s_armaster_Add.sellpriceDOM.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_sellpriceDOM");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.sellpriceDOM.RequiredErrorMessage.Replace("%s", s_armaster.sellpriceDOM.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.id_upd.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_id_upd");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.id_upd.RequiredErrorMessage.Replace("%s", s_armaster.id_upd.Caption)))");
+		</text>
+	}
+	@if (s_armaster_Add.dt_upd.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_dt_upd");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.dt_upd.RequiredErrorMessage.Replace("%s", s_armaster.dt_upd.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_dt_upd");
+		if (elm && !ew.checkDateDef(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.dt_upd.ErrorMessage))");
+	@if (s_armaster_Add.com_regno.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_com_regno");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_armaster.com_regno.RequiredErrorMessage.Replace("%s", s_armaster.com_regno.Caption)))");
+		</text>
+	}
+
+		// Fire Form_CustomValidate event
+		if (!this.Form_CustomValidate(fobj))
+			return false;
+	}
+
+	// Process detail forms
+	var dfs = $fobj.find("input[name='detailpage']").get();
+	for (var i = 0; i < dfs.length; i++) {
+		var df = dfs[i], val = df.value;
+		if (val && ew.forms[val])
+			if (!ew.forms[val].validate())
+				return false;
+	}
+	return true;
+}
+
+// Form_CustomValidate event
+fs_armasteradd.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_armasteradd.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_armasteradd.lists["x_skip_stmt"] = @Html.Raw(s_armaster_Add.skip_stmt.Lookup.ToClientList());
+fs_armasteradd.lists["x_skip_stmt"].options = @Html.Raw(ConvertToJson(s_armaster_Add.skip_stmt.Options(false))); // DN
+fs_armasteradd.lists["x_stop_sale"] = @Html.Raw(s_armaster_Add.stop_sale.Lookup.ToClientList());
+fs_armasteradd.lists["x_stop_sale"].options = @Html.Raw(ConvertToJson(s_armaster_Add.stop_sale.Options(false))); // DN
+fs_armasteradd.lists["x_opn_item"] = @Html.Raw(s_armaster_Add.opn_item.Lookup.ToClientList());
+fs_armasteradd.lists["x_opn_item"].options = @Html.Raw(ConvertToJson(s_armaster_Add.opn_item.Options(false))); // DN
+fs_armasteradd.lists["x_approved"] = @Html.Raw(s_armaster_Add.approved.Lookup.ToClientList());
+fs_armasteradd.lists["x_approved"].options = @Html.Raw(ConvertToJson(s_armaster_Add.approved.Options(false))); // DN
+fs_armasteradd.lists["x_oversea"] = @Html.Raw(s_armaster_Add.oversea.Lookup.ToClientList());
+fs_armasteradd.lists["x_oversea"].options = @Html.Raw(ConvertToJson(s_armaster_Add.oversea.Options(false))); // DN
+fs_armasteradd.lists["x_sellpriceDOM"] = @Html.Raw(s_armaster_Add.sellpriceDOM.Lookup.ToClientList());
+fs_armasteradd.lists["x_sellpriceDOM"].options = @Html.Raw(ConvertToJson(s_armaster_Add.sellpriceDOM.Options(false))); // DN
+
+// Form object for search
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_armaster_Add.ShowPageHeader()
+@s_armaster_Add.ShowMessages()
+<form name="fs_armasteradd" id="fs_armasteradd" class="@s_armaster_Add.FormClassName" action="@AppPath(CurrentPageName())" method="post">
+@if (s_armaster_Add.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="t" value="s_armaster">
+<input type="hidden" name="action" id="action" value="insert">
+<input type="hidden" name="modal" value="@ConvertToInt(s_armaster_Add.IsModal)">
+<div class="ew-add-div"><!-- page* -->
+@if (s_armaster.dbcode.Visible) { // dbcode.Visible (begin)
+	<div id="r_dbcode" class="form-group row">
+		<label id="elh_s_armaster_dbcode" for="x_dbcode" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.dbcode.Caption)@Html.Raw(s_armaster.dbcode.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.dbcode.CellAttributes)>
+<span id="el_s_armaster_dbcode">
+<input type="text" data-table="s_armaster" data-field="x_dbcode" name="x_dbcode" id="x_dbcode" size="30" maxlength="20" placeholder="@s_armaster.dbcode.PlaceHolder" value="@s_armaster.dbcode.EditValue" @Html.Raw(s_armaster.dbcode.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.dbcode.CustomMessage)</div></div>
+	</div>
+} @* dbcode.Visible (end) *@
+@if (s_armaster.name.Visible) { // name.Visible (begin)
+	<div id="r_name" class="form-group row">
+		<label id="elh_s_armaster_name" for="x_name" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.name.Caption)@Html.Raw(s_armaster.name.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.name.CellAttributes)>
+<span id="el_s_armaster_name">
+<input type="text" data-table="s_armaster" data-field="x_name" name="x_name" id="x_name" size="30" maxlength="100" placeholder="@s_armaster.name.PlaceHolder" value="@s_armaster.name.EditValue" @Html.Raw(s_armaster.name.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.name.CustomMessage)</div></div>
+	</div>
+} @* name.Visible (end) *@
+@if (s_armaster.name2.Visible) { // name2.Visible (begin)
+	<div id="r_name2" class="form-group row">
+		<label id="elh_s_armaster_name2" for="x_name2" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.name2.Caption)@Html.Raw(s_armaster.name2.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.name2.CellAttributes)>
+<span id="el_s_armaster_name2">
+<input type="text" data-table="s_armaster" data-field="x_name2" name="x_name2" id="x_name2" size="30" maxlength="50" placeholder="@s_armaster.name2.PlaceHolder" value="@s_armaster.name2.EditValue" @Html.Raw(s_armaster.name2.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.name2.CustomMessage)</div></div>
+	</div>
+} @* name2.Visible (end) *@
+@if (s_armaster.short_name.Visible) { // short_name.Visible (begin)
+	<div id="r_short_name" class="form-group row">
+		<label id="elh_s_armaster_short_name" for="x_short_name" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.short_name.Caption)@Html.Raw(s_armaster.short_name.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.short_name.CellAttributes)>
+<span id="el_s_armaster_short_name">
+<input type="text" data-table="s_armaster" data-field="x_short_name" name="x_short_name" id="x_short_name" size="30" maxlength="50" placeholder="@s_armaster.short_name.PlaceHolder" value="@s_armaster.short_name.EditValue" @Html.Raw(s_armaster.short_name.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.short_name.CustomMessage)</div></div>
+	</div>
+} @* short_name.Visible (end) *@
+@if (s_armaster.add1.Visible) { // add1.Visible (begin)
+	<div id="r_add1" class="form-group row">
+		<label id="elh_s_armaster_add1" for="x_add1" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.add1.Caption)@Html.Raw(s_armaster.add1.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.add1.CellAttributes)>
+<span id="el_s_armaster_add1">
+<input type="text" data-table="s_armaster" data-field="x_add1" name="x_add1" id="x_add1" size="30" maxlength="100" placeholder="@s_armaster.add1.PlaceHolder" value="@s_armaster.add1.EditValue" @Html.Raw(s_armaster.add1.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.add1.CustomMessage)</div></div>
+	</div>
+} @* add1.Visible (end) *@
+@if (s_armaster.add2.Visible) { // add2.Visible (begin)
+	<div id="r_add2" class="form-group row">
+		<label id="elh_s_armaster_add2" for="x_add2" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.add2.Caption)@Html.Raw(s_armaster.add2.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.add2.CellAttributes)>
+<span id="el_s_armaster_add2">
+<input type="text" data-table="s_armaster" data-field="x_add2" name="x_add2" id="x_add2" size="30" maxlength="100" placeholder="@s_armaster.add2.PlaceHolder" value="@s_armaster.add2.EditValue" @Html.Raw(s_armaster.add2.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.add2.CustomMessage)</div></div>
+	</div>
+} @* add2.Visible (end) *@
+@if (s_armaster.add3.Visible) { // add3.Visible (begin)
+	<div id="r_add3" class="form-group row">
+		<label id="elh_s_armaster_add3" for="x_add3" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.add3.Caption)@Html.Raw(s_armaster.add3.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.add3.CellAttributes)>
+<span id="el_s_armaster_add3">
+<input type="text" data-table="s_armaster" data-field="x_add3" name="x_add3" id="x_add3" size="30" maxlength="100" placeholder="@s_armaster.add3.PlaceHolder" value="@s_armaster.add3.EditValue" @Html.Raw(s_armaster.add3.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.add3.CustomMessage)</div></div>
+	</div>
+} @* add3.Visible (end) *@
+@if (s_armaster.add4.Visible) { // add4.Visible (begin)
+	<div id="r_add4" class="form-group row">
+		<label id="elh_s_armaster_add4" for="x_add4" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.add4.Caption)@Html.Raw(s_armaster.add4.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.add4.CellAttributes)>
+<span id="el_s_armaster_add4">
+<input type="text" data-table="s_armaster" data-field="x_add4" name="x_add4" id="x_add4" size="30" maxlength="100" placeholder="@s_armaster.add4.PlaceHolder" value="@s_armaster.add4.EditValue" @Html.Raw(s_armaster.add4.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.add4.CustomMessage)</div></div>
+	</div>
+} @* add4.Visible (end) *@
+@if (s_armaster.area.Visible) { // area.Visible (begin)
+	<div id="r_area" class="form-group row">
+		<label id="elh_s_armaster_area" for="x_area" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.area.Caption)@Html.Raw(s_armaster.area.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.area.CellAttributes)>
+<span id="el_s_armaster_area">
+<input type="text" data-table="s_armaster" data-field="x_area" name="x_area" id="x_area" size="30" maxlength="100" placeholder="@s_armaster.area.PlaceHolder" value="@s_armaster.area.EditValue" @Html.Raw(s_armaster.area.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.area.CustomMessage)</div></div>
+	</div>
+} @* area.Visible (end) *@
+@if (s_armaster.postcode.Visible) { // postcode.Visible (begin)
+	<div id="r_postcode" class="form-group row">
+		<label id="elh_s_armaster_postcode" for="x_postcode" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.postcode.Caption)@Html.Raw(s_armaster.postcode.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.postcode.CellAttributes)>
+<span id="el_s_armaster_postcode">
+<input type="text" data-table="s_armaster" data-field="x_postcode" name="x_postcode" id="x_postcode" size="30" maxlength="20" placeholder="@s_armaster.postcode.PlaceHolder" value="@s_armaster.postcode.EditValue" @Html.Raw(s_armaster.postcode.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.postcode.CustomMessage)</div></div>
+	</div>
+} @* postcode.Visible (end) *@
+@if (s_armaster.state.Visible) { // state.Visible (begin)
+	<div id="r_state" class="form-group row">
+		<label id="elh_s_armaster_state" for="x_state" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.state.Caption)@Html.Raw(s_armaster.state.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.state.CellAttributes)>
+<span id="el_s_armaster_state">
+<input type="text" data-table="s_armaster" data-field="x_state" name="x_state" id="x_state" size="30" maxlength="100" placeholder="@s_armaster.state.PlaceHolder" value="@s_armaster.state.EditValue" @Html.Raw(s_armaster.state.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.state.CustomMessage)</div></div>
+	</div>
+} @* state.Visible (end) *@
+@if (s_armaster.country.Visible) { // country.Visible (begin)
+	<div id="r_country" class="form-group row">
+		<label id="elh_s_armaster_country" for="x_country" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.country.Caption)@Html.Raw(s_armaster.country.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.country.CellAttributes)>
+<span id="el_s_armaster_country">
+<input type="text" data-table="s_armaster" data-field="x_country" name="x_country" id="x_country" size="30" maxlength="100" placeholder="@s_armaster.country.PlaceHolder" value="@s_armaster.country.EditValue" @Html.Raw(s_armaster.country.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.country.CustomMessage)</div></div>
+	</div>
+} @* country.Visible (end) *@
+@if (s_armaster.tel1.Visible) { // tel1.Visible (begin)
+	<div id="r_tel1" class="form-group row">
+		<label id="elh_s_armaster_tel1" for="x_tel1" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.tel1.Caption)@Html.Raw(s_armaster.tel1.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.tel1.CellAttributes)>
+<span id="el_s_armaster_tel1">
+<input type="text" data-table="s_armaster" data-field="x_tel1" name="x_tel1" id="x_tel1" size="30" maxlength="100" placeholder="@s_armaster.tel1.PlaceHolder" value="@s_armaster.tel1.EditValue" @Html.Raw(s_armaster.tel1.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.tel1.CustomMessage)</div></div>
+	</div>
+} @* tel1.Visible (end) *@
+@if (s_armaster.tel2.Visible) { // tel2.Visible (begin)
+	<div id="r_tel2" class="form-group row">
+		<label id="elh_s_armaster_tel2" for="x_tel2" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.tel2.Caption)@Html.Raw(s_armaster.tel2.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.tel2.CellAttributes)>
+<span id="el_s_armaster_tel2">
+<input type="text" data-table="s_armaster" data-field="x_tel2" name="x_tel2" id="x_tel2" size="30" maxlength="100" placeholder="@s_armaster.tel2.PlaceHolder" value="@s_armaster.tel2.EditValue" @Html.Raw(s_armaster.tel2.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.tel2.CustomMessage)</div></div>
+	</div>
+} @* tel2.Visible (end) *@
+@if (s_armaster.phone1.Visible) { // phone1.Visible (begin)
+	<div id="r_phone1" class="form-group row">
+		<label id="elh_s_armaster_phone1" for="x_phone1" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.phone1.Caption)@Html.Raw(s_armaster.phone1.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.phone1.CellAttributes)>
+<span id="el_s_armaster_phone1">
+<input type="text" data-table="s_armaster" data-field="x_phone1" name="x_phone1" id="x_phone1" size="30" maxlength="100" placeholder="@s_armaster.phone1.PlaceHolder" value="@s_armaster.phone1.EditValue" @Html.Raw(s_armaster.phone1.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.phone1.CustomMessage)</div></div>
+	</div>
+} @* phone1.Visible (end) *@
+@if (s_armaster.phone2.Visible) { // phone2.Visible (begin)
+	<div id="r_phone2" class="form-group row">
+		<label id="elh_s_armaster_phone2" for="x_phone2" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.phone2.Caption)@Html.Raw(s_armaster.phone2.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.phone2.CellAttributes)>
+<span id="el_s_armaster_phone2">
+<input type="text" data-table="s_armaster" data-field="x_phone2" name="x_phone2" id="x_phone2" size="30" maxlength="100" placeholder="@s_armaster.phone2.PlaceHolder" value="@s_armaster.phone2.EditValue" @Html.Raw(s_armaster.phone2.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.phone2.CustomMessage)</div></div>
+	</div>
+} @* phone2.Visible (end) *@
+@if (s_armaster.fax.Visible) { // fax.Visible (begin)
+	<div id="r_fax" class="form-group row">
+		<label id="elh_s_armaster_fax" for="x_fax" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.fax.Caption)@Html.Raw(s_armaster.fax.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.fax.CellAttributes)>
+<span id="el_s_armaster_fax">
+<input type="text" data-table="s_armaster" data-field="x_fax" name="x_fax" id="x_fax" size="30" maxlength="100" placeholder="@s_armaster.fax.PlaceHolder" value="@s_armaster.fax.EditValue" @Html.Raw(s_armaster.fax.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.fax.CustomMessage)</div></div>
+	</div>
+} @* fax.Visible (end) *@
+@if (s_armaster._email.Visible) { // _email.Visible (begin)
+	<div id="r__email" class="form-group row">
+		<label id="elh_s_armaster__email" for="x__email" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster._email.Caption)@Html.Raw(s_armaster._email.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster._email.CellAttributes)>
+<span id="el_s_armaster__email">
+<input type="text" data-table="s_armaster" data-field="x__email" name="x__email" id="x__email" size="30" maxlength="100" placeholder="@s_armaster._email.PlaceHolder" value="@s_armaster._email.EditValue" @Html.Raw(s_armaster._email.EditAttributes)>
+</span>
+@Html.Raw(s_armaster._email.CustomMessage)</div></div>
+	</div>
+} @* _email.Visible (end) *@
+@if (s_armaster.ptc1.Visible) { // ptc1.Visible (begin)
+	<div id="r_ptc1" class="form-group row">
+		<label id="elh_s_armaster_ptc1" for="x_ptc1" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.ptc1.Caption)@Html.Raw(s_armaster.ptc1.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.ptc1.CellAttributes)>
+<span id="el_s_armaster_ptc1">
+<input type="text" data-table="s_armaster" data-field="x_ptc1" name="x_ptc1" id="x_ptc1" size="30" maxlength="100" placeholder="@s_armaster.ptc1.PlaceHolder" value="@s_armaster.ptc1.EditValue" @Html.Raw(s_armaster.ptc1.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.ptc1.CustomMessage)</div></div>
+	</div>
+} @* ptc1.Visible (end) *@
+@if (s_armaster.ptc.Visible) { // ptc.Visible (begin)
+	<div id="r_ptc" class="form-group row">
+		<label id="elh_s_armaster_ptc" for="x_ptc" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.ptc.Caption)@Html.Raw(s_armaster.ptc.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.ptc.CellAttributes)>
+<span id="el_s_armaster_ptc">
+<input type="text" data-table="s_armaster" data-field="x_ptc" name="x_ptc" id="x_ptc" size="30" maxlength="100" placeholder="@s_armaster.ptc.PlaceHolder" value="@s_armaster.ptc.EditValue" @Html.Raw(s_armaster.ptc.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.ptc.CustomMessage)</div></div>
+	</div>
+} @* ptc.Visible (end) *@
+@if (s_armaster.ptc2.Visible) { // ptc2.Visible (begin)
+	<div id="r_ptc2" class="form-group row">
+		<label id="elh_s_armaster_ptc2" for="x_ptc2" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.ptc2.Caption)@Html.Raw(s_armaster.ptc2.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.ptc2.CellAttributes)>
+<span id="el_s_armaster_ptc2">
+<input type="text" data-table="s_armaster" data-field="x_ptc2" name="x_ptc2" id="x_ptc2" size="30" maxlength="100" placeholder="@s_armaster.ptc2.PlaceHolder" value="@s_armaster.ptc2.EditValue" @Html.Raw(s_armaster.ptc2.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.ptc2.CustomMessage)</div></div>
+	</div>
+} @* ptc2.Visible (end) *@
+@if (s_armaster.ar_grp.Visible) { // ar_grp.Visible (begin)
+	<div id="r_ar_grp" class="form-group row">
+		<label id="elh_s_armaster_ar_grp" for="x_ar_grp" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.ar_grp.Caption)@Html.Raw(s_armaster.ar_grp.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.ar_grp.CellAttributes)>
+<span id="el_s_armaster_ar_grp">
+<input type="text" data-table="s_armaster" data-field="x_ar_grp" name="x_ar_grp" id="x_ar_grp" size="30" maxlength="20" placeholder="@s_armaster.ar_grp.PlaceHolder" value="@s_armaster.ar_grp.EditValue" @Html.Raw(s_armaster.ar_grp.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.ar_grp.CustomMessage)</div></div>
+	</div>
+} @* ar_grp.Visible (end) *@
+@if (s_armaster.term_code.Visible) { // term_code.Visible (begin)
+	<div id="r_term_code" class="form-group row">
+		<label id="elh_s_armaster_term_code" for="x_term_code" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.term_code.Caption)@Html.Raw(s_armaster.term_code.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.term_code.CellAttributes)>
+<span id="el_s_armaster_term_code">
+<input type="text" data-table="s_armaster" data-field="x_term_code" name="x_term_code" id="x_term_code" size="30" maxlength="50" placeholder="@s_armaster.term_code.PlaceHolder" value="@s_armaster.term_code.EditValue" @Html.Raw(s_armaster.term_code.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.term_code.CustomMessage)</div></div>
+	</div>
+} @* term_code.Visible (end) *@
+@if (s_armaster.pterm_code.Visible) { // pterm_code.Visible (begin)
+	<div id="r_pterm_code" class="form-group row">
+		<label id="elh_s_armaster_pterm_code" for="x_pterm_code" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.pterm_code.Caption)@Html.Raw(s_armaster.pterm_code.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.pterm_code.CellAttributes)>
+<span id="el_s_armaster_pterm_code">
+<input type="text" data-table="s_armaster" data-field="x_pterm_code" name="x_pterm_code" id="x_pterm_code" size="30" maxlength="50" placeholder="@s_armaster.pterm_code.PlaceHolder" value="@s_armaster.pterm_code.EditValue" @Html.Raw(s_armaster.pterm_code.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.pterm_code.CustomMessage)</div></div>
+	</div>
+} @* pterm_code.Visible (end) *@
+@if (s_armaster.cr_limit.Visible) { // cr_limit.Visible (begin)
+	<div id="r_cr_limit" class="form-group row">
+		<label id="elh_s_armaster_cr_limit" for="x_cr_limit" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.cr_limit.Caption)@Html.Raw(s_armaster.cr_limit.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.cr_limit.CellAttributes)>
+<span id="el_s_armaster_cr_limit">
+<input type="text" data-table="s_armaster" data-field="x_cr_limit" name="x_cr_limit" id="x_cr_limit" size="30" placeholder="@s_armaster.cr_limit.PlaceHolder" value="@s_armaster.cr_limit.EditValue" @Html.Raw(s_armaster.cr_limit.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.cr_limit.CustomMessage)</div></div>
+	</div>
+} @* cr_limit.Visible (end) *@
+@if (s_armaster.CurrencyCode.Visible) { // CurrencyCode.Visible (begin)
+	<div id="r_CurrencyCode" class="form-group row">
+		<label id="elh_s_armaster_CurrencyCode" for="x_CurrencyCode" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.CurrencyCode.Caption)@Html.Raw(s_armaster.CurrencyCode.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.CurrencyCode.CellAttributes)>
+<span id="el_s_armaster_CurrencyCode">
+<input type="text" data-table="s_armaster" data-field="x_CurrencyCode" name="x_CurrencyCode" id="x_CurrencyCode" size="30" maxlength="20" placeholder="@s_armaster.CurrencyCode.PlaceHolder" value="@s_armaster.CurrencyCode.EditValue" @Html.Raw(s_armaster.CurrencyCode.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.CurrencyCode.CustomMessage)</div></div>
+	</div>
+} @* CurrencyCode.Visible (end) *@
+@if (s_armaster.slsman.Visible) { // slsman.Visible (begin)
+	<div id="r_slsman" class="form-group row">
+		<label id="elh_s_armaster_slsman" for="x_slsman" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.slsman.Caption)@Html.Raw(s_armaster.slsman.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.slsman.CellAttributes)>
+<span id="el_s_armaster_slsman">
+<input type="text" data-table="s_armaster" data-field="x_slsman" name="x_slsman" id="x_slsman" size="30" maxlength="50" placeholder="@s_armaster.slsman.PlaceHolder" value="@s_armaster.slsman.EditValue" @Html.Raw(s_armaster.slsman.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.slsman.CustomMessage)</div></div>
+	</div>
+} @* slsman.Visible (end) *@
+@if (s_armaster.ytd_sale.Visible) { // ytd_sale.Visible (begin)
+	<div id="r_ytd_sale" class="form-group row">
+		<label id="elh_s_armaster_ytd_sale" for="x_ytd_sale" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.ytd_sale.Caption)@Html.Raw(s_armaster.ytd_sale.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.ytd_sale.CellAttributes)>
+<span id="el_s_armaster_ytd_sale">
+<input type="text" data-table="s_armaster" data-field="x_ytd_sale" name="x_ytd_sale" id="x_ytd_sale" size="30" placeholder="@s_armaster.ytd_sale.PlaceHolder" value="@s_armaster.ytd_sale.EditValue" @Html.Raw(s_armaster.ytd_sale.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.ytd_sale.CustomMessage)</div></div>
+	</div>
+} @* ytd_sale.Visible (end) *@
+@if (s_armaster.ytd_cost.Visible) { // ytd_cost.Visible (begin)
+	<div id="r_ytd_cost" class="form-group row">
+		<label id="elh_s_armaster_ytd_cost" for="x_ytd_cost" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.ytd_cost.Caption)@Html.Raw(s_armaster.ytd_cost.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.ytd_cost.CellAttributes)>
+<span id="el_s_armaster_ytd_cost">
+<input type="text" data-table="s_armaster" data-field="x_ytd_cost" name="x_ytd_cost" id="x_ytd_cost" size="30" placeholder="@s_armaster.ytd_cost.PlaceHolder" value="@s_armaster.ytd_cost.EditValue" @Html.Raw(s_armaster.ytd_cost.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.ytd_cost.CustomMessage)</div></div>
+	</div>
+} @* ytd_cost.Visible (end) *@
+@if (s_armaster.ytd_disc.Visible) { // ytd_disc.Visible (begin)
+	<div id="r_ytd_disc" class="form-group row">
+		<label id="elh_s_armaster_ytd_disc" for="x_ytd_disc" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.ytd_disc.Caption)@Html.Raw(s_armaster.ytd_disc.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.ytd_disc.CellAttributes)>
+<span id="el_s_armaster_ytd_disc">
+<input type="text" data-table="s_armaster" data-field="x_ytd_disc" name="x_ytd_disc" id="x_ytd_disc" size="30" placeholder="@s_armaster.ytd_disc.PlaceHolder" value="@s_armaster.ytd_disc.EditValue" @Html.Raw(s_armaster.ytd_disc.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.ytd_disc.CustomMessage)</div></div>
+	</div>
+} @* ytd_disc.Visible (end) *@
+@if (s_armaster.ctrl_acct.Visible) { // ctrl_acct.Visible (begin)
+	<div id="r_ctrl_acct" class="form-group row">
+		<label id="elh_s_armaster_ctrl_acct" for="x_ctrl_acct" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.ctrl_acct.Caption)@Html.Raw(s_armaster.ctrl_acct.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.ctrl_acct.CellAttributes)>
+<span id="el_s_armaster_ctrl_acct">
+<input type="text" data-table="s_armaster" data-field="x_ctrl_acct" name="x_ctrl_acct" id="x_ctrl_acct" size="30" maxlength="20" placeholder="@s_armaster.ctrl_acct.PlaceHolder" value="@s_armaster.ctrl_acct.EditValue" @Html.Raw(s_armaster.ctrl_acct.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.ctrl_acct.CustomMessage)</div></div>
+	</div>
+} @* ctrl_acct.Visible (end) *@
+@if (s_armaster.ctrl_dept.Visible) { // ctrl_dept.Visible (begin)
+	<div id="r_ctrl_dept" class="form-group row">
+		<label id="elh_s_armaster_ctrl_dept" for="x_ctrl_dept" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.ctrl_dept.Caption)@Html.Raw(s_armaster.ctrl_dept.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.ctrl_dept.CellAttributes)>
+<span id="el_s_armaster_ctrl_dept">
+<input type="text" data-table="s_armaster" data-field="x_ctrl_dept" name="x_ctrl_dept" id="x_ctrl_dept" size="30" maxlength="20" placeholder="@s_armaster.ctrl_dept.PlaceHolder" value="@s_armaster.ctrl_dept.EditValue" @Html.Raw(s_armaster.ctrl_dept.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.ctrl_dept.CustomMessage)</div></div>
+	</div>
+} @* ctrl_dept.Visible (end) *@
+@if (s_armaster.acct_code.Visible) { // acct_code.Visible (begin)
+	<div id="r_acct_code" class="form-group row">
+		<label id="elh_s_armaster_acct_code" for="x_acct_code" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.acct_code.Caption)@Html.Raw(s_armaster.acct_code.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.acct_code.CellAttributes)>
+<span id="el_s_armaster_acct_code">
+<input type="text" data-table="s_armaster" data-field="x_acct_code" name="x_acct_code" id="x_acct_code" size="30" maxlength="20" placeholder="@s_armaster.acct_code.PlaceHolder" value="@s_armaster.acct_code.EditValue" @Html.Raw(s_armaster.acct_code.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.acct_code.CustomMessage)</div></div>
+	</div>
+} @* acct_code.Visible (end) *@
+@if (s_armaster.acct_dept.Visible) { // acct_dept.Visible (begin)
+	<div id="r_acct_dept" class="form-group row">
+		<label id="elh_s_armaster_acct_dept" for="x_acct_dept" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.acct_dept.Caption)@Html.Raw(s_armaster.acct_dept.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.acct_dept.CellAttributes)>
+<span id="el_s_armaster_acct_dept">
+<input type="text" data-table="s_armaster" data-field="x_acct_dept" name="x_acct_dept" id="x_acct_dept" size="30" maxlength="20" placeholder="@s_armaster.acct_dept.PlaceHolder" value="@s_armaster.acct_dept.EditValue" @Html.Raw(s_armaster.acct_dept.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.acct_dept.CustomMessage)</div></div>
+	</div>
+} @* acct_dept.Visible (end) *@
+@if (s_armaster.skip_stmt.Visible) { // skip_stmt.Visible (begin)
+	<div id="r_skip_stmt" class="form-group row">
+		<label id="elh_s_armaster_skip_stmt" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.skip_stmt.Caption)@Html.Raw(s_armaster.skip_stmt.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.skip_stmt.CellAttributes)>
+<span id="el_s_armaster_skip_stmt">
+<input type="checkbox" data-table="s_armaster" data-field="x_skip_stmt" name="x_skip_stmt" id="x_skip_stmt" value="1" checked="@ConvertToBool(s_armaster.skip_stmt.CurrentValue)" @Html.Raw(s_armaster.skip_stmt.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.skip_stmt.CustomMessage)</div></div>
+	</div>
+} @* skip_stmt.Visible (end) *@
+@if (s_armaster.stop_sale.Visible) { // stop_sale.Visible (begin)
+	<div id="r_stop_sale" class="form-group row">
+		<label id="elh_s_armaster_stop_sale" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.stop_sale.Caption)@Html.Raw(s_armaster.stop_sale.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.stop_sale.CellAttributes)>
+<span id="el_s_armaster_stop_sale">
+<input type="checkbox" data-table="s_armaster" data-field="x_stop_sale" name="x_stop_sale" id="x_stop_sale" value="1" checked="@ConvertToBool(s_armaster.stop_sale.CurrentValue)" @Html.Raw(s_armaster.stop_sale.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.stop_sale.CustomMessage)</div></div>
+	</div>
+} @* stop_sale.Visible (end) *@
+@if (s_armaster.opn_item.Visible) { // opn_item.Visible (begin)
+	<div id="r_opn_item" class="form-group row">
+		<label id="elh_s_armaster_opn_item" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.opn_item.Caption)@Html.Raw(s_armaster.opn_item.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.opn_item.CellAttributes)>
+<span id="el_s_armaster_opn_item">
+<input type="checkbox" data-table="s_armaster" data-field="x_opn_item" name="x_opn_item" id="x_opn_item" value="1" checked="@ConvertToBool(s_armaster.opn_item.CurrentValue)" @Html.Raw(s_armaster.opn_item.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.opn_item.CustomMessage)</div></div>
+	</div>
+} @* opn_item.Visible (end) *@
+@if (s_armaster.status.Visible) { // status.Visible (begin)
+	<div id="r_status" class="form-group row">
+		<label id="elh_s_armaster_status" for="x_status" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.status.Caption)@Html.Raw(s_armaster.status.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.status.CellAttributes)>
+<span id="el_s_armaster_status">
+<input type="text" data-table="s_armaster" data-field="x_status" name="x_status" id="x_status" size="30" maxlength="10" placeholder="@s_armaster.status.PlaceHolder" value="@s_armaster.status.EditValue" @Html.Raw(s_armaster.status.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.status.CustomMessage)</div></div>
+	</div>
+} @* status.Visible (end) *@
+@if (s_armaster.tax_desc.Visible) { // tax_desc.Visible (begin)
+	<div id="r_tax_desc" class="form-group row">
+		<label id="elh_s_armaster_tax_desc" for="x_tax_desc" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.tax_desc.Caption)@Html.Raw(s_armaster.tax_desc.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.tax_desc.CellAttributes)>
+<span id="el_s_armaster_tax_desc">
+<input type="text" data-table="s_armaster" data-field="x_tax_desc" name="x_tax_desc" id="x_tax_desc" size="30" maxlength="100" placeholder="@s_armaster.tax_desc.PlaceHolder" value="@s_armaster.tax_desc.EditValue" @Html.Raw(s_armaster.tax_desc.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.tax_desc.CustomMessage)</div></div>
+	</div>
+} @* tax_desc.Visible (end) *@
+@if (s_armaster.stax.Visible) { // stax.Visible (begin)
+	<div id="r_stax" class="form-group row">
+		<label id="elh_s_armaster_stax" for="x_stax" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.stax.Caption)@Html.Raw(s_armaster.stax.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.stax.CellAttributes)>
+<span id="el_s_armaster_stax">
+<input type="text" data-table="s_armaster" data-field="x_stax" name="x_stax" id="x_stax" size="30" maxlength="100" placeholder="@s_armaster.stax.PlaceHolder" value="@s_armaster.stax.EditValue" @Html.Raw(s_armaster.stax.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.stax.CustomMessage)</div></div>
+	</div>
+} @* stax.Visible (end) *@
+@if (s_armaster.remark.Visible) { // remark.Visible (begin)
+	<div id="r_remark" class="form-group row">
+		<label id="elh_s_armaster_remark" for="x_remark" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.remark.Caption)@Html.Raw(s_armaster.remark.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.remark.CellAttributes)>
+<span id="el_s_armaster_remark">
+<input type="text" data-table="s_armaster" data-field="x_remark" name="x_remark" id="x_remark" size="30" maxlength="100" placeholder="@s_armaster.remark.PlaceHolder" value="@s_armaster.remark.EditValue" @Html.Raw(s_armaster.remark.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.remark.CustomMessage)</div></div>
+	</div>
+} @* remark.Visible (end) *@
+@if (s_armaster.inv_fmt.Visible) { // inv_fmt.Visible (begin)
+	<div id="r_inv_fmt" class="form-group row">
+		<label id="elh_s_armaster_inv_fmt" for="x_inv_fmt" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.inv_fmt.Caption)@Html.Raw(s_armaster.inv_fmt.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.inv_fmt.CellAttributes)>
+<span id="el_s_armaster_inv_fmt">
+<input type="text" data-table="s_armaster" data-field="x_inv_fmt" name="x_inv_fmt" id="x_inv_fmt" size="30" maxlength="100" placeholder="@s_armaster.inv_fmt.PlaceHolder" value="@s_armaster.inv_fmt.EditValue" @Html.Raw(s_armaster.inv_fmt.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.inv_fmt.CustomMessage)</div></div>
+	</div>
+} @* inv_fmt.Visible (end) *@
+@if (s_armaster.do_fmt.Visible) { // do_fmt.Visible (begin)
+	<div id="r_do_fmt" class="form-group row">
+		<label id="elh_s_armaster_do_fmt" for="x_do_fmt" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.do_fmt.Caption)@Html.Raw(s_armaster.do_fmt.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.do_fmt.CellAttributes)>
+<span id="el_s_armaster_do_fmt">
+<input type="text" data-table="s_armaster" data-field="x_do_fmt" name="x_do_fmt" id="x_do_fmt" size="30" maxlength="100" placeholder="@s_armaster.do_fmt.PlaceHolder" value="@s_armaster.do_fmt.EditValue" @Html.Raw(s_armaster.do_fmt.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.do_fmt.CustomMessage)</div></div>
+	</div>
+} @* do_fmt.Visible (end) *@
+@if (s_armaster.Ship_Code.Visible) { // Ship_Code.Visible (begin)
+	<div id="r_Ship_Code" class="form-group row">
+		<label id="elh_s_armaster_Ship_Code" for="x_Ship_Code" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.Ship_Code.Caption)@Html.Raw(s_armaster.Ship_Code.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.Ship_Code.CellAttributes)>
+<span id="el_s_armaster_Ship_Code">
+<input type="text" data-table="s_armaster" data-field="x_Ship_Code" name="x_Ship_Code" id="x_Ship_Code" size="30" maxlength="20" placeholder="@s_armaster.Ship_Code.PlaceHolder" value="@s_armaster.Ship_Code.EditValue" @Html.Raw(s_armaster.Ship_Code.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.Ship_Code.CustomMessage)</div></div>
+	</div>
+} @* Ship_Code.Visible (end) *@
+@if (s_armaster.custtype.Visible) { // custtype.Visible (begin)
+	<div id="r_custtype" class="form-group row">
+		<label id="elh_s_armaster_custtype" for="x_custtype" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.custtype.Caption)@Html.Raw(s_armaster.custtype.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.custtype.CellAttributes)>
+<span id="el_s_armaster_custtype">
+<input type="text" data-table="s_armaster" data-field="x_custtype" name="x_custtype" id="x_custtype" size="30" maxlength="20" placeholder="@s_armaster.custtype.PlaceHolder" value="@s_armaster.custtype.EditValue" @Html.Raw(s_armaster.custtype.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.custtype.CustomMessage)</div></div>
+	</div>
+} @* custtype.Visible (end) *@
+@if (s_armaster.Acct_BillAcct.Visible) { // Acct_BillAcct.Visible (begin)
+	<div id="r_Acct_BillAcct" class="form-group row">
+		<label id="elh_s_armaster_Acct_BillAcct" for="x_Acct_BillAcct" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.Acct_BillAcct.Caption)@Html.Raw(s_armaster.Acct_BillAcct.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.Acct_BillAcct.CellAttributes)>
+<span id="el_s_armaster_Acct_BillAcct">
+<input type="text" data-table="s_armaster" data-field="x_Acct_BillAcct" name="x_Acct_BillAcct" id="x_Acct_BillAcct" size="30" maxlength="20" placeholder="@s_armaster.Acct_BillAcct.PlaceHolder" value="@s_armaster.Acct_BillAcct.EditValue" @Html.Raw(s_armaster.Acct_BillAcct.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.Acct_BillAcct.CustomMessage)</div></div>
+	</div>
+} @* Acct_BillAcct.Visible (end) *@
+@if (s_armaster.bill_flag.Visible) { // bill_flag.Visible (begin)
+	<div id="r_bill_flag" class="form-group row">
+		<label id="elh_s_armaster_bill_flag" for="x_bill_flag" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.bill_flag.Caption)@Html.Raw(s_armaster.bill_flag.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.bill_flag.CellAttributes)>
+<span id="el_s_armaster_bill_flag">
+<input type="text" data-table="s_armaster" data-field="x_bill_flag" name="x_bill_flag" id="x_bill_flag" size="30" maxlength="20" placeholder="@s_armaster.bill_flag.PlaceHolder" value="@s_armaster.bill_flag.EditValue" @Html.Raw(s_armaster.bill_flag.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.bill_flag.CustomMessage)</div></div>
+	</div>
+} @* bill_flag.Visible (end) *@
+@if (s_armaster.payment_code.Visible) { // payment_code.Visible (begin)
+	<div id="r_payment_code" class="form-group row">
+		<label id="elh_s_armaster_payment_code" for="x_payment_code" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.payment_code.Caption)@Html.Raw(s_armaster.payment_code.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.payment_code.CellAttributes)>
+<span id="el_s_armaster_payment_code">
+<input type="text" data-table="s_armaster" data-field="x_payment_code" name="x_payment_code" id="x_payment_code" size="30" maxlength="20" placeholder="@s_armaster.payment_code.PlaceHolder" value="@s_armaster.payment_code.EditValue" @Html.Raw(s_armaster.payment_code.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.payment_code.CustomMessage)</div></div>
+	</div>
+} @* payment_code.Visible (end) *@
+@if (s_armaster.stax_pct.Visible) { // stax_pct.Visible (begin)
+	<div id="r_stax_pct" class="form-group row">
+		<label id="elh_s_armaster_stax_pct" for="x_stax_pct" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.stax_pct.Caption)@Html.Raw(s_armaster.stax_pct.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.stax_pct.CellAttributes)>
+<span id="el_s_armaster_stax_pct">
+<input type="text" data-table="s_armaster" data-field="x_stax_pct" name="x_stax_pct" id="x_stax_pct" size="30" placeholder="@s_armaster.stax_pct.PlaceHolder" value="@s_armaster.stax_pct.EditValue" @Html.Raw(s_armaster.stax_pct.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.stax_pct.CustomMessage)</div></div>
+	</div>
+} @* stax_pct.Visible (end) *@
+@if (s_armaster.db_part.Visible) { // db_part.Visible (begin)
+	<div id="r_db_part" class="form-group row">
+		<label id="elh_s_armaster_db_part" for="x_db_part" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.db_part.Caption)@Html.Raw(s_armaster.db_part.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.db_part.CellAttributes)>
+<span id="el_s_armaster_db_part">
+<input type="text" data-table="s_armaster" data-field="x_db_part" name="x_db_part" id="x_db_part" size="30" maxlength="20" placeholder="@s_armaster.db_part.PlaceHolder" value="@s_armaster.db_part.EditValue" @Html.Raw(s_armaster.db_part.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.db_part.CustomMessage)</div></div>
+	</div>
+} @* db_part.Visible (end) *@
+@if (s_armaster.b_code.Visible) { // b_code.Visible (begin)
+	<div id="r_b_code" class="form-group row">
+		<label id="elh_s_armaster_b_code" for="x_b_code" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.b_code.Caption)@Html.Raw(s_armaster.b_code.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.b_code.CellAttributes)>
+<span id="el_s_armaster_b_code">
+<input type="text" data-table="s_armaster" data-field="x_b_code" name="x_b_code" id="x_b_code" size="30" maxlength="20" placeholder="@s_armaster.b_code.PlaceHolder" value="@s_armaster.b_code.EditValue" @Html.Raw(s_armaster.b_code.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.b_code.CustomMessage)</div></div>
+	</div>
+} @* b_code.Visible (end) *@
+@if (s_armaster.lmw_no.Visible) { // lmw_no.Visible (begin)
+	<div id="r_lmw_no" class="form-group row">
+		<label id="elh_s_armaster_lmw_no" for="x_lmw_no" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.lmw_no.Caption)@Html.Raw(s_armaster.lmw_no.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.lmw_no.CellAttributes)>
+<span id="el_s_armaster_lmw_no">
+<input type="text" data-table="s_armaster" data-field="x_lmw_no" name="x_lmw_no" id="x_lmw_no" size="30" maxlength="20" placeholder="@s_armaster.lmw_no.PlaceHolder" value="@s_armaster.lmw_no.EditValue" @Html.Raw(s_armaster.lmw_no.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.lmw_no.CustomMessage)</div></div>
+	</div>
+} @* lmw_no.Visible (end) *@
+@if (s_armaster.cs_code.Visible) { // cs_code.Visible (begin)
+	<div id="r_cs_code" class="form-group row">
+		<label id="elh_s_armaster_cs_code" for="x_cs_code" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.cs_code.Caption)@Html.Raw(s_armaster.cs_code.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.cs_code.CellAttributes)>
+<span id="el_s_armaster_cs_code">
+<input type="text" data-table="s_armaster" data-field="x_cs_code" name="x_cs_code" id="x_cs_code" size="30" maxlength="20" placeholder="@s_armaster.cs_code.PlaceHolder" value="@s_armaster.cs_code.EditValue" @Html.Raw(s_armaster.cs_code.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.cs_code.CustomMessage)</div></div>
+	</div>
+} @* cs_code.Visible (end) *@
+@if (s_armaster.approved.Visible) { // approved.Visible (begin)
+	<div id="r_approved" class="form-group row">
+		<label id="elh_s_armaster_approved" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.approved.Caption)@Html.Raw(s_armaster.approved.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.approved.CellAttributes)>
+<span id="el_s_armaster_approved">
+<input type="checkbox" data-table="s_armaster" data-field="x_approved" name="x_approved" id="x_approved" value="1" checked="@ConvertToBool(s_armaster.approved.CurrentValue)" @Html.Raw(s_armaster.approved.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.approved.CustomMessage)</div></div>
+	</div>
+} @* approved.Visible (end) *@
+@if (s_armaster.oversea.Visible) { // oversea.Visible (begin)
+	<div id="r_oversea" class="form-group row">
+		<label id="elh_s_armaster_oversea" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.oversea.Caption)@Html.Raw(s_armaster.oversea.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.oversea.CellAttributes)>
+<span id="el_s_armaster_oversea">
+<input type="checkbox" data-table="s_armaster" data-field="x_oversea" name="x_oversea" id="x_oversea" value="1" checked="@ConvertToBool(s_armaster.oversea.CurrentValue)" @Html.Raw(s_armaster.oversea.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.oversea.CustomMessage)</div></div>
+	</div>
+} @* oversea.Visible (end) *@
+@if (s_armaster.defa_disc_pct.Visible) { // defa_disc_pct.Visible (begin)
+	<div id="r_defa_disc_pct" class="form-group row">
+		<label id="elh_s_armaster_defa_disc_pct" for="x_defa_disc_pct" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.defa_disc_pct.Caption)@Html.Raw(s_armaster.defa_disc_pct.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.defa_disc_pct.CellAttributes)>
+<span id="el_s_armaster_defa_disc_pct">
+<input type="text" data-table="s_armaster" data-field="x_defa_disc_pct" name="x_defa_disc_pct" id="x_defa_disc_pct" size="30" placeholder="@s_armaster.defa_disc_pct.PlaceHolder" value="@s_armaster.defa_disc_pct.EditValue" @Html.Raw(s_armaster.defa_disc_pct.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.defa_disc_pct.CustomMessage)</div></div>
+	</div>
+} @* defa_disc_pct.Visible (end) *@
+@if (s_armaster.sellpriceDOM.Visible) { // sellpriceDOM.Visible (begin)
+	<div id="r_sellpriceDOM" class="form-group row">
+		<label id="elh_s_armaster_sellpriceDOM" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.sellpriceDOM.Caption)@Html.Raw(s_armaster.sellpriceDOM.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.sellpriceDOM.CellAttributes)>
+<span id="el_s_armaster_sellpriceDOM">
+<input type="checkbox" data-table="s_armaster" data-field="x_sellpriceDOM" name="x_sellpriceDOM" id="x_sellpriceDOM" value="1" checked="@ConvertToBool(s_armaster.sellpriceDOM.CurrentValue)" @Html.Raw(s_armaster.sellpriceDOM.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.sellpriceDOM.CustomMessage)</div></div>
+	</div>
+} @* sellpriceDOM.Visible (end) *@
+@if (s_armaster.id_upd.Visible) { // id_upd.Visible (begin)
+	<div id="r_id_upd" class="form-group row">
+		<label id="elh_s_armaster_id_upd" for="x_id_upd" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.id_upd.Caption)@Html.Raw(s_armaster.id_upd.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.id_upd.CellAttributes)>
+<span id="el_s_armaster_id_upd">
+<input type="text" data-table="s_armaster" data-field="x_id_upd" name="x_id_upd" id="x_id_upd" size="30" maxlength="20" placeholder="@s_armaster.id_upd.PlaceHolder" value="@s_armaster.id_upd.EditValue" @Html.Raw(s_armaster.id_upd.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.id_upd.CustomMessage)</div></div>
+	</div>
+} @* id_upd.Visible (end) *@
+@if (s_armaster.dt_upd.Visible) { // dt_upd.Visible (begin)
+	<div id="r_dt_upd" class="form-group row">
+		<label id="elh_s_armaster_dt_upd" for="x_dt_upd" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.dt_upd.Caption)@Html.Raw(s_armaster.dt_upd.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.dt_upd.CellAttributes)>
+<span id="el_s_armaster_dt_upd">
+<input type="text" data-table="s_armaster" data-field="x_dt_upd" name="x_dt_upd" id="x_dt_upd" placeholder="@s_armaster.dt_upd.PlaceHolder" value="@s_armaster.dt_upd.EditValue" @Html.Raw(s_armaster.dt_upd.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.dt_upd.CustomMessage)</div></div>
+	</div>
+} @* dt_upd.Visible (end) *@
+@if (s_armaster.com_regno.Visible) { // com_regno.Visible (begin)
+	<div id="r_com_regno" class="form-group row">
+		<label id="elh_s_armaster_com_regno" for="x_com_regno" class="@s_armaster_Add.LeftColumnClass">@Html.Raw(s_armaster.com_regno.Caption)@Html.Raw(s_armaster.com_regno.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_armaster_Add.RightColumnClass"><div @Html.Raw(s_armaster.com_regno.CellAttributes)>
+<span id="el_s_armaster_com_regno">
+<input type="text" data-table="s_armaster" data-field="x_com_regno" name="x_com_regno" id="x_com_regno" size="30" maxlength="100" placeholder="@s_armaster.com_regno.PlaceHolder" value="@s_armaster.com_regno.EditValue" @Html.Raw(s_armaster.com_regno.EditAttributes)>
+</span>
+@Html.Raw(s_armaster.com_regno.CustomMessage)</div></div>
+	</div>
+} @* com_regno.Visible (end) *@
+</div><!-- /page* -->
+@{ s_armaster_Add.CloseRecordset(); }
+@if (!s_armaster_Add.IsModal) {
+<div class="form-group row"><!-- buttons .form-group -->
+	<div class="@s_armaster_Add.OffsetColumnClass"><!-- buttons offset -->
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("AddBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_armaster_Add.ReturnUrl)"> @Html.Raw(Language.Phrase("CancelBtn"))</button>
+	</div><!-- /buttons offset -->
+</div><!-- /buttons .form-group -->
+}
+</form>
+@s_armaster_Add.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

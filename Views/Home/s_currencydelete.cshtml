@@ -1,0 +1,243 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_currency_Delete.Page_Render();
+
+	// Check action result
+	if (s_currency_Delete.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "delete";
+var fs_currencydelete = currentForm = new ew.Form("fs_currencydelete", "delete");
+
+// Form_CustomValidate event
+fs_currencydelete.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_currencydelete.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_currencydelete.lists["x_PrimaryCurrency"] = @Html.Raw(s_currency_Delete.PrimaryCurrency.Lookup.ToClientList());
+fs_currencydelete.lists["x_PrimaryCurrency"].options = @Html.Raw(ConvertToJson(s_currency_Delete.PrimaryCurrency.Options(false))); // DN
+fs_currencydelete.lists["x_Published"] = @Html.Raw(s_currency_Delete.Published.Lookup.ToClientList());
+fs_currencydelete.lists["x_Published"].options = @Html.Raw(ConvertToJson(s_currency_Delete.Published.Options(false))); // DN
+
+// Form object for search
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_currency_Delete.ShowPageHeader()
+@s_currency_Delete.ShowMessages()
+<form name="fs_currencydelete" id="fs_currencydelete" class="form-inline ew-form ew-delete-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_currency_Delete.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="delete">
+@foreach (string key in s_currency_Delete.RecordKeys) {
+<input type="hidden" name="key_m" value="@key">
+}
+<div class="card ew-card ew-grid">
+<div class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+<table class="table ew-table">
+	<thead>
+	<tr class="ew-table-header">
+@if (s_currency.Id.Visible) { // Id (begin)
+		<th class="@Html.Raw(s_currency.Id.HeaderCellClass)"><span id="elh_s_currency_Id" class="s_currency_Id">@Html.Raw(s_currency.Id.Caption)</span></th>
+} @* Id.Visible (end) *@
+@if (s_currency.CurrencyCode.Visible) { // CurrencyCode (begin)
+		<th class="@Html.Raw(s_currency.CurrencyCode.HeaderCellClass)"><span id="elh_s_currency_CurrencyCode" class="s_currency_CurrencyCode">@Html.Raw(s_currency.CurrencyCode.Caption)</span></th>
+} @* CurrencyCode.Visible (end) *@
+@if (s_currency.CurrencyName.Visible) { // CurrencyName (begin)
+		<th class="@Html.Raw(s_currency.CurrencyName.HeaderCellClass)"><span id="elh_s_currency_CurrencyName" class="s_currency_CurrencyName">@Html.Raw(s_currency.CurrencyName.Caption)</span></th>
+} @* CurrencyName.Visible (end) *@
+@if (s_currency.PrimaryCurrency.Visible) { // PrimaryCurrency (begin)
+		<th class="@Html.Raw(s_currency.PrimaryCurrency.HeaderCellClass)"><span id="elh_s_currency_PrimaryCurrency" class="s_currency_PrimaryCurrency">@Html.Raw(s_currency.PrimaryCurrency.Caption)</span></th>
+} @* PrimaryCurrency.Visible (end) *@
+@if (s_currency.Rate.Visible) { // Rate (begin)
+		<th class="@Html.Raw(s_currency.Rate.HeaderCellClass)"><span id="elh_s_currency_Rate" class="s_currency_Rate">@Html.Raw(s_currency.Rate.Caption)</span></th>
+} @* Rate.Visible (end) *@
+@if (s_currency.DisplayLocale.Visible) { // DisplayLocale (begin)
+		<th class="@Html.Raw(s_currency.DisplayLocale.HeaderCellClass)"><span id="elh_s_currency_DisplayLocale" class="s_currency_DisplayLocale">@Html.Raw(s_currency.DisplayLocale.Caption)</span></th>
+} @* DisplayLocale.Visible (end) *@
+@if (s_currency.CustomFormatting.Visible) { // CustomFormatting (begin)
+		<th class="@Html.Raw(s_currency.CustomFormatting.HeaderCellClass)"><span id="elh_s_currency_CustomFormatting" class="s_currency_CustomFormatting">@Html.Raw(s_currency.CustomFormatting.Caption)</span></th>
+} @* CustomFormatting.Visible (end) *@
+@if (s_currency.Published.Visible) { // Published (begin)
+		<th class="@Html.Raw(s_currency.Published.HeaderCellClass)"><span id="elh_s_currency_Published" class="s_currency_Published">@Html.Raw(s_currency.Published.Caption)</span></th>
+} @* Published.Visible (end) *@
+@if (s_currency.UpdatedOnUtc.Visible) { // UpdatedOnUtc (begin)
+		<th class="@Html.Raw(s_currency.UpdatedOnUtc.HeaderCellClass)"><span id="elh_s_currency_UpdatedOnUtc" class="s_currency_UpdatedOnUtc">@Html.Raw(s_currency.UpdatedOnUtc.Caption)</span></th>
+} @* UpdatedOnUtc.Visible (end) *@
+@if (s_currency.RoundingTypeId.Visible) { // RoundingTypeId (begin)
+		<th class="@Html.Raw(s_currency.RoundingTypeId.HeaderCellClass)"><span id="elh_s_currency_RoundingTypeId" class="s_currency_RoundingTypeId">@Html.Raw(s_currency.RoundingTypeId.Caption)</span></th>
+} @* RoundingTypeId.Visible (end) *@
+@if (s_currency.DisplayOrder.Visible) { // DisplayOrder (begin)
+		<th class="@Html.Raw(s_currency.DisplayOrder.HeaderCellClass)"><span id="elh_s_currency_DisplayOrder" class="s_currency_DisplayOrder">@Html.Raw(s_currency.DisplayOrder.Caption)</span></th>
+} @* DisplayOrder.Visible (end) *@
+	</tr>
+	</thead>
+	<tbody>
+@{ s_currency_Delete.RecordCount = 0; }
+@while (s_currency_Delete.Recordset != null && await s_currency_Delete.Recordset.ReadAsync()) { // DN
+	s_currency_Delete.RecordCount++;
+	s_currency_Delete.RowCnt++;
+
+	// Set row properties
+	s_currency_Delete.ResetAttributes();
+	s_currency_Delete.RowType = Config.RowTypeView; // View
+
+	// Get the field contents
+	await s_currency_Delete.LoadRowValues(s_currency_Delete.Recordset);
+
+	// Render row
+	await s_currency_Delete.RenderRow();
+	<tr @Html.Raw(s_currency_Delete.RowAttributes)>
+@if (s_currency.Id.Visible) { // Id (begin)
+		<td @Html.Raw(s_currency.Id.CellAttributes)>
+<span id="el@(s_currency_Delete.RowCnt)_s_currency_Id" class="s_currency_Id">
+<span @Html.Raw(s_currency.Id.ViewAttributes)>
+@Html.Raw(s_currency.Id.GetViewValue())</span>
+</span>
+</td>
+} @* Id.Visible (end) *@
+@if (s_currency.CurrencyCode.Visible) { // CurrencyCode (begin)
+		<td @Html.Raw(s_currency.CurrencyCode.CellAttributes)>
+<span id="el@(s_currency_Delete.RowCnt)_s_currency_CurrencyCode" class="s_currency_CurrencyCode">
+<span @Html.Raw(s_currency.CurrencyCode.ViewAttributes)>
+@Html.Raw(s_currency.CurrencyCode.GetViewValue())</span>
+</span>
+</td>
+} @* CurrencyCode.Visible (end) *@
+@if (s_currency.CurrencyName.Visible) { // CurrencyName (begin)
+		<td @Html.Raw(s_currency.CurrencyName.CellAttributes)>
+<span id="el@(s_currency_Delete.RowCnt)_s_currency_CurrencyName" class="s_currency_CurrencyName">
+<span @Html.Raw(s_currency.CurrencyName.ViewAttributes)>
+@Html.Raw(s_currency.CurrencyName.GetViewValue())</span>
+</span>
+</td>
+} @* CurrencyName.Visible (end) *@
+@if (s_currency.PrimaryCurrency.Visible) { // PrimaryCurrency (begin)
+		<td @Html.Raw(s_currency.PrimaryCurrency.CellAttributes)>
+<span id="el@(s_currency_Delete.RowCnt)_s_currency_PrimaryCurrency" class="s_currency_PrimaryCurrency">
+<span @Html.Raw(s_currency.PrimaryCurrency.ViewAttributes)>
+<input type="checkbox" value="@s_currency.PrimaryCurrency.GetViewValue()" disabled checked="@ConvertToBool(s_currency.PrimaryCurrency.CurrentValue)"></span>
+</span>
+</td>
+} @* PrimaryCurrency.Visible (end) *@
+@if (s_currency.Rate.Visible) { // Rate (begin)
+		<td @Html.Raw(s_currency.Rate.CellAttributes)>
+<span id="el@(s_currency_Delete.RowCnt)_s_currency_Rate" class="s_currency_Rate">
+<span @Html.Raw(s_currency.Rate.ViewAttributes)>
+@Html.Raw(s_currency.Rate.GetViewValue())</span>
+</span>
+</td>
+} @* Rate.Visible (end) *@
+@if (s_currency.DisplayLocale.Visible) { // DisplayLocale (begin)
+		<td @Html.Raw(s_currency.DisplayLocale.CellAttributes)>
+<span id="el@(s_currency_Delete.RowCnt)_s_currency_DisplayLocale" class="s_currency_DisplayLocale">
+<span @Html.Raw(s_currency.DisplayLocale.ViewAttributes)>
+@Html.Raw(s_currency.DisplayLocale.GetViewValue())</span>
+</span>
+</td>
+} @* DisplayLocale.Visible (end) *@
+@if (s_currency.CustomFormatting.Visible) { // CustomFormatting (begin)
+		<td @Html.Raw(s_currency.CustomFormatting.CellAttributes)>
+<span id="el@(s_currency_Delete.RowCnt)_s_currency_CustomFormatting" class="s_currency_CustomFormatting">
+<span @Html.Raw(s_currency.CustomFormatting.ViewAttributes)>
+@Html.Raw(s_currency.CustomFormatting.GetViewValue())</span>
+</span>
+</td>
+} @* CustomFormatting.Visible (end) *@
+@if (s_currency.Published.Visible) { // Published (begin)
+		<td @Html.Raw(s_currency.Published.CellAttributes)>
+<span id="el@(s_currency_Delete.RowCnt)_s_currency_Published" class="s_currency_Published">
+<span @Html.Raw(s_currency.Published.ViewAttributes)>
+<input type="checkbox" value="@s_currency.Published.GetViewValue()" disabled checked="@ConvertToBool(s_currency.Published.CurrentValue)"></span>
+</span>
+</td>
+} @* Published.Visible (end) *@
+@if (s_currency.UpdatedOnUtc.Visible) { // UpdatedOnUtc (begin)
+		<td @Html.Raw(s_currency.UpdatedOnUtc.CellAttributes)>
+<span id="el@(s_currency_Delete.RowCnt)_s_currency_UpdatedOnUtc" class="s_currency_UpdatedOnUtc">
+<span @Html.Raw(s_currency.UpdatedOnUtc.ViewAttributes)>
+@Html.Raw(s_currency.UpdatedOnUtc.GetViewValue())</span>
+</span>
+</td>
+} @* UpdatedOnUtc.Visible (end) *@
+@if (s_currency.RoundingTypeId.Visible) { // RoundingTypeId (begin)
+		<td @Html.Raw(s_currency.RoundingTypeId.CellAttributes)>
+<span id="el@(s_currency_Delete.RowCnt)_s_currency_RoundingTypeId" class="s_currency_RoundingTypeId">
+<span @Html.Raw(s_currency.RoundingTypeId.ViewAttributes)>
+@Html.Raw(s_currency.RoundingTypeId.GetViewValue())</span>
+</span>
+</td>
+} @* RoundingTypeId.Visible (end) *@
+@if (s_currency.DisplayOrder.Visible) { // DisplayOrder (begin)
+		<td @Html.Raw(s_currency.DisplayOrder.CellAttributes)>
+<span id="el@(s_currency_Delete.RowCnt)_s_currency_DisplayOrder" class="s_currency_DisplayOrder">
+<span @Html.Raw(s_currency.DisplayOrder.ViewAttributes)>
+@Html.Raw(s_currency.DisplayOrder.GetViewValue())</span>
+</span>
+</td>
+} @* DisplayOrder.Visible (end) *@
+	</tr>
+}
+@{ s_currency_Delete.CloseRecordset(); }
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<div class="divconfirmdelete">
+  <div>
+	<label>
+		@Html.Raw(Language.Phrase("askconfirmdelete"))
+	</label>
+  </div>
+</div>
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("DeleteBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_currency_Delete.ReturnUrl)">@Language.Phrase("CancelBtn")</button>
+</div>
+</form>
+@s_currency_Delete.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

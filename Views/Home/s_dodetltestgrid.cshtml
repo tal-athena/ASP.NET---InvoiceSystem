@@ -1,0 +1,1261 @@
+@{
+
+	// View
+	View = this;
+
+	// Set up CurrentGrid
+	CurrentGrid = s_dodetltest_Grid;
+
+	// Run
+	await s_dodetltest_Grid.Run();
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_dodetltest_Grid.Page_Render();
+
+	// Check action result
+	if (s_dodetltest_Grid.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_dodetltest.IsExport()) {
+<script>
+
+// Form object
+var fs_dodetltestgrid = new ew.Form("fs_dodetltestgrid", "grid");
+fs_dodetltestgrid.formKeyCountName = "@s_dodetltest_Grid.FormKeyCountName";
+
+// Validate form
+fs_dodetltestgrid.validate = function() {
+	if (!this.validateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.getForm(), $fobj = $(fobj);
+	if ($fobj.find("#confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.formKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = ["insert", "gridinsert"].includes($fobj.find("#action").val()) && $k[0];
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+		var checkrow = gridinsert ? !this.emptyRow(infix) : true;
+		if (checkrow) {
+			addcnt++;
+	@if (s_dodetltest_Grid.item_no.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_item_no");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.item_no.RequiredErrorMessage.Replace("%s", s_dodetltest.item_no.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_item_no");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.item_no.ErrorMessage))");
+	@if (s_dodetltest_Grid.item_type.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_item_type");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.item_type.RequiredErrorMessage.Replace("%s", s_dodetltest.item_type.Caption)))");
+		</text>
+	}
+	@if (s_dodetltest_Grid.part_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_part_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.part_code.RequiredErrorMessage.Replace("%s", s_dodetltest.part_code.Caption)))");
+		</text>
+	}
+	@if (s_dodetltest_Grid.part_desc.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_part_desc");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.part_desc.RequiredErrorMessage.Replace("%s", s_dodetltest.part_desc.Caption)))");
+		</text>
+	}
+	@if (s_dodetltest_Grid.uom.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_uom");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.uom.RequiredErrorMessage.Replace("%s", s_dodetltest.uom.Caption)))");
+		</text>
+	}
+	@if (s_dodetltest_Grid.qty.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_qty");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.qty.RequiredErrorMessage.Replace("%s", s_dodetltest.qty.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_qty");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.qty.ErrorMessage))");
+	@if (s_dodetltest_Grid.unit_price.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_unit_price");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.unit_price.RequiredErrorMessage.Replace("%s", s_dodetltest.unit_price.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_unit_price");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.unit_price.ErrorMessage))");
+	@if (s_dodetltest_Grid.amount_origin.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_amount_origin");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.amount_origin.RequiredErrorMessage.Replace("%s", s_dodetltest.amount_origin.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_amount_origin");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.amount_origin.ErrorMessage))");
+	@if (s_dodetltest_Grid.tax_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tax_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.tax_code.RequiredErrorMessage.Replace("%s", s_dodetltest.tax_code.Caption)))");
+		</text>
+	}
+	@if (s_dodetltest_Grid.tax_rate.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tax_rate");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.tax_rate.RequiredErrorMessage.Replace("%s", s_dodetltest.tax_rate.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_tax_rate");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.tax_rate.ErrorMessage))");
+	@if (s_dodetltest_Grid.tax_amount_origin.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tax_amount_origin");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.tax_amount_origin.RequiredErrorMessage.Replace("%s", s_dodetltest.tax_amount_origin.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_tax_amount_origin");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.tax_amount_origin.ErrorMessage))");
+	@if (s_dodetltest_Grid.to_gl_acct.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_to_gl_acct");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.to_gl_acct.RequiredErrorMessage.Replace("%s", s_dodetltest.to_gl_acct.Caption)))");
+		</text>
+	}
+	@if (s_dodetltest_Grid.tax_acct.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tax_acct");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.tax_acct.RequiredErrorMessage.Replace("%s", s_dodetltest.tax_acct.Caption)))");
+		</text>
+	}
+
+		// Fire Form_CustomValidate event
+		if (!this.Form_CustomValidate(fobj))
+			return false;
+		} // End Grid Add checking
+	}
+	return true;
+}
+
+// Check empty row
+fs_dodetltestgrid.emptyRow = function(infix) {
+	var fobj = this._form;
+	if (ew.valueChanged(fobj, infix, "item_no", false)) return false;
+	if (ew.valueChanged(fobj, infix, "item_type", false)) return false;
+	if (ew.valueChanged(fobj, infix, "part_code", false)) return false;
+	if (ew.valueChanged(fobj, infix, "part_desc", false)) return false;
+	if (ew.valueChanged(fobj, infix, "uom", false)) return false;
+	if (ew.valueChanged(fobj, infix, "qty", false)) return false;
+	if (ew.valueChanged(fobj, infix, "unit_price", false)) return false;
+	if (ew.valueChanged(fobj, infix, "amount_origin", false)) return false;
+	if (ew.valueChanged(fobj, infix, "tax_code", false)) return false;
+	if (ew.valueChanged(fobj, infix, "tax_rate", false)) return false;
+	if (ew.valueChanged(fobj, infix, "tax_amount_origin", false)) return false;
+	if (ew.valueChanged(fobj, infix, "to_gl_acct", false)) return false;
+	if (ew.valueChanged(fobj, infix, "tax_acct", false)) return false;
+	return true;
+}
+
+// Form_CustomValidate event
+fs_dodetltestgrid.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_dodetltestgrid.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_dodetltestgrid.lists["x_part_code"] = @Html.Raw(s_dodetltest_Grid.part_code.Lookup.ToClientList());
+fs_dodetltestgrid.lists["x_part_code"].options = @Html.Raw(ConvertToJson(s_dodetltest_Grid.part_code.LookupOptions));
+fs_dodetltestgrid.autoSuggests["x_part_code"] = @Html.Raw(ConvertToJson(new Dictionary<string, string> { {"data", "ajax=autosuggest"} }));
+
+// Form object for search
+</script>
+}
+@{ s_dodetltest_Grid.RenderOtherOptions(); }
+@s_dodetltest_Grid.ShowPageHeader()
+@s_dodetltest_Grid.ShowMessages()
+@if (s_dodetltest_Grid.TotalRecords > 0 || s_dodetltest_Grid.CurrentAction != "") {
+<div class="card ew-card ew-grid@(s_dodetltest_Grid.IsAddOrEdit ? " ew-grid-add-edit" : "") s_dodetltest">
+<div id="fs_dodetltestgrid" class="ew-form ew-list-form form-inline">
+<div id="gmp_s_dodetltest" class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+<table id="tbl_s_dodetltestgrid" class="table ew-table"><!-- .ew-table -->
+<thead>
+	<tr class="ew-table-header">
+@{
+
+	// Header row
+	s_dodetltest_Grid.RowType = Config.RowTypeHeader;
+
+	// Render list options
+	await s_dodetltest_Grid.RenderListOptions();
+
+	// Render list options (header, left)
+	s_dodetltest_Grid.ListOptions.Render("header", "left");
+}
+@if (s_dodetltest.item_no.Visible) { // item_no.Visible (begin)
+	if (s_dodetltest_Grid.SortUrl(s_dodetltest.item_no) == "") {
+		<th data-name="item_no" class="@s_dodetltest.item_no.HeaderCellClass"><div id="elh_s_dodetltest_item_no" class="s_dodetltest_item_no"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.item_no.Caption)</div></div></th>
+	} else {
+		<th data-name="item_no" class="@s_dodetltest.item_no.HeaderCellClass"><div><div id="elh_s_dodetltest_item_no" class="s_dodetltest_item_no">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.item_no.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.item_no.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.item_no.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* item_no.Visible (end) *@
+@if (s_dodetltest.item_type.Visible) { // item_type.Visible (begin)
+	if (s_dodetltest_Grid.SortUrl(s_dodetltest.item_type) == "") {
+		<th data-name="item_type" class="@s_dodetltest.item_type.HeaderCellClass"><div id="elh_s_dodetltest_item_type" class="s_dodetltest_item_type"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.item_type.Caption)</div></div></th>
+	} else {
+		<th data-name="item_type" class="@s_dodetltest.item_type.HeaderCellClass"><div><div id="elh_s_dodetltest_item_type" class="s_dodetltest_item_type">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.item_type.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.item_type.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.item_type.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* item_type.Visible (end) *@
+@if (s_dodetltest.part_code.Visible) { // part_code.Visible (begin)
+	if (s_dodetltest_Grid.SortUrl(s_dodetltest.part_code) == "") {
+		<th data-name="part_code" class="@s_dodetltest.part_code.HeaderCellClass"><div id="elh_s_dodetltest_part_code" class="s_dodetltest_part_code"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.part_code.Caption)</div></div></th>
+	} else {
+		<th data-name="part_code" class="@s_dodetltest.part_code.HeaderCellClass"><div><div id="elh_s_dodetltest_part_code" class="s_dodetltest_part_code">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.part_code.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.part_code.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.part_code.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* part_code.Visible (end) *@
+@if (s_dodetltest.part_desc.Visible) { // part_desc.Visible (begin)
+	if (s_dodetltest_Grid.SortUrl(s_dodetltest.part_desc) == "") {
+		<th data-name="part_desc" class="@s_dodetltest.part_desc.HeaderCellClass"><div id="elh_s_dodetltest_part_desc" class="s_dodetltest_part_desc"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.part_desc.Caption)</div></div></th>
+	} else {
+		<th data-name="part_desc" class="@s_dodetltest.part_desc.HeaderCellClass"><div><div id="elh_s_dodetltest_part_desc" class="s_dodetltest_part_desc">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.part_desc.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.part_desc.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.part_desc.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* part_desc.Visible (end) *@
+@if (s_dodetltest.uom.Visible) { // uom.Visible (begin)
+	if (s_dodetltest_Grid.SortUrl(s_dodetltest.uom) == "") {
+		<th data-name="uom" class="@s_dodetltest.uom.HeaderCellClass"><div id="elh_s_dodetltest_uom" class="s_dodetltest_uom"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.uom.Caption)</div></div></th>
+	} else {
+		<th data-name="uom" class="@s_dodetltest.uom.HeaderCellClass"><div><div id="elh_s_dodetltest_uom" class="s_dodetltest_uom">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.uom.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.uom.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.uom.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* uom.Visible (end) *@
+@if (s_dodetltest.qty.Visible) { // qty.Visible (begin)
+	if (s_dodetltest_Grid.SortUrl(s_dodetltest.qty) == "") {
+		<th data-name="qty" class="@s_dodetltest.qty.HeaderCellClass"><div id="elh_s_dodetltest_qty" class="s_dodetltest_qty"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.qty.Caption)</div></div></th>
+	} else {
+		<th data-name="qty" class="@s_dodetltest.qty.HeaderCellClass"><div><div id="elh_s_dodetltest_qty" class="s_dodetltest_qty">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.qty.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.qty.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.qty.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* qty.Visible (end) *@
+@if (s_dodetltest.unit_price.Visible) { // unit_price.Visible (begin)
+	if (s_dodetltest_Grid.SortUrl(s_dodetltest.unit_price) == "") {
+		<th data-name="unit_price" class="@s_dodetltest.unit_price.HeaderCellClass"><div id="elh_s_dodetltest_unit_price" class="s_dodetltest_unit_price"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.unit_price.Caption)</div></div></th>
+	} else {
+		<th data-name="unit_price" class="@s_dodetltest.unit_price.HeaderCellClass"><div><div id="elh_s_dodetltest_unit_price" class="s_dodetltest_unit_price">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.unit_price.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.unit_price.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.unit_price.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* unit_price.Visible (end) *@
+@if (s_dodetltest.amount_origin.Visible) { // amount_origin.Visible (begin)
+	if (s_dodetltest_Grid.SortUrl(s_dodetltest.amount_origin) == "") {
+		<th data-name="amount_origin" class="@s_dodetltest.amount_origin.HeaderCellClass"><div id="elh_s_dodetltest_amount_origin" class="s_dodetltest_amount_origin"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.amount_origin.Caption)</div></div></th>
+	} else {
+		<th data-name="amount_origin" class="@s_dodetltest.amount_origin.HeaderCellClass"><div><div id="elh_s_dodetltest_amount_origin" class="s_dodetltest_amount_origin">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.amount_origin.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.amount_origin.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.amount_origin.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* amount_origin.Visible (end) *@
+@if (s_dodetltest.tax_code.Visible) { // tax_code.Visible (begin)
+	if (s_dodetltest_Grid.SortUrl(s_dodetltest.tax_code) == "") {
+		<th data-name="tax_code" class="@s_dodetltest.tax_code.HeaderCellClass"><div id="elh_s_dodetltest_tax_code" class="s_dodetltest_tax_code"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_code.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_code" class="@s_dodetltest.tax_code.HeaderCellClass"><div><div id="elh_s_dodetltest_tax_code" class="s_dodetltest_tax_code">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_code.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.tax_code.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.tax_code.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_code.Visible (end) *@
+@if (s_dodetltest.tax_rate.Visible) { // tax_rate.Visible (begin)
+	if (s_dodetltest_Grid.SortUrl(s_dodetltest.tax_rate) == "") {
+		<th data-name="tax_rate" class="@s_dodetltest.tax_rate.HeaderCellClass"><div id="elh_s_dodetltest_tax_rate" class="s_dodetltest_tax_rate"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_rate.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_rate" class="@s_dodetltest.tax_rate.HeaderCellClass"><div><div id="elh_s_dodetltest_tax_rate" class="s_dodetltest_tax_rate">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_rate.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.tax_rate.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.tax_rate.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_rate.Visible (end) *@
+@if (s_dodetltest.tax_amount_origin.Visible) { // tax_amount_origin.Visible (begin)
+	if (s_dodetltest_Grid.SortUrl(s_dodetltest.tax_amount_origin) == "") {
+		<th data-name="tax_amount_origin" class="@s_dodetltest.tax_amount_origin.HeaderCellClass"><div id="elh_s_dodetltest_tax_amount_origin" class="s_dodetltest_tax_amount_origin"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_amount_origin.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_amount_origin" class="@s_dodetltest.tax_amount_origin.HeaderCellClass"><div><div id="elh_s_dodetltest_tax_amount_origin" class="s_dodetltest_tax_amount_origin">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_amount_origin.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.tax_amount_origin.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.tax_amount_origin.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_amount_origin.Visible (end) *@
+@if (s_dodetltest.to_gl_acct.Visible) { // to_gl_acct.Visible (begin)
+	if (s_dodetltest_Grid.SortUrl(s_dodetltest.to_gl_acct) == "") {
+		<th data-name="to_gl_acct" class="@s_dodetltest.to_gl_acct.HeaderCellClass"><div id="elh_s_dodetltest_to_gl_acct" class="s_dodetltest_to_gl_acct"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.to_gl_acct.Caption)</div></div></th>
+	} else {
+		<th data-name="to_gl_acct" class="@s_dodetltest.to_gl_acct.HeaderCellClass"><div><div id="elh_s_dodetltest_to_gl_acct" class="s_dodetltest_to_gl_acct">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.to_gl_acct.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.to_gl_acct.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.to_gl_acct.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* to_gl_acct.Visible (end) *@
+@if (s_dodetltest.tax_acct.Visible) { // tax_acct.Visible (begin)
+	if (s_dodetltest_Grid.SortUrl(s_dodetltest.tax_acct) == "") {
+		<th data-name="tax_acct" class="@s_dodetltest.tax_acct.HeaderCellClass"><div id="elh_s_dodetltest_tax_acct" class="s_dodetltest_tax_acct"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_acct.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_acct" class="@s_dodetltest.tax_acct.HeaderCellClass"><div><div id="elh_s_dodetltest_tax_acct" class="s_dodetltest_tax_acct">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_acct.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.tax_acct.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.tax_acct.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_acct.Visible (end) *@
+@{
+
+	// Render list options (header, right)
+	s_dodetltest_Grid.ListOptions.Render("header", "right");
+}
+	</tr>
+</thead>
+<tbody>
+@{ // Begin Code
+s_dodetltest_Grid.StartRecord = 1;
+s_dodetltest_Grid.StopRecord = s_dodetltest_Grid.TotalRecords; // Show all records
+
+// Restore number of post back records
+if (CurrentForm != null && s_dodetltest_Grid.EventCancelled) {
+	CurrentForm.Index = -1;
+	if (CurrentForm.HasValue(s_dodetltest_Grid.FormKeyCountName) && (s_dodetltest_Grid.IsGridAdd || s_dodetltest_Grid.IsGridEdit || s_dodetltest_Grid.IsConfirm)) {
+		s_dodetltest_Grid.KeyCount = CurrentForm.GetInt(s_dodetltest_Grid.FormKeyCountName);
+		s_dodetltest_Grid.StopRecord = s_dodetltest_Grid.StartRecord + s_dodetltest_Grid.KeyCount - 1;
+	}
+}
+if (s_dodetltest_Grid.Recordset != null && s_dodetltest_Grid.Recordset.HasRows) {
+	if (!s_dodetltest_Grid.Connection.SelectOffset) { // DN
+		for (var i = 1; i <= s_dodetltest_Grid.StartRecord - 1; i++) { // Move to first record
+			if (await s_dodetltest_Grid.Recordset.ReadAsync()) {
+				s_dodetltest_Grid.RecordCount++;
+			}
+		}
+	} else {
+		s_dodetltest_Grid.RecordCount = s_dodetltest_Grid.StartRecord - 1;
+	}
+} else if (!s_dodetltest_Grid.AllowAddDeleteRow && s_dodetltest_Grid.StopRecord == 0) {
+	s_dodetltest_Grid.StopRecord = s_dodetltest_Grid.GridAddRowCount;
+}
+
+// Initialize aggregate
+s_dodetltest_Grid.RowType = Config.RowTypeAggregateInit;
+s_dodetltest_Grid.ResetAttributes();
+await s_dodetltest_Grid.RenderRow();
+if (s_dodetltest_Grid.IsGridAdd) {
+	s_dodetltest_Grid.RowIndex = 0;
+}
+if (s_dodetltest_Grid.IsGridEdit) {
+	s_dodetltest_Grid.RowIndex = 0;
+}
+
+// Output data rows
+bool eof = (s_dodetltest_Grid.Recordset == null); // DN
+while (s_dodetltest_Grid.RecordCount < s_dodetltest_Grid.StopRecord) { // Begin While
+	if ((!s_dodetltest_Grid.IsGridAdd || s_dodetltest_Grid.CurrentMode == "copy") && !eof) { // DN
+		eof = !await s_dodetltest_Grid.Recordset.ReadAsync();
+	}
+	s_dodetltest_Grid.RecordCount++;
+	if (s_dodetltest_Grid.RecordCount >= s_dodetltest_Grid.StartRecord) {
+		s_dodetltest_Grid.RowCnt++;
+		if (s_dodetltest_Grid.IsGridAdd || s_dodetltest_Grid.IsGridEdit || s_dodetltest_Grid.IsConfirm) {
+			s_dodetltest_Grid.RowIndex = ConvertToInt(s_dodetltest_Grid.RowIndex) + 1;
+			CurrentForm.Index = ConvertToInt(s_dodetltest_Grid.RowIndex);
+			if (CurrentForm.HasValue(s_dodetltest_Grid.FormActionName) && s_dodetltest_Grid.EventCancelled) {
+				s_dodetltest_Grid.RowAction = CurrentForm.GetValue(s_dodetltest_Grid.FormActionName);
+			} else if (s_dodetltest_Grid.IsGridAdd) {
+				s_dodetltest_Grid.RowAction = "insert";
+			} else {
+				s_dodetltest_Grid.RowAction = "";
+			}
+		}
+
+		// Set up key count
+		s_dodetltest_Grid.KeyCount = ConvertToInt(s_dodetltest_Grid.RowIndex);
+
+		// Init row class and style
+		s_dodetltest_Grid.ResetAttributes();
+		s_dodetltest_Grid.CssClass = "";
+		if (s_dodetltest_Grid.IsGridAdd) {
+			if (s_dodetltest_Grid.CurrentMode == "copy") {
+				await s_dodetltest_Grid.LoadRowValues(s_dodetltest_Grid.Recordset); // Load row values
+				s_dodetltest_Grid.SetRecordKey(ref s_dodetltest_Grid.RowOldKey, s_dodetltest_Grid.Recordset); // Set old record key
+			} else {
+				await s_dodetltest_Grid.LoadRowValues(); // Load default values
+				s_dodetltest_Grid.RowOldKey = ""; // Clear old key value
+			}
+		} else {
+			await s_dodetltest_Grid.LoadRowValues(s_dodetltest_Grid.Recordset); // Load row values
+		}
+		s_dodetltest_Grid.RowType = Config.RowTypeView; // Render view
+		if (s_dodetltest_Grid.IsGridAdd) { // Grid add
+			s_dodetltest_Grid.RowType = Config.RowTypeAdd; // Render add
+		}
+		if (s_dodetltest_Grid.IsGridAdd && s_dodetltest_Grid.EventCancelled && !CurrentForm.HasValue("k_blankrow")) { // Insert failed
+			await s_dodetltest_Grid.RestoreCurrentRowFormValues(s_dodetltest_Grid.RowIndex); // Restore form values
+		}
+		if (s_dodetltest_Grid.IsGridEdit) { // Grid edit
+			if (s_dodetltest_Grid.EventCancelled) {
+				await s_dodetltest_Grid.RestoreCurrentRowFormValues(s_dodetltest_Grid.RowIndex); // Restore form values
+			}
+			if (s_dodetltest_Grid.RowAction == "insert") {
+				s_dodetltest_Grid.RowType = Config.RowTypeAdd; // Render add
+			} else {
+				s_dodetltest_Grid.RowType = Config.RowTypeEdit; // Render edit
+			}
+		}
+		if (s_dodetltest_Grid.IsGridEdit && (s_dodetltest_Grid.RowType == Config.RowTypeEdit || s_dodetltest_Grid.RowType == Config.RowTypeAdd) && s_dodetltest_Grid.EventCancelled) { // Update failed
+			await s_dodetltest_Grid.RestoreCurrentRowFormValues(s_dodetltest_Grid.RowIndex); // Restore form values
+		}
+		if (s_dodetltest_Grid.RowType == Config.RowTypeEdit) { // Edit row
+			s_dodetltest_Grid.EditRowCount++;
+		}
+		if (s_dodetltest_Grid.IsConfirm) { // Confirm row
+			await s_dodetltest_Grid.RestoreCurrentRowFormValues(s_dodetltest_Grid.RowIndex); // Restore form values
+		}
+
+		// Set up row id / data-rowindex
+		s_dodetltest_Grid.RowAttrs.Add("data-rowindex", Convert.ToString(s_dodetltest_Grid.RowCnt));
+		s_dodetltest_Grid.RowAttrs.Add("id", "r" + Convert.ToString(s_dodetltest_Grid.RowCnt) + "_s_dodetltest");
+		s_dodetltest_Grid.RowAttrs.Add("data-rowtype", Convert.ToString(s_dodetltest_Grid.RowType));
+
+		// Render row
+		await s_dodetltest_Grid.RenderRow();
+
+		// Render list options
+		await s_dodetltest_Grid.RenderListOptions();
+
+		// Skip delete row / empty row for confirm page
+		if (s_dodetltest_Grid.RowAction != "delete" && s_dodetltest_Grid.RowAction != "insertdelete" && !(s_dodetltest_Grid.RowAction == "insert" && s_dodetltest_Grid.IsConfirm && s_dodetltest_Grid.EmptyRow())) {
+	<tr @Html.Raw(s_dodetltest_Grid.RowAttributes)>
+	@{
+
+		// Render list options (body, left)
+		s_dodetltest_Grid.ListOptions.Render("body", "left", s_dodetltest_Grid.RowCnt);
+	}
+	@if (s_dodetltest.item_no.Visible) { // item_no.Visible (begin)
+		<td data-name="item_no"@Html.Raw(s_dodetltest.item_no.CellAttributes)>
+		@if (s_dodetltest.RowType == Config.RowTypeAdd) { // Add (begin)
+			 @* item_no (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_item_no" class="form-group s_dodetltest_item_no">
+<input type="text" data-table="s_dodetltest" data-field="x_item_no" name="x@(s_dodetltest_Grid.RowIndex)_item_no" id="x@(s_dodetltest_Grid.RowIndex)_item_no" size="30" placeholder="@s_dodetltest.item_no.PlaceHolder" value="@s_dodetltest.item_no.EditValue" @Html.Raw(s_dodetltest.item_no.EditAttributes)>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_item_no" name="o@(s_dodetltest_Grid.RowIndex)_item_no" id="o@(s_dodetltest_Grid.RowIndex)_item_no" value="@s_dodetltest.item_no.OldValue">
+			 @* item_no (end) *@
+		} @* Add (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeEdit) { // Edit (begin)
+			 @* item_no (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_item_no" class="form-group s_dodetltest_item_no">
+<input type="text" data-table="s_dodetltest" data-field="x_item_no" name="x@(s_dodetltest_Grid.RowIndex)_item_no" id="x@(s_dodetltest_Grid.RowIndex)_item_no" size="30" placeholder="@s_dodetltest.item_no.PlaceHolder" value="@s_dodetltest.item_no.EditValue" @Html.Raw(s_dodetltest.item_no.EditAttributes)>
+</span>
+			 @* item_no (end) *@
+		} @* Edit (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeView) { // View (begin)
+			 @* item_no (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_item_no" class="s_dodetltest_item_no">
+<span @Html.Raw(s_dodetltest.item_no.ViewAttributes)>
+@Html.Raw(s_dodetltest.item_no.GetViewValue())</span>
+</span>
+			@if (!s_dodetltest.IsConfirm) {
+<input type="hidden" data-table="s_dodetltest" data-field="x_item_no" name="x@(s_dodetltest_Grid.RowIndex)_item_no" id="x@(s_dodetltest_Grid.RowIndex)_item_no" value="@s_dodetltest.item_no.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_item_no" name="o@(s_dodetltest_Grid.RowIndex)_item_no" id="o@(s_dodetltest_Grid.RowIndex)_item_no" value="@s_dodetltest.item_no.OldValue">
+			} else {
+<input type="hidden" data-table="s_dodetltest" data-field="x_item_no" name="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_item_no" id="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_item_no" value="@s_dodetltest.item_no.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_item_no" name="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_item_no" id="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_item_no" value="@s_dodetltest.item_no.OldValue">
+			}
+			 @* item_no (end) *@
+		} @* View (end) *@
+</td>
+	} @* item_no.Visible (end) *@
+			@if (s_dodetltest.RowType == Config.RowTypeAdd) { // Add (begin)
+				 @* TrxId (begin) *@
+	<input type="hidden" data-table="s_dodetltest" data-field="x_TrxId" name="x@(s_dodetltest_Grid.RowIndex)_TrxId" id="x@(s_dodetltest_Grid.RowIndex)_TrxId" value="@s_dodetltest.TrxId.CurrentValue">
+	<input type="hidden" data-table="s_dodetltest" data-field="x_TrxId" name="o@(s_dodetltest_Grid.RowIndex)_TrxId" id="o@(s_dodetltest_Grid.RowIndex)_TrxId" value="@s_dodetltest.TrxId.OldValue">
+				 @* TrxId (end) *@
+			} @* Add (end) *@
+			@if (s_dodetltest.RowType == Config.RowTypeEdit) { // Edit (begin)
+				 @* TrxId (begin) *@
+	<input type="hidden" data-table="s_dodetltest" data-field="x_TrxId" name="x@(s_dodetltest_Grid.RowIndex)_TrxId" id="x@(s_dodetltest_Grid.RowIndex)_TrxId" value="@s_dodetltest.TrxId.CurrentValue">
+				 @* TrxId (end) *@
+			} @* Edit (end) *@
+	@if (s_dodetltest.item_type.Visible) { // item_type.Visible (begin)
+		<td data-name="item_type"@Html.Raw(s_dodetltest.item_type.CellAttributes)>
+		@if (s_dodetltest.RowType == Config.RowTypeAdd) { // Add (begin)
+			 @* item_type (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_item_type" class="form-group s_dodetltest_item_type">
+<input type="text" data-table="s_dodetltest" data-field="x_item_type" name="x@(s_dodetltest_Grid.RowIndex)_item_type" id="x@(s_dodetltest_Grid.RowIndex)_item_type" size="30" maxlength="1" placeholder="@s_dodetltest.item_type.PlaceHolder" value="@s_dodetltest.item_type.EditValue" @Html.Raw(s_dodetltest.item_type.EditAttributes)>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_item_type" name="o@(s_dodetltest_Grid.RowIndex)_item_type" id="o@(s_dodetltest_Grid.RowIndex)_item_type" value="@s_dodetltest.item_type.OldValue">
+			 @* item_type (end) *@
+		} @* Add (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeEdit) { // Edit (begin)
+			 @* item_type (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_item_type" class="form-group s_dodetltest_item_type">
+<input type="text" data-table="s_dodetltest" data-field="x_item_type" name="x@(s_dodetltest_Grid.RowIndex)_item_type" id="x@(s_dodetltest_Grid.RowIndex)_item_type" size="30" maxlength="1" placeholder="@s_dodetltest.item_type.PlaceHolder" value="@s_dodetltest.item_type.EditValue" @Html.Raw(s_dodetltest.item_type.EditAttributes)>
+</span>
+			 @* item_type (end) *@
+		} @* Edit (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeView) { // View (begin)
+			 @* item_type (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_item_type" class="s_dodetltest_item_type">
+<span @Html.Raw(s_dodetltest.item_type.ViewAttributes)>
+@Html.Raw(s_dodetltest.item_type.GetViewValue())</span>
+</span>
+			@if (!s_dodetltest.IsConfirm) {
+<input type="hidden" data-table="s_dodetltest" data-field="x_item_type" name="x@(s_dodetltest_Grid.RowIndex)_item_type" id="x@(s_dodetltest_Grid.RowIndex)_item_type" value="@s_dodetltest.item_type.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_item_type" name="o@(s_dodetltest_Grid.RowIndex)_item_type" id="o@(s_dodetltest_Grid.RowIndex)_item_type" value="@s_dodetltest.item_type.OldValue">
+			} else {
+<input type="hidden" data-table="s_dodetltest" data-field="x_item_type" name="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_item_type" id="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_item_type" value="@s_dodetltest.item_type.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_item_type" name="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_item_type" id="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_item_type" value="@s_dodetltest.item_type.OldValue">
+			}
+			 @* item_type (end) *@
+		} @* View (end) *@
+</td>
+	} @* item_type.Visible (end) *@
+	@if (s_dodetltest.part_code.Visible) { // part_code.Visible (begin)
+		<td data-name="part_code"@Html.Raw(s_dodetltest.part_code.CellAttributes)>
+		@if (s_dodetltest.RowType == Config.RowTypeAdd) { // Add (begin)
+			 @* part_code (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_part_code" class="form-group s_dodetltest_part_code">
+<span>@{ s_dodetltest.part_code.EditAttrs.Prepend("onchange", "ew.autoFill(this);"); }</span>
+<span id="as_x@(s_dodetltest_Grid.RowIndex)_part_code" class="text-nowrap" style="z-index:  @Html.Raw(9000 - s_dodetltest_Grid.RowCnt * 10)">
+	<div class="input-group mb-3">
+		<input type="text" class="form-control" name="sv_x@(s_dodetltest_Grid.RowIndex)_part_code" id="sv_x@(s_dodetltest_Grid.RowIndex)_part_code" value="@RemoveHtml(Convert.ToString(s_dodetltest.part_code.EditValue))" size="30" maxlength="30" placeholder="@s_dodetltest.part_code.PlaceHolder" data-placeholder="@s_dodetltest.part_code.PlaceHolder"@s_dodetltest.part_code.EditAttributes>
+		<div class="input-group-append">
+			<button type="button" title="@HtmlEncode(Language.Phrase("LookupLink", true).Replace("%s", RemoveHtml(s_dodetltest.part_code.Caption)))" onclick="ew.modalLookupShow({lnk:this,el:'x@(s_dodetltest_Grid.RowIndex)_part_code',m:0,n:10,srch:false});" class="ew-lookup-btn btn btn-default"@((s_dodetltest.part_code.ReadOnly || s_dodetltest.part_code.Disabled) ? " disabled" : "")><i class="fa fa-search ew-icon"></i></button>
+		</div>
+	</div>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_code" data-multiple="0" data-lookup="1" data-value-separator="@s_dodetltest.part_code.DisplayValueSeparatorAttribute" name="x@(s_dodetltest_Grid.RowIndex)_part_code" id="x@(s_dodetltest_Grid.RowIndex)_part_code" value="@(s_dodetltest.part_code.CurrentValue)" onchange="@s_dodetltest.part_code.EditAttrs.Extract("onchange")">
+<script>
+fs_dodetltestgrid.createAutoSuggest({"id":"x@(s_dodetltest_Grid.RowIndex)_part_code","forceSelect":true});
+</script>
+@Html.Raw(s_dodetltest.part_code.Lookup.GetParamTag("p_x" + s_dodetltest_Grid.RowIndex + "_part_code"))
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_code" name="o@(s_dodetltest_Grid.RowIndex)_part_code" id="o@(s_dodetltest_Grid.RowIndex)_part_code" value="@s_dodetltest.part_code.OldValue">
+			 @* part_code (end) *@
+		} @* Add (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeEdit) { // Edit (begin)
+			 @* part_code (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_part_code" class="form-group s_dodetltest_part_code">
+<span>@{ s_dodetltest.part_code.EditAttrs.Prepend("onchange", "ew.autoFill(this);"); }</span>
+<span id="as_x@(s_dodetltest_Grid.RowIndex)_part_code" class="text-nowrap" style="z-index:  @Html.Raw(9000 - s_dodetltest_Grid.RowCnt * 10)">
+	<div class="input-group mb-3">
+		<input type="text" class="form-control" name="sv_x@(s_dodetltest_Grid.RowIndex)_part_code" id="sv_x@(s_dodetltest_Grid.RowIndex)_part_code" value="@RemoveHtml(Convert.ToString(s_dodetltest.part_code.EditValue))" size="30" maxlength="30" placeholder="@s_dodetltest.part_code.PlaceHolder" data-placeholder="@s_dodetltest.part_code.PlaceHolder"@s_dodetltest.part_code.EditAttributes>
+		<div class="input-group-append">
+			<button type="button" title="@HtmlEncode(Language.Phrase("LookupLink", true).Replace("%s", RemoveHtml(s_dodetltest.part_code.Caption)))" onclick="ew.modalLookupShow({lnk:this,el:'x@(s_dodetltest_Grid.RowIndex)_part_code',m:0,n:10,srch:false});" class="ew-lookup-btn btn btn-default"@((s_dodetltest.part_code.ReadOnly || s_dodetltest.part_code.Disabled) ? " disabled" : "")><i class="fa fa-search ew-icon"></i></button>
+		</div>
+	</div>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_code" data-multiple="0" data-lookup="1" data-value-separator="@s_dodetltest.part_code.DisplayValueSeparatorAttribute" name="x@(s_dodetltest_Grid.RowIndex)_part_code" id="x@(s_dodetltest_Grid.RowIndex)_part_code" value="@(s_dodetltest.part_code.CurrentValue)" onchange="@s_dodetltest.part_code.EditAttrs.Extract("onchange")">
+<script>
+fs_dodetltestgrid.createAutoSuggest({"id":"x@(s_dodetltest_Grid.RowIndex)_part_code","forceSelect":true});
+</script>
+@Html.Raw(s_dodetltest.part_code.Lookup.GetParamTag("p_x" + s_dodetltest_Grid.RowIndex + "_part_code"))
+</span>
+			 @* part_code (end) *@
+		} @* Edit (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeView) { // View (begin)
+			 @* part_code (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_part_code" class="s_dodetltest_part_code">
+<span @Html.Raw(s_dodetltest.part_code.ViewAttributes)>
+@Html.Raw(s_dodetltest.part_code.GetViewValue())</span>
+</span>
+			@if (!s_dodetltest.IsConfirm) {
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_code" name="x@(s_dodetltest_Grid.RowIndex)_part_code" id="x@(s_dodetltest_Grid.RowIndex)_part_code" value="@s_dodetltest.part_code.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_code" name="o@(s_dodetltest_Grid.RowIndex)_part_code" id="o@(s_dodetltest_Grid.RowIndex)_part_code" value="@s_dodetltest.part_code.OldValue">
+			} else {
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_code" name="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_part_code" id="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_part_code" value="@s_dodetltest.part_code.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_code" name="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_part_code" id="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_part_code" value="@s_dodetltest.part_code.OldValue">
+			}
+			 @* part_code (end) *@
+		} @* View (end) *@
+</td>
+	} @* part_code.Visible (end) *@
+	@if (s_dodetltest.part_desc.Visible) { // part_desc.Visible (begin)
+		<td data-name="part_desc"@Html.Raw(s_dodetltest.part_desc.CellAttributes)>
+		@if (s_dodetltest.RowType == Config.RowTypeAdd) { // Add (begin)
+			 @* part_desc (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_part_desc" class="form-group s_dodetltest_part_desc">
+<input type="text" data-table="s_dodetltest" data-field="x_part_desc" name="x@(s_dodetltest_Grid.RowIndex)_part_desc" id="x@(s_dodetltest_Grid.RowIndex)_part_desc" size="30" maxlength="100" placeholder="@s_dodetltest.part_desc.PlaceHolder" value="@s_dodetltest.part_desc.EditValue" @Html.Raw(s_dodetltest.part_desc.EditAttributes)>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_desc" name="o@(s_dodetltest_Grid.RowIndex)_part_desc" id="o@(s_dodetltest_Grid.RowIndex)_part_desc" value="@s_dodetltest.part_desc.OldValue">
+			 @* part_desc (end) *@
+		} @* Add (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeEdit) { // Edit (begin)
+			 @* part_desc (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_part_desc" class="form-group s_dodetltest_part_desc">
+<input type="text" data-table="s_dodetltest" data-field="x_part_desc" name="x@(s_dodetltest_Grid.RowIndex)_part_desc" id="x@(s_dodetltest_Grid.RowIndex)_part_desc" size="30" maxlength="100" placeholder="@s_dodetltest.part_desc.PlaceHolder" value="@s_dodetltest.part_desc.EditValue" @Html.Raw(s_dodetltest.part_desc.EditAttributes)>
+</span>
+			 @* part_desc (end) *@
+		} @* Edit (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeView) { // View (begin)
+			 @* part_desc (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_part_desc" class="s_dodetltest_part_desc">
+<span @Html.Raw(s_dodetltest.part_desc.ViewAttributes)>
+@Html.Raw(s_dodetltest.part_desc.GetViewValue())</span>
+</span>
+			@if (!s_dodetltest.IsConfirm) {
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_desc" name="x@(s_dodetltest_Grid.RowIndex)_part_desc" id="x@(s_dodetltest_Grid.RowIndex)_part_desc" value="@s_dodetltest.part_desc.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_desc" name="o@(s_dodetltest_Grid.RowIndex)_part_desc" id="o@(s_dodetltest_Grid.RowIndex)_part_desc" value="@s_dodetltest.part_desc.OldValue">
+			} else {
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_desc" name="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_part_desc" id="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_part_desc" value="@s_dodetltest.part_desc.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_desc" name="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_part_desc" id="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_part_desc" value="@s_dodetltest.part_desc.OldValue">
+			}
+			 @* part_desc (end) *@
+		} @* View (end) *@
+</td>
+	} @* part_desc.Visible (end) *@
+	@if (s_dodetltest.uom.Visible) { // uom.Visible (begin)
+		<td data-name="uom"@Html.Raw(s_dodetltest.uom.CellAttributes)>
+		@if (s_dodetltest.RowType == Config.RowTypeAdd) { // Add (begin)
+			 @* uom (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_uom" class="form-group s_dodetltest_uom">
+<input type="text" data-table="s_dodetltest" data-field="x_uom" name="x@(s_dodetltest_Grid.RowIndex)_uom" id="x@(s_dodetltest_Grid.RowIndex)_uom" size="30" maxlength="10" placeholder="@s_dodetltest.uom.PlaceHolder" value="@s_dodetltest.uom.EditValue" @Html.Raw(s_dodetltest.uom.EditAttributes)>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_uom" name="o@(s_dodetltest_Grid.RowIndex)_uom" id="o@(s_dodetltest_Grid.RowIndex)_uom" value="@s_dodetltest.uom.OldValue">
+			 @* uom (end) *@
+		} @* Add (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeEdit) { // Edit (begin)
+			 @* uom (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_uom" class="form-group s_dodetltest_uom">
+<input type="text" data-table="s_dodetltest" data-field="x_uom" name="x@(s_dodetltest_Grid.RowIndex)_uom" id="x@(s_dodetltest_Grid.RowIndex)_uom" size="30" maxlength="10" placeholder="@s_dodetltest.uom.PlaceHolder" value="@s_dodetltest.uom.EditValue" @Html.Raw(s_dodetltest.uom.EditAttributes)>
+</span>
+			 @* uom (end) *@
+		} @* Edit (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeView) { // View (begin)
+			 @* uom (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_uom" class="s_dodetltest_uom">
+<span @Html.Raw(s_dodetltest.uom.ViewAttributes)>
+@Html.Raw(s_dodetltest.uom.GetViewValue())</span>
+</span>
+			@if (!s_dodetltest.IsConfirm) {
+<input type="hidden" data-table="s_dodetltest" data-field="x_uom" name="x@(s_dodetltest_Grid.RowIndex)_uom" id="x@(s_dodetltest_Grid.RowIndex)_uom" value="@s_dodetltest.uom.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_uom" name="o@(s_dodetltest_Grid.RowIndex)_uom" id="o@(s_dodetltest_Grid.RowIndex)_uom" value="@s_dodetltest.uom.OldValue">
+			} else {
+<input type="hidden" data-table="s_dodetltest" data-field="x_uom" name="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_uom" id="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_uom" value="@s_dodetltest.uom.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_uom" name="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_uom" id="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_uom" value="@s_dodetltest.uom.OldValue">
+			}
+			 @* uom (end) *@
+		} @* View (end) *@
+</td>
+	} @* uom.Visible (end) *@
+	@if (s_dodetltest.qty.Visible) { // qty.Visible (begin)
+		<td data-name="qty"@Html.Raw(s_dodetltest.qty.CellAttributes)>
+		@if (s_dodetltest.RowType == Config.RowTypeAdd) { // Add (begin)
+			 @* qty (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_qty" class="form-group s_dodetltest_qty">
+<input type="text" data-table="s_dodetltest" data-field="x_qty" name="x@(s_dodetltest_Grid.RowIndex)_qty" id="x@(s_dodetltest_Grid.RowIndex)_qty" size="30" placeholder="@s_dodetltest.qty.PlaceHolder" value="@s_dodetltest.qty.EditValue" @Html.Raw(s_dodetltest.qty.EditAttributes)>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_qty" name="o@(s_dodetltest_Grid.RowIndex)_qty" id="o@(s_dodetltest_Grid.RowIndex)_qty" value="@s_dodetltest.qty.OldValue">
+			 @* qty (end) *@
+		} @* Add (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeEdit) { // Edit (begin)
+			 @* qty (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_qty" class="form-group s_dodetltest_qty">
+<input type="text" data-table="s_dodetltest" data-field="x_qty" name="x@(s_dodetltest_Grid.RowIndex)_qty" id="x@(s_dodetltest_Grid.RowIndex)_qty" size="30" placeholder="@s_dodetltest.qty.PlaceHolder" value="@s_dodetltest.qty.EditValue" @Html.Raw(s_dodetltest.qty.EditAttributes)>
+</span>
+			 @* qty (end) *@
+		} @* Edit (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeView) { // View (begin)
+			 @* qty (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_qty" class="s_dodetltest_qty">
+<span @Html.Raw(s_dodetltest.qty.ViewAttributes)>
+@Html.Raw(s_dodetltest.qty.GetViewValue())</span>
+</span>
+			@if (!s_dodetltest.IsConfirm) {
+<input type="hidden" data-table="s_dodetltest" data-field="x_qty" name="x@(s_dodetltest_Grid.RowIndex)_qty" id="x@(s_dodetltest_Grid.RowIndex)_qty" value="@s_dodetltest.qty.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_qty" name="o@(s_dodetltest_Grid.RowIndex)_qty" id="o@(s_dodetltest_Grid.RowIndex)_qty" value="@s_dodetltest.qty.OldValue">
+			} else {
+<input type="hidden" data-table="s_dodetltest" data-field="x_qty" name="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_qty" id="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_qty" value="@s_dodetltest.qty.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_qty" name="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_qty" id="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_qty" value="@s_dodetltest.qty.OldValue">
+			}
+			 @* qty (end) *@
+		} @* View (end) *@
+</td>
+	} @* qty.Visible (end) *@
+	@if (s_dodetltest.unit_price.Visible) { // unit_price.Visible (begin)
+		<td data-name="unit_price"@Html.Raw(s_dodetltest.unit_price.CellAttributes)>
+		@if (s_dodetltest.RowType == Config.RowTypeAdd) { // Add (begin)
+			 @* unit_price (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_unit_price" class="form-group s_dodetltest_unit_price">
+<input type="text" data-table="s_dodetltest" data-field="x_unit_price" name="x@(s_dodetltest_Grid.RowIndex)_unit_price" id="x@(s_dodetltest_Grid.RowIndex)_unit_price" size="30" placeholder="@s_dodetltest.unit_price.PlaceHolder" value="@s_dodetltest.unit_price.EditValue" @Html.Raw(s_dodetltest.unit_price.EditAttributes)>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_unit_price" name="o@(s_dodetltest_Grid.RowIndex)_unit_price" id="o@(s_dodetltest_Grid.RowIndex)_unit_price" value="@s_dodetltest.unit_price.OldValue">
+			 @* unit_price (end) *@
+		} @* Add (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeEdit) { // Edit (begin)
+			 @* unit_price (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_unit_price" class="form-group s_dodetltest_unit_price">
+<input type="text" data-table="s_dodetltest" data-field="x_unit_price" name="x@(s_dodetltest_Grid.RowIndex)_unit_price" id="x@(s_dodetltest_Grid.RowIndex)_unit_price" size="30" placeholder="@s_dodetltest.unit_price.PlaceHolder" value="@s_dodetltest.unit_price.EditValue" @Html.Raw(s_dodetltest.unit_price.EditAttributes)>
+</span>
+			 @* unit_price (end) *@
+		} @* Edit (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeView) { // View (begin)
+			 @* unit_price (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_unit_price" class="s_dodetltest_unit_price">
+<span @Html.Raw(s_dodetltest.unit_price.ViewAttributes)>
+@Html.Raw(s_dodetltest.unit_price.GetViewValue())</span>
+</span>
+			@if (!s_dodetltest.IsConfirm) {
+<input type="hidden" data-table="s_dodetltest" data-field="x_unit_price" name="x@(s_dodetltest_Grid.RowIndex)_unit_price" id="x@(s_dodetltest_Grid.RowIndex)_unit_price" value="@s_dodetltest.unit_price.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_unit_price" name="o@(s_dodetltest_Grid.RowIndex)_unit_price" id="o@(s_dodetltest_Grid.RowIndex)_unit_price" value="@s_dodetltest.unit_price.OldValue">
+			} else {
+<input type="hidden" data-table="s_dodetltest" data-field="x_unit_price" name="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_unit_price" id="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_unit_price" value="@s_dodetltest.unit_price.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_unit_price" name="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_unit_price" id="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_unit_price" value="@s_dodetltest.unit_price.OldValue">
+			}
+			 @* unit_price (end) *@
+		} @* View (end) *@
+</td>
+	} @* unit_price.Visible (end) *@
+	@if (s_dodetltest.amount_origin.Visible) { // amount_origin.Visible (begin)
+		<td data-name="amount_origin"@Html.Raw(s_dodetltest.amount_origin.CellAttributes)>
+		@if (s_dodetltest.RowType == Config.RowTypeAdd) { // Add (begin)
+			 @* amount_origin (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_amount_origin" class="form-group s_dodetltest_amount_origin">
+<input type="text" data-table="s_dodetltest" data-field="x_amount_origin" name="x@(s_dodetltest_Grid.RowIndex)_amount_origin" id="x@(s_dodetltest_Grid.RowIndex)_amount_origin" size="30" placeholder="@s_dodetltest.amount_origin.PlaceHolder" value="@s_dodetltest.amount_origin.EditValue" @Html.Raw(s_dodetltest.amount_origin.EditAttributes)>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_amount_origin" name="o@(s_dodetltest_Grid.RowIndex)_amount_origin" id="o@(s_dodetltest_Grid.RowIndex)_amount_origin" value="@s_dodetltest.amount_origin.OldValue">
+			 @* amount_origin (end) *@
+		} @* Add (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeEdit) { // Edit (begin)
+			 @* amount_origin (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_amount_origin" class="form-group s_dodetltest_amount_origin">
+<input type="text" data-table="s_dodetltest" data-field="x_amount_origin" name="x@(s_dodetltest_Grid.RowIndex)_amount_origin" id="x@(s_dodetltest_Grid.RowIndex)_amount_origin" size="30" placeholder="@s_dodetltest.amount_origin.PlaceHolder" value="@s_dodetltest.amount_origin.EditValue" @Html.Raw(s_dodetltest.amount_origin.EditAttributes)>
+</span>
+			 @* amount_origin (end) *@
+		} @* Edit (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeView) { // View (begin)
+			 @* amount_origin (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_amount_origin" class="s_dodetltest_amount_origin">
+<span @Html.Raw(s_dodetltest.amount_origin.ViewAttributes)>
+@Html.Raw(s_dodetltest.amount_origin.GetViewValue())</span>
+</span>
+			@if (!s_dodetltest.IsConfirm) {
+<input type="hidden" data-table="s_dodetltest" data-field="x_amount_origin" name="x@(s_dodetltest_Grid.RowIndex)_amount_origin" id="x@(s_dodetltest_Grid.RowIndex)_amount_origin" value="@s_dodetltest.amount_origin.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_amount_origin" name="o@(s_dodetltest_Grid.RowIndex)_amount_origin" id="o@(s_dodetltest_Grid.RowIndex)_amount_origin" value="@s_dodetltest.amount_origin.OldValue">
+			} else {
+<input type="hidden" data-table="s_dodetltest" data-field="x_amount_origin" name="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_amount_origin" id="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_amount_origin" value="@s_dodetltest.amount_origin.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_amount_origin" name="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_amount_origin" id="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_amount_origin" value="@s_dodetltest.amount_origin.OldValue">
+			}
+			 @* amount_origin (end) *@
+		} @* View (end) *@
+</td>
+	} @* amount_origin.Visible (end) *@
+	@if (s_dodetltest.tax_code.Visible) { // tax_code.Visible (begin)
+		<td data-name="tax_code"@Html.Raw(s_dodetltest.tax_code.CellAttributes)>
+		@if (s_dodetltest.RowType == Config.RowTypeAdd) { // Add (begin)
+			 @* tax_code (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_tax_code" class="form-group s_dodetltest_tax_code">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_code" name="x@(s_dodetltest_Grid.RowIndex)_tax_code" id="x@(s_dodetltest_Grid.RowIndex)_tax_code" size="30" maxlength="10" placeholder="@s_dodetltest.tax_code.PlaceHolder" value="@s_dodetltest.tax_code.EditValue" @Html.Raw(s_dodetltest.tax_code.EditAttributes)>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_code" name="o@(s_dodetltest_Grid.RowIndex)_tax_code" id="o@(s_dodetltest_Grid.RowIndex)_tax_code" value="@s_dodetltest.tax_code.OldValue">
+			 @* tax_code (end) *@
+		} @* Add (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeEdit) { // Edit (begin)
+			 @* tax_code (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_tax_code" class="form-group s_dodetltest_tax_code">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_code" name="x@(s_dodetltest_Grid.RowIndex)_tax_code" id="x@(s_dodetltest_Grid.RowIndex)_tax_code" size="30" maxlength="10" placeholder="@s_dodetltest.tax_code.PlaceHolder" value="@s_dodetltest.tax_code.EditValue" @Html.Raw(s_dodetltest.tax_code.EditAttributes)>
+</span>
+			 @* tax_code (end) *@
+		} @* Edit (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeView) { // View (begin)
+			 @* tax_code (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_tax_code" class="s_dodetltest_tax_code">
+<span @Html.Raw(s_dodetltest.tax_code.ViewAttributes)>
+@Html.Raw(s_dodetltest.tax_code.GetViewValue())</span>
+</span>
+			@if (!s_dodetltest.IsConfirm) {
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_code" name="x@(s_dodetltest_Grid.RowIndex)_tax_code" id="x@(s_dodetltest_Grid.RowIndex)_tax_code" value="@s_dodetltest.tax_code.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_code" name="o@(s_dodetltest_Grid.RowIndex)_tax_code" id="o@(s_dodetltest_Grid.RowIndex)_tax_code" value="@s_dodetltest.tax_code.OldValue">
+			} else {
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_code" name="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_tax_code" id="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_tax_code" value="@s_dodetltest.tax_code.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_code" name="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_tax_code" id="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_tax_code" value="@s_dodetltest.tax_code.OldValue">
+			}
+			 @* tax_code (end) *@
+		} @* View (end) *@
+</td>
+	} @* tax_code.Visible (end) *@
+	@if (s_dodetltest.tax_rate.Visible) { // tax_rate.Visible (begin)
+		<td data-name="tax_rate"@Html.Raw(s_dodetltest.tax_rate.CellAttributes)>
+		@if (s_dodetltest.RowType == Config.RowTypeAdd) { // Add (begin)
+			 @* tax_rate (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_tax_rate" class="form-group s_dodetltest_tax_rate">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_rate" name="x@(s_dodetltest_Grid.RowIndex)_tax_rate" id="x@(s_dodetltest_Grid.RowIndex)_tax_rate" size="30" placeholder="@s_dodetltest.tax_rate.PlaceHolder" value="@s_dodetltest.tax_rate.EditValue" @Html.Raw(s_dodetltest.tax_rate.EditAttributes)>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_rate" name="o@(s_dodetltest_Grid.RowIndex)_tax_rate" id="o@(s_dodetltest_Grid.RowIndex)_tax_rate" value="@s_dodetltest.tax_rate.OldValue">
+			 @* tax_rate (end) *@
+		} @* Add (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeEdit) { // Edit (begin)
+			 @* tax_rate (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_tax_rate" class="form-group s_dodetltest_tax_rate">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_rate" name="x@(s_dodetltest_Grid.RowIndex)_tax_rate" id="x@(s_dodetltest_Grid.RowIndex)_tax_rate" size="30" placeholder="@s_dodetltest.tax_rate.PlaceHolder" value="@s_dodetltest.tax_rate.EditValue" @Html.Raw(s_dodetltest.tax_rate.EditAttributes)>
+</span>
+			 @* tax_rate (end) *@
+		} @* Edit (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeView) { // View (begin)
+			 @* tax_rate (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_tax_rate" class="s_dodetltest_tax_rate">
+<span @Html.Raw(s_dodetltest.tax_rate.ViewAttributes)>
+@Html.Raw(s_dodetltest.tax_rate.GetViewValue())</span>
+</span>
+			@if (!s_dodetltest.IsConfirm) {
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_rate" name="x@(s_dodetltest_Grid.RowIndex)_tax_rate" id="x@(s_dodetltest_Grid.RowIndex)_tax_rate" value="@s_dodetltest.tax_rate.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_rate" name="o@(s_dodetltest_Grid.RowIndex)_tax_rate" id="o@(s_dodetltest_Grid.RowIndex)_tax_rate" value="@s_dodetltest.tax_rate.OldValue">
+			} else {
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_rate" name="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_tax_rate" id="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_tax_rate" value="@s_dodetltest.tax_rate.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_rate" name="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_tax_rate" id="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_tax_rate" value="@s_dodetltest.tax_rate.OldValue">
+			}
+			 @* tax_rate (end) *@
+		} @* View (end) *@
+</td>
+	} @* tax_rate.Visible (end) *@
+	@if (s_dodetltest.tax_amount_origin.Visible) { // tax_amount_origin.Visible (begin)
+		<td data-name="tax_amount_origin"@Html.Raw(s_dodetltest.tax_amount_origin.CellAttributes)>
+		@if (s_dodetltest.RowType == Config.RowTypeAdd) { // Add (begin)
+			 @* tax_amount_origin (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_tax_amount_origin" class="form-group s_dodetltest_tax_amount_origin">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_amount_origin" name="x@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" id="x@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" size="30" placeholder="@s_dodetltest.tax_amount_origin.PlaceHolder" value="@s_dodetltest.tax_amount_origin.EditValue" @Html.Raw(s_dodetltest.tax_amount_origin.EditAttributes)>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_amount_origin" name="o@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" id="o@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" value="@s_dodetltest.tax_amount_origin.OldValue">
+			 @* tax_amount_origin (end) *@
+		} @* Add (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeEdit) { // Edit (begin)
+			 @* tax_amount_origin (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_tax_amount_origin" class="form-group s_dodetltest_tax_amount_origin">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_amount_origin" name="x@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" id="x@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" size="30" placeholder="@s_dodetltest.tax_amount_origin.PlaceHolder" value="@s_dodetltest.tax_amount_origin.EditValue" @Html.Raw(s_dodetltest.tax_amount_origin.EditAttributes)>
+</span>
+			 @* tax_amount_origin (end) *@
+		} @* Edit (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeView) { // View (begin)
+			 @* tax_amount_origin (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_tax_amount_origin" class="s_dodetltest_tax_amount_origin">
+<span @Html.Raw(s_dodetltest.tax_amount_origin.ViewAttributes)>
+@Html.Raw(s_dodetltest.tax_amount_origin.GetViewValue())</span>
+</span>
+			@if (!s_dodetltest.IsConfirm) {
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_amount_origin" name="x@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" id="x@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" value="@s_dodetltest.tax_amount_origin.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_amount_origin" name="o@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" id="o@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" value="@s_dodetltest.tax_amount_origin.OldValue">
+			} else {
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_amount_origin" name="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" id="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" value="@s_dodetltest.tax_amount_origin.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_amount_origin" name="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" id="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" value="@s_dodetltest.tax_amount_origin.OldValue">
+			}
+			 @* tax_amount_origin (end) *@
+		} @* View (end) *@
+</td>
+	} @* tax_amount_origin.Visible (end) *@
+	@if (s_dodetltest.to_gl_acct.Visible) { // to_gl_acct.Visible (begin)
+		<td data-name="to_gl_acct"@Html.Raw(s_dodetltest.to_gl_acct.CellAttributes)>
+		@if (s_dodetltest.RowType == Config.RowTypeAdd) { // Add (begin)
+			 @* to_gl_acct (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_to_gl_acct" class="form-group s_dodetltest_to_gl_acct">
+<input type="text" data-table="s_dodetltest" data-field="x_to_gl_acct" name="x@(s_dodetltest_Grid.RowIndex)_to_gl_acct" id="x@(s_dodetltest_Grid.RowIndex)_to_gl_acct" size="30" maxlength="10" placeholder="@s_dodetltest.to_gl_acct.PlaceHolder" value="@s_dodetltest.to_gl_acct.EditValue" @Html.Raw(s_dodetltest.to_gl_acct.EditAttributes)>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_to_gl_acct" name="o@(s_dodetltest_Grid.RowIndex)_to_gl_acct" id="o@(s_dodetltest_Grid.RowIndex)_to_gl_acct" value="@s_dodetltest.to_gl_acct.OldValue">
+			 @* to_gl_acct (end) *@
+		} @* Add (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeEdit) { // Edit (begin)
+			 @* to_gl_acct (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_to_gl_acct" class="form-group s_dodetltest_to_gl_acct">
+<input type="text" data-table="s_dodetltest" data-field="x_to_gl_acct" name="x@(s_dodetltest_Grid.RowIndex)_to_gl_acct" id="x@(s_dodetltest_Grid.RowIndex)_to_gl_acct" size="30" maxlength="10" placeholder="@s_dodetltest.to_gl_acct.PlaceHolder" value="@s_dodetltest.to_gl_acct.EditValue" @Html.Raw(s_dodetltest.to_gl_acct.EditAttributes)>
+</span>
+			 @* to_gl_acct (end) *@
+		} @* Edit (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeView) { // View (begin)
+			 @* to_gl_acct (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_to_gl_acct" class="s_dodetltest_to_gl_acct">
+<span @Html.Raw(s_dodetltest.to_gl_acct.ViewAttributes)>
+@Html.Raw(s_dodetltest.to_gl_acct.GetViewValue())</span>
+</span>
+			@if (!s_dodetltest.IsConfirm) {
+<input type="hidden" data-table="s_dodetltest" data-field="x_to_gl_acct" name="x@(s_dodetltest_Grid.RowIndex)_to_gl_acct" id="x@(s_dodetltest_Grid.RowIndex)_to_gl_acct" value="@s_dodetltest.to_gl_acct.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_to_gl_acct" name="o@(s_dodetltest_Grid.RowIndex)_to_gl_acct" id="o@(s_dodetltest_Grid.RowIndex)_to_gl_acct" value="@s_dodetltest.to_gl_acct.OldValue">
+			} else {
+<input type="hidden" data-table="s_dodetltest" data-field="x_to_gl_acct" name="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_to_gl_acct" id="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_to_gl_acct" value="@s_dodetltest.to_gl_acct.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_to_gl_acct" name="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_to_gl_acct" id="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_to_gl_acct" value="@s_dodetltest.to_gl_acct.OldValue">
+			}
+			 @* to_gl_acct (end) *@
+		} @* View (end) *@
+</td>
+	} @* to_gl_acct.Visible (end) *@
+	@if (s_dodetltest.tax_acct.Visible) { // tax_acct.Visible (begin)
+		<td data-name="tax_acct"@Html.Raw(s_dodetltest.tax_acct.CellAttributes)>
+		@if (s_dodetltest.RowType == Config.RowTypeAdd) { // Add (begin)
+			 @* tax_acct (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_tax_acct" class="form-group s_dodetltest_tax_acct">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_acct" name="x@(s_dodetltest_Grid.RowIndex)_tax_acct" id="x@(s_dodetltest_Grid.RowIndex)_tax_acct" size="30" maxlength="10" placeholder="@s_dodetltest.tax_acct.PlaceHolder" value="@s_dodetltest.tax_acct.EditValue" @Html.Raw(s_dodetltest.tax_acct.EditAttributes)>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_acct" name="o@(s_dodetltest_Grid.RowIndex)_tax_acct" id="o@(s_dodetltest_Grid.RowIndex)_tax_acct" value="@s_dodetltest.tax_acct.OldValue">
+			 @* tax_acct (end) *@
+		} @* Add (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeEdit) { // Edit (begin)
+			 @* tax_acct (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_tax_acct" class="form-group s_dodetltest_tax_acct">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_acct" name="x@(s_dodetltest_Grid.RowIndex)_tax_acct" id="x@(s_dodetltest_Grid.RowIndex)_tax_acct" size="30" maxlength="10" placeholder="@s_dodetltest.tax_acct.PlaceHolder" value="@s_dodetltest.tax_acct.EditValue" @Html.Raw(s_dodetltest.tax_acct.EditAttributes)>
+</span>
+			 @* tax_acct (end) *@
+		} @* Edit (end) *@
+		@if (s_dodetltest.RowType == Config.RowTypeView) { // View (begin)
+			 @* tax_acct (begin) *@
+<span id="el@(s_dodetltest_Grid.RowCnt)_s_dodetltest_tax_acct" class="s_dodetltest_tax_acct">
+<span @Html.Raw(s_dodetltest.tax_acct.ViewAttributes)>
+@Html.Raw(s_dodetltest.tax_acct.GetViewValue())</span>
+</span>
+			@if (!s_dodetltest.IsConfirm) {
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_acct" name="x@(s_dodetltest_Grid.RowIndex)_tax_acct" id="x@(s_dodetltest_Grid.RowIndex)_tax_acct" value="@s_dodetltest.tax_acct.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_acct" name="o@(s_dodetltest_Grid.RowIndex)_tax_acct" id="o@(s_dodetltest_Grid.RowIndex)_tax_acct" value="@s_dodetltest.tax_acct.OldValue">
+			} else {
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_acct" name="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_tax_acct" id="fs_dodetltestgrid$x@(s_dodetltest_Grid.RowIndex)_tax_acct" value="@s_dodetltest.tax_acct.FormValue">
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_acct" name="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_tax_acct" id="fs_dodetltestgrid$o@(s_dodetltest_Grid.RowIndex)_tax_acct" value="@s_dodetltest.tax_acct.OldValue">
+			}
+			 @* tax_acct (end) *@
+		} @* View (end) *@
+</td>
+	} @* tax_acct.Visible (end) *@
+	@{
+
+		// Render list options (body, right)
+		s_dodetltest_Grid.ListOptions.Render("body", "right", s_dodetltest_Grid.RowCnt);
+	}
+	</tr>
+		if (s_dodetltest_Grid.RowType == Config.RowTypeAdd || s_dodetltest_Grid.RowType == Config.RowTypeEdit) {
+			<script>
+			fs_dodetltestgrid.updateLists(@s_dodetltest_Grid.RowIndex);
+			</script>
+		}
+	} @* End if *@
+	} @* End if *@
+} @* End While *@
+} @* End Code *@
+@if (s_dodetltest_Grid.CurrentMode == "add" || s_dodetltest_Grid.CurrentMode == "copy" || s_dodetltest_Grid.CurrentMode == "edit") {
+	s_dodetltest_Grid.RowIndex = "$rowindex$";
+	await s_dodetltest_Grid.LoadRowValues();
+
+	// Set row properties
+	s_dodetltest_Grid.ResetAttributes();
+	s_dodetltest_Grid.RowAttrs.Add("data-rowindex", Convert.ToString(s_dodetltest_Grid.RowIndex));
+	s_dodetltest_Grid.RowAttrs.Add("id", "r0_s_dodetltest");
+	s_dodetltest_Grid.RowAttrs.Add("data-rowtype", Convert.ToString(Config.RowTypeAdd));
+	s_dodetltest_Grid.RowAttrs.AppendClass("ew-template");
+	s_dodetltest_Grid.RowType = Config.RowTypeAdd;
+
+	// Render row
+	await s_dodetltest_Grid.RenderRow();
+
+	// Render list options
+	await s_dodetltest_Grid.RenderListOptions();
+	s_dodetltest_Grid.StartRowCount = 0;
+	<tr @Html.Raw(s_dodetltest_Grid.RowAttributes)>
+	@* Render list options (body, left) *@
+	@s_dodetltest_Grid.ListOptions.RenderBody("left", s_dodetltest_Grid.RowIndex)
+	@if (s_dodetltest.item_no.Visible) { // item_no.Visible (begin)
+		<td data-name="item_no">
+@if (!s_dodetltest.IsConfirm) { // item_no (begin)
+<span id="el$rowindex$_s_dodetltest_item_no" class="form-group s_dodetltest_item_no">
+<input type="text" data-table="s_dodetltest" data-field="x_item_no" name="x@(s_dodetltest_Grid.RowIndex)_item_no" id="x@(s_dodetltest_Grid.RowIndex)_item_no" size="30" placeholder="@s_dodetltest.item_no.PlaceHolder" value="@s_dodetltest.item_no.EditValue" @Html.Raw(s_dodetltest.item_no.EditAttributes)>
+</span>
+} else { // item_no (confirm)
+<span id="el$rowindex$_s_dodetltest_item_no" class="form-group s_dodetltest_item_no">
+<span @Html.Raw(s_dodetltest.item_no.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_dodetltest.item_no.ViewValue))"></span>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_item_no" name="x@(s_dodetltest_Grid.RowIndex)_item_no" id="x@(s_dodetltest_Grid.RowIndex)_item_no" value="@s_dodetltest.item_no.FormValue">
+} @* item_no (end) *@
+<input type="hidden" data-table="s_dodetltest" data-field="x_item_no" name="o@(s_dodetltest_Grid.RowIndex)_item_no" id="o@(s_dodetltest_Grid.RowIndex)_item_no" value="@s_dodetltest.item_no.OldValue">
+</td>
+	} @* item_no.Visible (end) *@
+	@if (s_dodetltest.item_type.Visible) { // item_type.Visible (begin)
+		<td data-name="item_type">
+@if (!s_dodetltest.IsConfirm) { // item_type (begin)
+<span id="el$rowindex$_s_dodetltest_item_type" class="form-group s_dodetltest_item_type">
+<input type="text" data-table="s_dodetltest" data-field="x_item_type" name="x@(s_dodetltest_Grid.RowIndex)_item_type" id="x@(s_dodetltest_Grid.RowIndex)_item_type" size="30" maxlength="1" placeholder="@s_dodetltest.item_type.PlaceHolder" value="@s_dodetltest.item_type.EditValue" @Html.Raw(s_dodetltest.item_type.EditAttributes)>
+</span>
+} else { // item_type (confirm)
+<span id="el$rowindex$_s_dodetltest_item_type" class="form-group s_dodetltest_item_type">
+<span @Html.Raw(s_dodetltest.item_type.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_dodetltest.item_type.ViewValue))"></span>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_item_type" name="x@(s_dodetltest_Grid.RowIndex)_item_type" id="x@(s_dodetltest_Grid.RowIndex)_item_type" value="@s_dodetltest.item_type.FormValue">
+} @* item_type (end) *@
+<input type="hidden" data-table="s_dodetltest" data-field="x_item_type" name="o@(s_dodetltest_Grid.RowIndex)_item_type" id="o@(s_dodetltest_Grid.RowIndex)_item_type" value="@s_dodetltest.item_type.OldValue">
+</td>
+	} @* item_type.Visible (end) *@
+	@if (s_dodetltest.part_code.Visible) { // part_code.Visible (begin)
+		<td data-name="part_code">
+@if (!s_dodetltest.IsConfirm) { // part_code (begin)
+<span id="el$rowindex$_s_dodetltest_part_code" class="form-group s_dodetltest_part_code">
+<span>@{ s_dodetltest.part_code.EditAttrs.Prepend("onchange", "ew.autoFill(this);"); }</span>
+<span id="as_x@(s_dodetltest_Grid.RowIndex)_part_code" class="text-nowrap" style="z-index:  @Html.Raw(9000 - s_dodetltest_Grid.RowCnt * 10)">
+	<div class="input-group mb-3">
+		<input type="text" class="form-control" name="sv_x@(s_dodetltest_Grid.RowIndex)_part_code" id="sv_x@(s_dodetltest_Grid.RowIndex)_part_code" value="@RemoveHtml(Convert.ToString(s_dodetltest.part_code.EditValue))" size="30" maxlength="30" placeholder="@s_dodetltest.part_code.PlaceHolder" data-placeholder="@s_dodetltest.part_code.PlaceHolder"@s_dodetltest.part_code.EditAttributes>
+		<div class="input-group-append">
+			<button type="button" title="@HtmlEncode(Language.Phrase("LookupLink", true).Replace("%s", RemoveHtml(s_dodetltest.part_code.Caption)))" onclick="ew.modalLookupShow({lnk:this,el:'x@(s_dodetltest_Grid.RowIndex)_part_code',m:0,n:10,srch:false});" class="ew-lookup-btn btn btn-default"@((s_dodetltest.part_code.ReadOnly || s_dodetltest.part_code.Disabled) ? " disabled" : "")><i class="fa fa-search ew-icon"></i></button>
+		</div>
+	</div>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_code" data-multiple="0" data-lookup="1" data-value-separator="@s_dodetltest.part_code.DisplayValueSeparatorAttribute" name="x@(s_dodetltest_Grid.RowIndex)_part_code" id="x@(s_dodetltest_Grid.RowIndex)_part_code" value="@(s_dodetltest.part_code.CurrentValue)" onchange="@s_dodetltest.part_code.EditAttrs.Extract("onchange")">
+<script>
+fs_dodetltestgrid.createAutoSuggest({"id":"x@(s_dodetltest_Grid.RowIndex)_part_code","forceSelect":true});
+</script>
+@Html.Raw(s_dodetltest.part_code.Lookup.GetParamTag("p_x" + s_dodetltest_Grid.RowIndex + "_part_code"))
+</span>
+} else { // part_code (confirm)
+<span id="el$rowindex$_s_dodetltest_part_code" class="form-group s_dodetltest_part_code">
+<span @Html.Raw(s_dodetltest.part_code.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_dodetltest.part_code.ViewValue))"></span>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_code" name="x@(s_dodetltest_Grid.RowIndex)_part_code" id="x@(s_dodetltest_Grid.RowIndex)_part_code" value="@s_dodetltest.part_code.FormValue">
+} @* part_code (end) *@
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_code" name="o@(s_dodetltest_Grid.RowIndex)_part_code" id="o@(s_dodetltest_Grid.RowIndex)_part_code" value="@s_dodetltest.part_code.OldValue">
+</td>
+	} @* part_code.Visible (end) *@
+	@if (s_dodetltest.part_desc.Visible) { // part_desc.Visible (begin)
+		<td data-name="part_desc">
+@if (!s_dodetltest.IsConfirm) { // part_desc (begin)
+<span id="el$rowindex$_s_dodetltest_part_desc" class="form-group s_dodetltest_part_desc">
+<input type="text" data-table="s_dodetltest" data-field="x_part_desc" name="x@(s_dodetltest_Grid.RowIndex)_part_desc" id="x@(s_dodetltest_Grid.RowIndex)_part_desc" size="30" maxlength="100" placeholder="@s_dodetltest.part_desc.PlaceHolder" value="@s_dodetltest.part_desc.EditValue" @Html.Raw(s_dodetltest.part_desc.EditAttributes)>
+</span>
+} else { // part_desc (confirm)
+<span id="el$rowindex$_s_dodetltest_part_desc" class="form-group s_dodetltest_part_desc">
+<span @Html.Raw(s_dodetltest.part_desc.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_dodetltest.part_desc.ViewValue))"></span>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_desc" name="x@(s_dodetltest_Grid.RowIndex)_part_desc" id="x@(s_dodetltest_Grid.RowIndex)_part_desc" value="@s_dodetltest.part_desc.FormValue">
+} @* part_desc (end) *@
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_desc" name="o@(s_dodetltest_Grid.RowIndex)_part_desc" id="o@(s_dodetltest_Grid.RowIndex)_part_desc" value="@s_dodetltest.part_desc.OldValue">
+</td>
+	} @* part_desc.Visible (end) *@
+	@if (s_dodetltest.uom.Visible) { // uom.Visible (begin)
+		<td data-name="uom">
+@if (!s_dodetltest.IsConfirm) { // uom (begin)
+<span id="el$rowindex$_s_dodetltest_uom" class="form-group s_dodetltest_uom">
+<input type="text" data-table="s_dodetltest" data-field="x_uom" name="x@(s_dodetltest_Grid.RowIndex)_uom" id="x@(s_dodetltest_Grid.RowIndex)_uom" size="30" maxlength="10" placeholder="@s_dodetltest.uom.PlaceHolder" value="@s_dodetltest.uom.EditValue" @Html.Raw(s_dodetltest.uom.EditAttributes)>
+</span>
+} else { // uom (confirm)
+<span id="el$rowindex$_s_dodetltest_uom" class="form-group s_dodetltest_uom">
+<span @Html.Raw(s_dodetltest.uom.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_dodetltest.uom.ViewValue))"></span>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_uom" name="x@(s_dodetltest_Grid.RowIndex)_uom" id="x@(s_dodetltest_Grid.RowIndex)_uom" value="@s_dodetltest.uom.FormValue">
+} @* uom (end) *@
+<input type="hidden" data-table="s_dodetltest" data-field="x_uom" name="o@(s_dodetltest_Grid.RowIndex)_uom" id="o@(s_dodetltest_Grid.RowIndex)_uom" value="@s_dodetltest.uom.OldValue">
+</td>
+	} @* uom.Visible (end) *@
+	@if (s_dodetltest.qty.Visible) { // qty.Visible (begin)
+		<td data-name="qty">
+@if (!s_dodetltest.IsConfirm) { // qty (begin)
+<span id="el$rowindex$_s_dodetltest_qty" class="form-group s_dodetltest_qty">
+<input type="text" data-table="s_dodetltest" data-field="x_qty" name="x@(s_dodetltest_Grid.RowIndex)_qty" id="x@(s_dodetltest_Grid.RowIndex)_qty" size="30" placeholder="@s_dodetltest.qty.PlaceHolder" value="@s_dodetltest.qty.EditValue" @Html.Raw(s_dodetltest.qty.EditAttributes)>
+</span>
+} else { // qty (confirm)
+<span id="el$rowindex$_s_dodetltest_qty" class="form-group s_dodetltest_qty">
+<span @Html.Raw(s_dodetltest.qty.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_dodetltest.qty.ViewValue))"></span>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_qty" name="x@(s_dodetltest_Grid.RowIndex)_qty" id="x@(s_dodetltest_Grid.RowIndex)_qty" value="@s_dodetltest.qty.FormValue">
+} @* qty (end) *@
+<input type="hidden" data-table="s_dodetltest" data-field="x_qty" name="o@(s_dodetltest_Grid.RowIndex)_qty" id="o@(s_dodetltest_Grid.RowIndex)_qty" value="@s_dodetltest.qty.OldValue">
+</td>
+	} @* qty.Visible (end) *@
+	@if (s_dodetltest.unit_price.Visible) { // unit_price.Visible (begin)
+		<td data-name="unit_price">
+@if (!s_dodetltest.IsConfirm) { // unit_price (begin)
+<span id="el$rowindex$_s_dodetltest_unit_price" class="form-group s_dodetltest_unit_price">
+<input type="text" data-table="s_dodetltest" data-field="x_unit_price" name="x@(s_dodetltest_Grid.RowIndex)_unit_price" id="x@(s_dodetltest_Grid.RowIndex)_unit_price" size="30" placeholder="@s_dodetltest.unit_price.PlaceHolder" value="@s_dodetltest.unit_price.EditValue" @Html.Raw(s_dodetltest.unit_price.EditAttributes)>
+</span>
+} else { // unit_price (confirm)
+<span id="el$rowindex$_s_dodetltest_unit_price" class="form-group s_dodetltest_unit_price">
+<span @Html.Raw(s_dodetltest.unit_price.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_dodetltest.unit_price.ViewValue))"></span>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_unit_price" name="x@(s_dodetltest_Grid.RowIndex)_unit_price" id="x@(s_dodetltest_Grid.RowIndex)_unit_price" value="@s_dodetltest.unit_price.FormValue">
+} @* unit_price (end) *@
+<input type="hidden" data-table="s_dodetltest" data-field="x_unit_price" name="o@(s_dodetltest_Grid.RowIndex)_unit_price" id="o@(s_dodetltest_Grid.RowIndex)_unit_price" value="@s_dodetltest.unit_price.OldValue">
+</td>
+	} @* unit_price.Visible (end) *@
+	@if (s_dodetltest.amount_origin.Visible) { // amount_origin.Visible (begin)
+		<td data-name="amount_origin">
+@if (!s_dodetltest.IsConfirm) { // amount_origin (begin)
+<span id="el$rowindex$_s_dodetltest_amount_origin" class="form-group s_dodetltest_amount_origin">
+<input type="text" data-table="s_dodetltest" data-field="x_amount_origin" name="x@(s_dodetltest_Grid.RowIndex)_amount_origin" id="x@(s_dodetltest_Grid.RowIndex)_amount_origin" size="30" placeholder="@s_dodetltest.amount_origin.PlaceHolder" value="@s_dodetltest.amount_origin.EditValue" @Html.Raw(s_dodetltest.amount_origin.EditAttributes)>
+</span>
+} else { // amount_origin (confirm)
+<span id="el$rowindex$_s_dodetltest_amount_origin" class="form-group s_dodetltest_amount_origin">
+<span @Html.Raw(s_dodetltest.amount_origin.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_dodetltest.amount_origin.ViewValue))"></span>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_amount_origin" name="x@(s_dodetltest_Grid.RowIndex)_amount_origin" id="x@(s_dodetltest_Grid.RowIndex)_amount_origin" value="@s_dodetltest.amount_origin.FormValue">
+} @* amount_origin (end) *@
+<input type="hidden" data-table="s_dodetltest" data-field="x_amount_origin" name="o@(s_dodetltest_Grid.RowIndex)_amount_origin" id="o@(s_dodetltest_Grid.RowIndex)_amount_origin" value="@s_dodetltest.amount_origin.OldValue">
+</td>
+	} @* amount_origin.Visible (end) *@
+	@if (s_dodetltest.tax_code.Visible) { // tax_code.Visible (begin)
+		<td data-name="tax_code">
+@if (!s_dodetltest.IsConfirm) { // tax_code (begin)
+<span id="el$rowindex$_s_dodetltest_tax_code" class="form-group s_dodetltest_tax_code">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_code" name="x@(s_dodetltest_Grid.RowIndex)_tax_code" id="x@(s_dodetltest_Grid.RowIndex)_tax_code" size="30" maxlength="10" placeholder="@s_dodetltest.tax_code.PlaceHolder" value="@s_dodetltest.tax_code.EditValue" @Html.Raw(s_dodetltest.tax_code.EditAttributes)>
+</span>
+} else { // tax_code (confirm)
+<span id="el$rowindex$_s_dodetltest_tax_code" class="form-group s_dodetltest_tax_code">
+<span @Html.Raw(s_dodetltest.tax_code.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_dodetltest.tax_code.ViewValue))"></span>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_code" name="x@(s_dodetltest_Grid.RowIndex)_tax_code" id="x@(s_dodetltest_Grid.RowIndex)_tax_code" value="@s_dodetltest.tax_code.FormValue">
+} @* tax_code (end) *@
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_code" name="o@(s_dodetltest_Grid.RowIndex)_tax_code" id="o@(s_dodetltest_Grid.RowIndex)_tax_code" value="@s_dodetltest.tax_code.OldValue">
+</td>
+	} @* tax_code.Visible (end) *@
+	@if (s_dodetltest.tax_rate.Visible) { // tax_rate.Visible (begin)
+		<td data-name="tax_rate">
+@if (!s_dodetltest.IsConfirm) { // tax_rate (begin)
+<span id="el$rowindex$_s_dodetltest_tax_rate" class="form-group s_dodetltest_tax_rate">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_rate" name="x@(s_dodetltest_Grid.RowIndex)_tax_rate" id="x@(s_dodetltest_Grid.RowIndex)_tax_rate" size="30" placeholder="@s_dodetltest.tax_rate.PlaceHolder" value="@s_dodetltest.tax_rate.EditValue" @Html.Raw(s_dodetltest.tax_rate.EditAttributes)>
+</span>
+} else { // tax_rate (confirm)
+<span id="el$rowindex$_s_dodetltest_tax_rate" class="form-group s_dodetltest_tax_rate">
+<span @Html.Raw(s_dodetltest.tax_rate.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_dodetltest.tax_rate.ViewValue))"></span>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_rate" name="x@(s_dodetltest_Grid.RowIndex)_tax_rate" id="x@(s_dodetltest_Grid.RowIndex)_tax_rate" value="@s_dodetltest.tax_rate.FormValue">
+} @* tax_rate (end) *@
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_rate" name="o@(s_dodetltest_Grid.RowIndex)_tax_rate" id="o@(s_dodetltest_Grid.RowIndex)_tax_rate" value="@s_dodetltest.tax_rate.OldValue">
+</td>
+	} @* tax_rate.Visible (end) *@
+	@if (s_dodetltest.tax_amount_origin.Visible) { // tax_amount_origin.Visible (begin)
+		<td data-name="tax_amount_origin">
+@if (!s_dodetltest.IsConfirm) { // tax_amount_origin (begin)
+<span id="el$rowindex$_s_dodetltest_tax_amount_origin" class="form-group s_dodetltest_tax_amount_origin">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_amount_origin" name="x@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" id="x@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" size="30" placeholder="@s_dodetltest.tax_amount_origin.PlaceHolder" value="@s_dodetltest.tax_amount_origin.EditValue" @Html.Raw(s_dodetltest.tax_amount_origin.EditAttributes)>
+</span>
+} else { // tax_amount_origin (confirm)
+<span id="el$rowindex$_s_dodetltest_tax_amount_origin" class="form-group s_dodetltest_tax_amount_origin">
+<span @Html.Raw(s_dodetltest.tax_amount_origin.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_dodetltest.tax_amount_origin.ViewValue))"></span>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_amount_origin" name="x@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" id="x@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" value="@s_dodetltest.tax_amount_origin.FormValue">
+} @* tax_amount_origin (end) *@
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_amount_origin" name="o@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" id="o@(s_dodetltest_Grid.RowIndex)_tax_amount_origin" value="@s_dodetltest.tax_amount_origin.OldValue">
+</td>
+	} @* tax_amount_origin.Visible (end) *@
+	@if (s_dodetltest.to_gl_acct.Visible) { // to_gl_acct.Visible (begin)
+		<td data-name="to_gl_acct">
+@if (!s_dodetltest.IsConfirm) { // to_gl_acct (begin)
+<span id="el$rowindex$_s_dodetltest_to_gl_acct" class="form-group s_dodetltest_to_gl_acct">
+<input type="text" data-table="s_dodetltest" data-field="x_to_gl_acct" name="x@(s_dodetltest_Grid.RowIndex)_to_gl_acct" id="x@(s_dodetltest_Grid.RowIndex)_to_gl_acct" size="30" maxlength="10" placeholder="@s_dodetltest.to_gl_acct.PlaceHolder" value="@s_dodetltest.to_gl_acct.EditValue" @Html.Raw(s_dodetltest.to_gl_acct.EditAttributes)>
+</span>
+} else { // to_gl_acct (confirm)
+<span id="el$rowindex$_s_dodetltest_to_gl_acct" class="form-group s_dodetltest_to_gl_acct">
+<span @Html.Raw(s_dodetltest.to_gl_acct.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_dodetltest.to_gl_acct.ViewValue))"></span>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_to_gl_acct" name="x@(s_dodetltest_Grid.RowIndex)_to_gl_acct" id="x@(s_dodetltest_Grid.RowIndex)_to_gl_acct" value="@s_dodetltest.to_gl_acct.FormValue">
+} @* to_gl_acct (end) *@
+<input type="hidden" data-table="s_dodetltest" data-field="x_to_gl_acct" name="o@(s_dodetltest_Grid.RowIndex)_to_gl_acct" id="o@(s_dodetltest_Grid.RowIndex)_to_gl_acct" value="@s_dodetltest.to_gl_acct.OldValue">
+</td>
+	} @* to_gl_acct.Visible (end) *@
+	@if (s_dodetltest.tax_acct.Visible) { // tax_acct.Visible (begin)
+		<td data-name="tax_acct">
+@if (!s_dodetltest.IsConfirm) { // tax_acct (begin)
+<span id="el$rowindex$_s_dodetltest_tax_acct" class="form-group s_dodetltest_tax_acct">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_acct" name="x@(s_dodetltest_Grid.RowIndex)_tax_acct" id="x@(s_dodetltest_Grid.RowIndex)_tax_acct" size="30" maxlength="10" placeholder="@s_dodetltest.tax_acct.PlaceHolder" value="@s_dodetltest.tax_acct.EditValue" @Html.Raw(s_dodetltest.tax_acct.EditAttributes)>
+</span>
+} else { // tax_acct (confirm)
+<span id="el$rowindex$_s_dodetltest_tax_acct" class="form-group s_dodetltest_tax_acct">
+<span @Html.Raw(s_dodetltest.tax_acct.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_dodetltest.tax_acct.ViewValue))"></span>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_acct" name="x@(s_dodetltest_Grid.RowIndex)_tax_acct" id="x@(s_dodetltest_Grid.RowIndex)_tax_acct" value="@s_dodetltest.tax_acct.FormValue">
+} @* tax_acct (end) *@
+<input type="hidden" data-table="s_dodetltest" data-field="x_tax_acct" name="o@(s_dodetltest_Grid.RowIndex)_tax_acct" id="o@(s_dodetltest_Grid.RowIndex)_tax_acct" value="@s_dodetltest.tax_acct.OldValue">
+</td>
+	} @* tax_acct.Visible (end) *@
+	@* Render list options (body, right) *@
+	@s_dodetltest_Grid.ListOptions.RenderBody("right", s_dodetltest_Grid.RowCnt)
+<script>
+fs_dodetltestgrid.updateLists(@s_dodetltest_Grid.RowIndex);
+</script>
+	</tr>
+}
+</tbody>
+</table><!-- /.ew-table -->
+@if (s_dodetltest_Grid.CurrentMode == "add" || s_dodetltest_Grid.CurrentMode == "copy") {
+<input type="hidden" name="@s_dodetltest_Grid.FormKeyCountName" id="@s_dodetltest_Grid.FormKeyCountName" value="@s_dodetltest_Grid.KeyCount">
+@Html.Raw(s_dodetltest_Grid.MultiSelectKey)
+}
+@if (s_dodetltest_Grid.CurrentMode == "edit") {
+<input type="hidden" name="@s_dodetltest_Grid.FormKeyCountName" id="@s_dodetltest_Grid.FormKeyCountName" value="@s_dodetltest_Grid.KeyCount">
+@Html.Raw(s_dodetltest_Grid.MultiSelectKey)
+}
+@if (Empty(s_dodetltest_Grid.CurrentMode)) {
+<input type="hidden" name="action" id="action" value="">
+}
+<input type="hidden" name="detailpage" value="fs_dodetltestgrid">
+</div><!-- /.ew-grid-middle-panel -->
+@{ s_dodetltest_Grid.CloseRecordset(); }
+</div>
+@if (s_dodetltest_Grid.ShowOtherOptions) {
+	<div class="card-footer ew-grid-lower-panel">
+	@s_dodetltest_Grid.OtherOptions.RenderBody("bottom")
+	</div>
+	<div class="clearfix"></div>
+}
+</div><!-- /.ew-grid -->
+}
+@if (s_dodetltest_Grid.TotalRecords <= 0 && s_dodetltest_Grid.CurrentAction == "") { // Show other options
+<div class="ew-list-other-options">
+@s_dodetltest_Grid.OtherOptions.ForEach(opt => opt.ButtonClass = "").RenderBody()
+</div>
+<div class="clearfix"></div>
+}
+@{
+
+	// Clear CurrentGrid
+	CurrentGrid = null;
+}

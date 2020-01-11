@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<configuration date="2019/07/11" author="e.World Technology Ltd.">
+  <project id="{0AEF8F72-728B-4321-84A3-E7108B2914AC}" file="C:\Users\User\Documents\ASPNETMaker\Projects\TotalClientAccounting.agx" name="project4" product="ASPNETMaker" version="16.0" datetime="2019/07/11 15:20:52" languagefolder="wwwroot/lang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
+    <table id="s_armaster" name="s_armaster" caption="s armaster" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_dodetltest" name="s_dodetltest" caption="s dodetltest" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_dohdrtest" name="s_dohdrtest" caption="s dohdrtest" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_employee" name="s_employee" caption="s employee" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_servicetype" name="s_servicetype" caption="s servicetype" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_taxmaster" name="s_taxmaster" caption="s taxmaster" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="UserLevelPermissions" name="UserLevelPermissions" caption="User Level Permissions" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="UserLevels" name="UserLevels" caption="User Levels" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+  </project>
+</configuration>

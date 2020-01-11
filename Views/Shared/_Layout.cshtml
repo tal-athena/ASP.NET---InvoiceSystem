@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>@Language.ProjectPhrase("BodyTitle")</title>
+	<meta charset="utf-8">
+@{
+	<link rel="stylesheet" type="text/css" href="~/adminlte3/css/@CssFile("adminlte.css")">
+	<link rel="stylesheet" type="text/css" href="~/plugins/font-awesome/css/font-awesome.min.css"><!-- Optional font -->
+}
+@{
+	<link rel="stylesheet" type="text/css" href="~/css/jquery.fileupload.css">
+	<link rel="stylesheet" type="text/css" href="~/css/jquery.fileupload-ui.css">
+	<link rel="stylesheet" type="text/css" href="~/colorbox/colorbox.css">
+}
+@{
+	@foreach (string cssfile in Config.StylesheetFiles) { // External Stylesheets
+		<link rel="stylesheet" type="text/css" href="@(IsRemote(cssfile) ? "" : @AppPath(cssfile))">
+	}
+}
+@{
+	if (IsResponsiveLayout()) {
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	}
+	<link rel="stylesheet" type="text/css" href="~/@Config.ProjectStylesheetFilename">
+	if (CustomExportType == "pdf" && !Empty(Config.PdfStylesheetFilename)) {
+	<link rel="stylesheet" type="text/css" href="~/@Config.PdfStylesheetFilename">
+	}
+	<script src="~/js/jquery-3.4.1.min.js"></script>
+	<script src="~/js/jquery.ui.widget.js"></script>
+	<script src="~/js/jquery.storageapi.min.js"></script>
+}
+@{
+	<script src="~/bootstrap4/js/bootstrap.bundle.min.js"></script>
+	<script src="~/adminlte3/js/adminlte.js"></script>
+	<script src="~/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+	<script src="~/js/jquery.fileDownload.min.js"></script>
+	<script src="~/js/load-image.all.min.js"></script>
+	<script src="~/js/jqueryfileupload.min.js"></script>
+	<script src="~/js/typeahead.jquery.js"></script>
+	<script src="~/colorbox/jquery.colorbox-min.js"></script>
+	<script src="~/js/mobile-detect.min.js"></script>
+	<script src="~/moment/moment.min.js"></script>
+	@foreach (string jsfile in Config.JavaScriptFiles) { // External JavaScripts
+		<script src="@(IsRemote(jsfile) ? "" : AppPath(jsfile))"></script>
+	}
+}
+@{
+	<script src="~/js/jsrender.min.js"></script>
+	<script src="~/js/ew.js"></script>
+	<script>
+	jQuery.extend(ew, {
+		LANGUAGE_ID: "@CurrentLanguage",
+		DATE_SEPARATOR: "@DateSeparator",
+		TIME_SEPARATOR: "@TimeSeparator",
+		DATE_FORMAT: "@DateFormat", // Default date format
+		DATE_FORMAT_ID: @DateFormatId, // Default date format ID
+		DATETIME_WITHOUT_SECONDS: @((Config.DateTimeWithoutSeconds) ? "true" : "false"), // Date/Time without seconds
+		DECIMAL_POINT: "@DecimalPoint",
+		THOUSANDS_SEP: "@ThousandsSeparator",
+		SESSION_TIMEOUT: @((Config.SessionTimeout > 0) ? SessionTimeoutTime() : 0), // Session timeout time (seconds)
+		SESSION_TIMEOUT_COUNTDOWN: @Config.SessionTimeoutCountdown, // Count down time to session timeout (seconds)
+		SESSION_KEEP_ALIVE_INTERVAL: @Config.SessionKeepAliveInterval, // Keep alive interval (seconds)
+		IS_LOGGEDIN: @ConvertToJson(IsLoggedIn()), // Is logged in
+		IS_SYS_ADMIN: @ConvertToJson(IsSysAdmin()), // Is sys admin
+		CURRENT_USER_NAME: @Html.Raw(ConvertToJson(CurrentUserName())), // Current user name
+		IS_AUTOLOGIN: @ConvertToJson(IsAutoLogin()), // Is logged in with option "Auto login until I logout explicitly"
+		TIMEOUT_URL: "@AppPath("logout")", // Timeout URL
+		API_URL: "@AppPath(Config.ApiUrl)", // API file name
+		API_ACTION_NAME: "@Config.ApiActionName", // API action name
+		API_OBJECT_NAME: "@Config.ApiObjectName", // API object name
+		API_FIELD_NAME: "@Config.ApiFieldName", // API field name
+		API_KEY_NAME: "@Config.ApiKeyName", // API key name
+		API_LIST_ACTION: "@Config.ApiListAction", // API list action
+		API_VIEW_ACTION: "@Config.ApiViewAction", // API view action
+		API_ADD_ACTION: "@Config.ApiAddAction", // API add action
+		API_EDIT_ACTION: "@Config.ApiEditAction", // API edit action
+		API_DELETE_ACTION: "@Config.ApiDeleteAction", // API delete action
+		API_LOGIN_ACTION: "@Config.ApiLoginAction", // API login action
+		API_FILE_ACTION: "@Config.ApiFileAction", // API file action
+		API_UPLOAD_ACTION: "@Config.ApiUploadAction", // API upload action
+		API_JQUERY_UPLOAD_ACTION: "@Config.ApiJqueryUploadAction", // API jQuery upload action
+		API_SESSION_ACTION: "@Config.ApiSessionAction", // API get session action
+		API_LOOKUP_ACTION: "@Config.ApiLookupAction", // API lookup action
+		API_LOOKUP_TABLE: "@Config.ApiLookupTable", // API lookup table name
+		API_PROGRESS_ACTION: "@Config.ApiProgressAction", // API progress action
+		LOOKUP_FILTER_VALUE_SEPARATOR: "@Config.LookupFilterValueSeparator", // Lookup filter value separator
+		AUTO_SUGGEST_MAX_ENTRIES: @Config.AutoSuggestMaxEntries, // Auto-Suggest max entries
+		DISABLE_BUTTON_ON_SUBMIT: true,
+		PATH_BASE: "@AppPath()", // Path base
+		IMAGE_FOLDER: "@AppPath("images/")", // Image folder
+		SESSION_ID: "@Encrypt(Session.SessionId)", // Session ID
+		UPLOAD_URL: "@AppPath(Config.ApiUrl)", // Upload URL
+		UPLOAD_TYPE: "@Config.UploadType", // Upload type
+		UPLOAD_THUMBNAIL_WIDTH: @Config.UploadThumbnailWidth, // Upload thumbnail width
+		UPLOAD_THUMBNAIL_HEIGHT: @Config.UploadThumbnailHeight, // Upload thumbnail height
+		MULTIPLE_UPLOAD_SEPARATOR: "@Config.MultipleUploadSeparator", // Upload multiple separator
+		IMPORT_FILE_ALLOWED_EXT: "@Config.ImportFileExtensions", // Import file allowed extensions
+		USE_COLORBOX: @ConvertToJson(Config.UseColorbox),
+		USE_JAVASCRIPT_MESSAGE: false,
+		PROJECT_STYLESHEET_FILENAME: "@AppPath(Config.ProjectStylesheetFilename)", // Project stylesheet
+		PDF_STYLESHEET_FILENAME: "@AppPath(Config.PdfStylesheetFilename)", // PDF stylesheet
+		TOKEN_NAME: "@Config.TokenName", // DN
+		ANTIFORGERY_TOKEN: "@CurrentToken",
+		CSS_FLIP: @ConvertToJson(Config.CssFlip),
+		LAZY_LOAD: @ConvertToJson(Config.LazyLoad),
+		RESET_HEIGHT: @ConvertToJson(Config.ResetHeight),
+		DEBUG_ENABLED: @ConvertToJson(Config.Debug),
+		SEARCH_FILTER_OPTION: "@Config.SearchFilterOption",
+		OPTION_HTML_TEMPLATE: @Html.Raw(ConvertToJson(Config.OptionHtmlTemplate))
+	});
+	</script>
+	<script src="~/js/jquery.ewjtable.js"></script>
+}
+@{
+	<script>
+	@Html.Raw(await Language.ToScript())
+	ew.vars = @Html.Raw(ConvertToJson(ClientVariables));
+	</script>
+	<script src="~/js/userfn.js"></script>
+	<script>
+
+	// Write your client script here, no need to add script tags.
+	</script>
+}
+	<meta name="generator" content="ASP.NET Maker v2019.0.6">
+</head>
+<body class="@Config.BodyClass" dir="@(Config.CssFlip ? "rtl" : "ltr")">
+@if (true) {
+	if (!SkipHeaderFooter) {
+		<div class="wrapper ew-layout">
+			<!-- Main Header -->
+	<!-- Navbar -->
+	<nav class="@Config.NavbarClass">
+		<!-- Left navbar links -->
+		<ul id="ew-navbar" class="navbar-nav">
+			<li class="nav-item">
+				<a class="nav-link" data-widget="pushmenu" href="#"><i class="fa fa-bars"></i></a>
+			</li>
+		</ul>
+		<!-- Right navbar links -->
+		<ul id="ew-navbar-right" class="navbar-nav ml-auto"></ul>
+	</nav>
+	<!-- /.navbar -->
+	<!-- Main Sidebar Container -->
+	<aside class="@Config.SidebarClass">
+		<!-- Brand Logo //** Note: Only licensed users are allowed to change the logo ** -->
+		<a href="#" class="brand-link">
+			<span class="brand-text">ASP.NET Maker 2019</span>
+		</a>
+		<!-- Sidebar -->
+		<div class="sidebar">
+			<!-- Sidebar Menu -->
+			<nav id="ew-menu" class="mt-2"></nav>
+			<!-- /.sidebar-menu -->
+		</div>
+		<!-- /.sidebar -->
+	</aside>
+	<!-- Content Wrapper. Contains page content -->
+	<div class="content-wrapper">
+		@if (Config.PageTitleStyle != "None") {
+		<!-- Content Header (Page header) -->
+		<div class="content-header">
+			<div class="container-fluid">
+				<div class="row mb-2">
+				<div class="col-sm-6">
+					<h1 class="m-0 text-dark">@Html.Raw(CurrentPageHeading()) <small class="text-muted">@Html.Raw(CurrentPageSubheading())</small></h1>
+				</div><!-- /.col -->
+				<div class="col-sm-6">
+					@{ CurrentBreadcrumb?.Render(); }
+				</div><!-- /.col -->
+				</div><!-- /.row -->
+			</div><!-- /.container-fluid -->
+		</div>
+		<!-- /.content-header -->
+		}
+		<!-- Main content -->
+		<section class="content">
+		<div class="container-fluid">
+		@RenderBody()
+		</div><!-- /.container-fluid -->
+		</section>
+		<!-- /.content -->
+		</div>
+		<!-- Main Footer -->
+		<footer class="main-footer fade">
+			<!-- ** Note: Only licensed users are allowed to change the copyright statement. ** -->
+			<div class="ew-footer-text">@Html.Raw(Language.ProjectPhrase("FooterText"))</div>
+			<div class="float-right d-none d-sm-inline-block"></div>
+		</footer>
+	</div>
+	<!-- ./wrapper -->
+	} else { // gbSkipHeaderFooter
+		@RenderBody()
+	}
+} else {
+	@RenderBody()
+}
+@if (!SkipHeaderFooter) {
+<!-- Navbar -->
+<script type="text/html" id="navbar-menu-items" class="ew-js-template" data-name="navbar" data-data="navbar" data-method="appendTo" data-target="#ew-navbar">
+{{if items}}
+	{{for items}}
+		<li id="{{:id}}" name="{{:name}}" class="{{if parentId == -1}}nav-item ew-navbar-item{{/if}}{{if isHeader && parentId > -1}}dropdown-header{{/if}}{{if items}} dropdown{{/if}}{{if items && parentId != -1}} dropdown-submenu{{/if}} d-none d-md-block">
+			{{if isHeader && parentId > -1}}
+				{{if icon}}<i class="{{:icon}}"></i>{{/if}}
+				<span>{{:text}}</span>
+			{{else}}
+			<a href="{{:href}}"{{if target}} target="{{:target}}"{{/if}}{{if attrs}}{{:attrs}}{{/if}} class="{{if parentId == -1}}nav-link{{else}}dropdown-item{{/if}}{{if active}} active{{/if}}{{if items}} dropdown-toggle ew-dropdown{{/if}}"{{if items}} role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"{{/if}}>
+				{{if icon}}<i class="{{:icon}}"></i>{{/if}}
+				<span>{{:text}}</span>
+			</a>
+			{{/if}}
+			{{if items}}
+			<ul class="dropdown-menu">
+				{{include tmpl="#navbar-menu-items"/}}
+			</ul>
+			{{/if}}
+		</li>
+	{{/for}}
+{{/if}}
+</script>
+<!-- Sidebar -->
+<script type="text/html" class="ew-js-template" data-name="menu" data-data="menu" data-target="#ew-menu">
+{{if items}}
+	<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="{{:accordion}}">
+	{{include tmpl="#menu-items"/}}
+	</ul>
+{{/if}}
+</script>
+<script type="text/html" id="menu-items">
+{{if items}}
+	{{for items}}
+		<li id="{{:id}}" name="{{:name}}" class="{{if isHeader}}nav-header{{else}}nav-item{{if items}} has-treeview{{/if}}{{if active}} active current{{/if}}{{if open}} menu-open{{/if}}{{/if}}{{if isNavbarItem}} d-block d-md-none{{/if}}">
+			{{if isHeader}}
+				{{if icon}}<i class="{{:icon}}"></i>{{/if}}
+				<span>{{:text}}</span>
+				{{if label}}
+				<span class="right">
+					{{:label}}
+				</span>
+				{{/if}}
+			{{else}}
+			<a href="{{:href}}" class="nav-link{{if active}} active{{/if}}"{{if target}} target="{{:target}}"{{/if}}{{if attrs}}{{:attrs}}{{/if}}>
+				{{if icon}}<i class="nav-icon {{:icon}}"></i>{{/if}}
+				<p><span>{{:text}}</span>
+					{{if items}}
+						<i class="right fa fa-angle-left"></i>
+						{{if label}}
+							<span class="right">
+								{{:label}}
+							</span>
+						{{/if}}
+					{{else}}
+						{{if label}}
+							<span class="right">
+								{{:label}}
+							</span>
+						{{/if}}
+					{{/if}}
+				</p>
+			</a>
+			{{/if}}
+			{{if items}}
+			<ul class="nav nav-treeview"{{if open}} style="display: block;"{{/if}}">
+				{{include tmpl="#menu-items"/}}
+			</ul>
+			{{/if}}
+		</li>
+	{{/for}}
+{{/if}}
+</script>
+}
+@if (!SkipHeaderFooter) {
+<script type="text/html" class="ew-js-template" data-name="languages" data-data="languages" data-method="@Language.Method" data-target="@Language.Target">
+@Html.Raw(Language.GetTemplate())
+</script>
+<script type="text/html" class="ew-js-template" data-name="login" data-data="login" data-method="appendTo" data-target=".navbar-nav.ml-auto">
+{{if isLoggedIn}}
+<li class="nav-item dropdown text-body">
+	<a class="nav-link" data-toggle="dropdown" href="#">
+		<i class="fa fa-user"></i>
+	</a>
+	<div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+		<div class="dropdown-item p-3"><i class="fa fa-user mr-2"></i>{{:currentUserName}}</div>
+		{{if (hasPersonalData || canChangePassword)}}
+		<div class="dropdown-divider"></div>
+		<div class="text-nowrap p-3">
+			{{if hasPersonalData}}
+			<a class="btn btn-default" href="{{:personalDataUrl}}">{{:personalDataText}}</a>
+			{{/if}}
+			{{if canChangePassword}}
+			<a class="btn btn-default" href="{{:changePasswordUrl}}">{{:changePasswordText}}</a>
+			{{/if}}
+		</div>
+		{{/if}}
+		{{if canLogout}}
+		<div class="dropdown-divider"></div>
+		<div class="dropdown-footer p-2 text-right">
+			<a class="btn btn-default" href="{{:logoutUrl}}">{{:logoutText}}</a>
+		</div>
+		{{/if}}
+	</div>
+<li>
+{{else}}
+	{{if canLogin}}
+<li class="nav-item"><a class="nav-link" href="{{:loginUrl}}">{{:loginText}}</a></li>
+	{{/if}}
+{{/if}}
+</script>
+}
+@if (true) {
+<!-- modal dialog -->
+<div id="ew-modal-dialog" class="modal" role="dialog" aria-hidden="true"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h4 class="modal-title"></h4></div><div class="modal-body"></div><div class="modal-footer"></div></div></div></div>
+<!-- modal lookup dialog -->
+<div id="ew-modal-lookup-dialog" class="modal" role="dialog" aria-hidden="true"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h4 class="modal-title"></h4></div><div class="modal-body"></div><div class="modal-footer"></div></div></div></div>
+<!-- import dialog -->
+<div id="ew-import-dialog" class="modal" role="dialog" aria-hidden="true"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h4 class="modal-title"></h4></div>
+<div class="modal-body">
+<div>
+	<span class="btn btn-default fileinput-button">
+		<span>@Html.Raw(Language.Phrase("ChooseFileBtn"))</span>
+		<input id="importfiles" type="file" title=" " name="importfiles[]" multiple>
+	</span>
+</div>
+<div class="message d-none mt-3"></div>
+<div class="progress d-none mt-3"><div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">0%</div></div>
+</div>
+<div class="modal-footer"><button type="button" class="btn btn-default ew-close-btn" data-dismiss="modal">@Html.Raw(Language.Phrase("CloseBtn"))</button></div></div></div></div>
+<!-- message box -->
+<div id="ew-message-box" class="modal" role="dialog" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"></div><div class="modal-footer"><button type="button" class="btn btn-primary ew-btn" data-dismiss="modal">@Html.Raw(Language.Phrase("MessageOK"))</button></div></div></div></div>
+<!-- prompt -->
+<div id="ew-prompt" class="modal" role="dialog" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"></div><div class="modal-footer"><button type="button" class="btn btn-primary ew-btn">@Html.Raw(Language.Phrase("MessageOK"))</button><button type="button" class="btn btn-default ew-btn" data-dismiss="modal">@Html.Raw(Language.Phrase("CancelBtn"))</button></div></div></div></div>
+<!-- session timer -->
+<div id="ew-timer" class="modal" role="dialog" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"></div><div class="modal-footer"><button type="button" class="btn btn-primary ew-btn" data-dismiss="modal">@Html.Raw(Language.Phrase("MessageOK"))</button></div></div></div></div>
+<!-- tooltip -->
+<div id="ew-tooltip"></div>
+<script>
+
+// User event handlers
+jQuery.get(ew.PATH_BASE + "js/userevt.js");
+</script>
+@await Html.PartialAsync("ewmenu")
+<script>
+
+// Write your global startup script here
+// document.write("page loaded");
+
+</script>
+}
+</body>
+</html>

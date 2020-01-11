@@ -1,0 +1,250 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_glchart_Delete.Page_Render();
+
+	// Check action result
+	if (s_glchart_Delete.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "delete";
+var fs_glchartdelete = currentForm = new ew.Form("fs_glchartdelete", "delete");
+
+// Form_CustomValidate event
+fs_glchartdelete.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_glchartdelete.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_glchart_Delete.ShowPageHeader()
+@s_glchart_Delete.ShowMessages()
+<form name="fs_glchartdelete" id="fs_glchartdelete" class="form-inline ew-form ew-delete-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_glchart_Delete.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="delete">
+@foreach (string key in s_glchart_Delete.RecordKeys) {
+<input type="hidden" name="key_m" value="@key">
+}
+<div class="card ew-card ew-grid">
+<div class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+<table class="table ew-table">
+	<thead>
+	<tr class="ew-table-header">
+@if (s_glchart.Id.Visible) { // Id (begin)
+		<th class="@Html.Raw(s_glchart.Id.HeaderCellClass)"><span id="elh_s_glchart_Id" class="s_glchart_Id">@Html.Raw(s_glchart.Id.Caption)</span></th>
+} @* Id.Visible (end) *@
+@if (s_glchart.acct_code.Visible) { // acct_code (begin)
+		<th class="@Html.Raw(s_glchart.acct_code.HeaderCellClass)"><span id="elh_s_glchart_acct_code" class="s_glchart_acct_code">@Html.Raw(s_glchart.acct_code.Caption)</span></th>
+} @* acct_code.Visible (end) *@
+@if (s_glchart.description.Visible) { // description (begin)
+		<th class="@Html.Raw(s_glchart.description.HeaderCellClass)"><span id="elh_s_glchart_description" class="s_glchart_description">@Html.Raw(s_glchart.description.Caption)</span></th>
+} @* description.Visible (end) *@
+@if (s_glchart.report_type.Visible) { // report_type (begin)
+		<th class="@Html.Raw(s_glchart.report_type.HeaderCellClass)"><span id="elh_s_glchart_report_type" class="s_glchart_report_type">@Html.Raw(s_glchart.report_type.Caption)</span></th>
+} @* report_type.Visible (end) *@
+@if (s_glchart.acct_group.Visible) { // acct_group (begin)
+		<th class="@Html.Raw(s_glchart.acct_group.HeaderCellClass)"><span id="elh_s_glchart_acct_group" class="s_glchart_acct_group">@Html.Raw(s_glchart.acct_group.Caption)</span></th>
+} @* acct_group.Visible (end) *@
+@if (s_glchart.acct_type.Visible) { // acct_type (begin)
+		<th class="@Html.Raw(s_glchart.acct_type.HeaderCellClass)"><span id="elh_s_glchart_acct_type" class="s_glchart_acct_type">@Html.Raw(s_glchart.acct_type.Caption)</span></th>
+} @* acct_type.Visible (end) *@
+@if (s_glchart.CurrencyCode.Visible) { // CurrencyCode (begin)
+		<th class="@Html.Raw(s_glchart.CurrencyCode.HeaderCellClass)"><span id="elh_s_glchart_CurrencyCode" class="s_glchart_CurrencyCode">@Html.Raw(s_glchart.CurrencyCode.Caption)</span></th>
+} @* CurrencyCode.Visible (end) *@
+@if (s_glchart.opn_debit.Visible) { // opn_debit (begin)
+		<th class="@Html.Raw(s_glchart.opn_debit.HeaderCellClass)"><span id="elh_s_glchart_opn_debit" class="s_glchart_opn_debit">@Html.Raw(s_glchart.opn_debit.Caption)</span></th>
+} @* opn_debit.Visible (end) *@
+@if (s_glchart.opn_credit.Visible) { // opn_credit (begin)
+		<th class="@Html.Raw(s_glchart.opn_credit.HeaderCellClass)"><span id="elh_s_glchart_opn_credit" class="s_glchart_opn_credit">@Html.Raw(s_glchart.opn_credit.Caption)</span></th>
+} @* opn_credit.Visible (end) *@
+@if (s_glchart.bal_mtd.Visible) { // bal_mtd (begin)
+		<th class="@Html.Raw(s_glchart.bal_mtd.HeaderCellClass)"><span id="elh_s_glchart_bal_mtd" class="s_glchart_bal_mtd">@Html.Raw(s_glchart.bal_mtd.Caption)</span></th>
+} @* bal_mtd.Visible (end) *@
+@if (s_glchart.bal_ytd.Visible) { // bal_ytd (begin)
+		<th class="@Html.Raw(s_glchart.bal_ytd.HeaderCellClass)"><span id="elh_s_glchart_bal_ytd" class="s_glchart_bal_ytd">@Html.Raw(s_glchart.bal_ytd.Caption)</span></th>
+} @* bal_ytd.Visible (end) *@
+@if (s_glchart.remark.Visible) { // remark (begin)
+		<th class="@Html.Raw(s_glchart.remark.HeaderCellClass)"><span id="elh_s_glchart_remark" class="s_glchart_remark">@Html.Raw(s_glchart.remark.Caption)</span></th>
+} @* remark.Visible (end) *@
+	</tr>
+	</thead>
+	<tbody>
+@{ s_glchart_Delete.RecordCount = 0; }
+@while (s_glchart_Delete.Recordset != null && await s_glchart_Delete.Recordset.ReadAsync()) { // DN
+	s_glchart_Delete.RecordCount++;
+	s_glchart_Delete.RowCnt++;
+
+	// Set row properties
+	s_glchart_Delete.ResetAttributes();
+	s_glchart_Delete.RowType = Config.RowTypeView; // View
+
+	// Get the field contents
+	await s_glchart_Delete.LoadRowValues(s_glchart_Delete.Recordset);
+
+	// Render row
+	await s_glchart_Delete.RenderRow();
+	<tr @Html.Raw(s_glchart_Delete.RowAttributes)>
+@if (s_glchart.Id.Visible) { // Id (begin)
+		<td @Html.Raw(s_glchart.Id.CellAttributes)>
+<span id="el@(s_glchart_Delete.RowCnt)_s_glchart_Id" class="s_glchart_Id">
+<span @Html.Raw(s_glchart.Id.ViewAttributes)>
+@Html.Raw(s_glchart.Id.GetViewValue())</span>
+</span>
+</td>
+} @* Id.Visible (end) *@
+@if (s_glchart.acct_code.Visible) { // acct_code (begin)
+		<td @Html.Raw(s_glchart.acct_code.CellAttributes)>
+<span id="el@(s_glchart_Delete.RowCnt)_s_glchart_acct_code" class="s_glchart_acct_code">
+<span @Html.Raw(s_glchart.acct_code.ViewAttributes)>
+@Html.Raw(s_glchart.acct_code.GetViewValue())</span>
+</span>
+</td>
+} @* acct_code.Visible (end) *@
+@if (s_glchart.description.Visible) { // description (begin)
+		<td @Html.Raw(s_glchart.description.CellAttributes)>
+<span id="el@(s_glchart_Delete.RowCnt)_s_glchart_description" class="s_glchart_description">
+<span @Html.Raw(s_glchart.description.ViewAttributes)>
+@Html.Raw(s_glchart.description.GetViewValue())</span>
+</span>
+</td>
+} @* description.Visible (end) *@
+@if (s_glchart.report_type.Visible) { // report_type (begin)
+		<td @Html.Raw(s_glchart.report_type.CellAttributes)>
+<span id="el@(s_glchart_Delete.RowCnt)_s_glchart_report_type" class="s_glchart_report_type">
+<span @Html.Raw(s_glchart.report_type.ViewAttributes)>
+@Html.Raw(s_glchart.report_type.GetViewValue())</span>
+</span>
+</td>
+} @* report_type.Visible (end) *@
+@if (s_glchart.acct_group.Visible) { // acct_group (begin)
+		<td @Html.Raw(s_glchart.acct_group.CellAttributes)>
+<span id="el@(s_glchart_Delete.RowCnt)_s_glchart_acct_group" class="s_glchart_acct_group">
+<span @Html.Raw(s_glchart.acct_group.ViewAttributes)>
+@Html.Raw(s_glchart.acct_group.GetViewValue())</span>
+</span>
+</td>
+} @* acct_group.Visible (end) *@
+@if (s_glchart.acct_type.Visible) { // acct_type (begin)
+		<td @Html.Raw(s_glchart.acct_type.CellAttributes)>
+<span id="el@(s_glchart_Delete.RowCnt)_s_glchart_acct_type" class="s_glchart_acct_type">
+<span @Html.Raw(s_glchart.acct_type.ViewAttributes)>
+@Html.Raw(s_glchart.acct_type.GetViewValue())</span>
+</span>
+</td>
+} @* acct_type.Visible (end) *@
+@if (s_glchart.CurrencyCode.Visible) { // CurrencyCode (begin)
+		<td @Html.Raw(s_glchart.CurrencyCode.CellAttributes)>
+<span id="el@(s_glchart_Delete.RowCnt)_s_glchart_CurrencyCode" class="s_glchart_CurrencyCode">
+<span @Html.Raw(s_glchart.CurrencyCode.ViewAttributes)>
+@Html.Raw(s_glchart.CurrencyCode.GetViewValue())</span>
+</span>
+</td>
+} @* CurrencyCode.Visible (end) *@
+@if (s_glchart.opn_debit.Visible) { // opn_debit (begin)
+		<td @Html.Raw(s_glchart.opn_debit.CellAttributes)>
+<span id="el@(s_glchart_Delete.RowCnt)_s_glchart_opn_debit" class="s_glchart_opn_debit">
+<span @Html.Raw(s_glchart.opn_debit.ViewAttributes)>
+@Html.Raw(s_glchart.opn_debit.GetViewValue())</span>
+</span>
+</td>
+} @* opn_debit.Visible (end) *@
+@if (s_glchart.opn_credit.Visible) { // opn_credit (begin)
+		<td @Html.Raw(s_glchart.opn_credit.CellAttributes)>
+<span id="el@(s_glchart_Delete.RowCnt)_s_glchart_opn_credit" class="s_glchart_opn_credit">
+<span @Html.Raw(s_glchart.opn_credit.ViewAttributes)>
+@Html.Raw(s_glchart.opn_credit.GetViewValue())</span>
+</span>
+</td>
+} @* opn_credit.Visible (end) *@
+@if (s_glchart.bal_mtd.Visible) { // bal_mtd (begin)
+		<td @Html.Raw(s_glchart.bal_mtd.CellAttributes)>
+<span id="el@(s_glchart_Delete.RowCnt)_s_glchart_bal_mtd" class="s_glchart_bal_mtd">
+<span @Html.Raw(s_glchart.bal_mtd.ViewAttributes)>
+@Html.Raw(s_glchart.bal_mtd.GetViewValue())</span>
+</span>
+</td>
+} @* bal_mtd.Visible (end) *@
+@if (s_glchart.bal_ytd.Visible) { // bal_ytd (begin)
+		<td @Html.Raw(s_glchart.bal_ytd.CellAttributes)>
+<span id="el@(s_glchart_Delete.RowCnt)_s_glchart_bal_ytd" class="s_glchart_bal_ytd">
+<span @Html.Raw(s_glchart.bal_ytd.ViewAttributes)>
+@Html.Raw(s_glchart.bal_ytd.GetViewValue())</span>
+</span>
+</td>
+} @* bal_ytd.Visible (end) *@
+@if (s_glchart.remark.Visible) { // remark (begin)
+		<td @Html.Raw(s_glchart.remark.CellAttributes)>
+<span id="el@(s_glchart_Delete.RowCnt)_s_glchart_remark" class="s_glchart_remark">
+<span @Html.Raw(s_glchart.remark.ViewAttributes)>
+@Html.Raw(s_glchart.remark.GetViewValue())</span>
+</span>
+</td>
+} @* remark.Visible (end) *@
+	</tr>
+}
+@{ s_glchart_Delete.CloseRecordset(); }
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<div class="divconfirmdelete">
+  <div>
+	<label>
+		@Html.Raw(Language.Phrase("askconfirmdelete"))
+	</label>
+  </div>
+</div>
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("DeleteBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_glchart_Delete.ReturnUrl)">@Language.Phrase("CancelBtn")</button>
+</div>
+</form>
+@s_glchart_Delete.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

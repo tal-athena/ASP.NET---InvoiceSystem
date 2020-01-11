@@ -1,0 +1,808 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_employee_List.Page_Render();
+
+	// Check action result
+	if (s_employee_List.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_employee.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "list";
+var fs_employeelist = currentForm = new ew.Form("fs_employeelist", "list");
+fs_employeelist.formKeyCountName = "@s_employee_List.FormKeyCountName";
+
+// Form_CustomValidate event
+fs_employeelist.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_employeelist.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_employeelist.lists["x_UserLevelId"] = @Html.Raw(s_employee_List.UserLevelId.Lookup.ToClientList());
+fs_employeelist.lists["x_UserLevelId"].options = @Html.Raw(ConvertToJson(s_employee_List.UserLevelId.LookupOptions));
+fs_employeelist.lists["x_active"] = @Html.Raw(s_employee_List.active.Lookup.ToClientList());
+fs_employeelist.lists["x_active"].options = @Html.Raw(ConvertToJson(s_employee_List.active.Options(false))); // DN
+
+// Form object for search
+var fs_employeelistsrch = currentSearchForm = new ew.Form("fs_employeelistsrch");
+
+// Filters
+fs_employeelistsrch.filterList = @Html.Raw(await s_employee_List.GetFilterList());
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_employee.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+@if (s_employee_List.TotalRecords > 0 && s_employee_List.ExportOptions.Visible) {
+	s_employee_List.ExportOptions.Render("body");
+}
+@if (s_employee_List.ImportOptions.Visible) {
+	s_employee_List.ImportOptions.Render("body");
+}
+@if (s_employee_List.SearchOptions.Visible) {
+	s_employee_List.SearchOptions.Render("body");
+}
+@if (s_employee_List.FilterOptions.Visible) {
+	s_employee_List.FilterOptions.Render("body");
+}
+<div class="clearfix"></div>
+</div>
+}
+@{ s_employee_List.RenderOtherOptions(); }
+@if (Security.CanSearch) {
+if (!s_employee_List.IsExport() && Empty(s_employee_List.CurrentAction)) { // Begin search form
+<form name="fs_employeelistsrch" id="fs_employeelistsrch" class="form-inline ew-form ew-ext-search-form" action="@AppPath(CurrentPageName())">
+<div id="fs_employeelistsrch-search-panel" class="ew-search-panel collapse@(!Empty(s_employee_List.SearchWhere) ? " show" : " show")">
+<input type="hidden" name="cmd" value="search">
+<div class="ew-basic-search">
+<div id="xsr_1" class="ew-row d-sm-flex">
+	<div class="ew-quick-search input-group">
+	<input type="text" name="@Config.TableBasicSearch" id="@Config.TableBasicSearch" class="form-control" value="@s_employee_List.BasicSearch.SessionKeyword" placeholder="@Language.Phrase("Search")">
+	<input type="hidden" name="@Config.TableBasicSearchType" id="@Config.TableBasicSearchType" value="@s_employee_List.BasicSearch.SessionType">
+	<div class="input-group-append">
+		<button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit">@Html.Raw(Language.Phrase("SearchBtn"))</button>
+		<button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype">@Html.Raw(s_employee_List.BasicSearch.TypeNameShort)</span></button>
+		<div class="dropdown-menu dropdown-menu-right">
+			<a class="dropdown-item @((s_employee_List.BasicSearch.SessionType == "") ? " active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this)">@Html.Raw(Language.Phrase("QuickSearchAuto"))</a>
+			<a class="dropdown-item @((s_employee_List.BasicSearch.SessionType == "=") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'=')">@Html.Raw(Language.Phrase("QuickSearchExact"))</a>
+			<a class="dropdown-item @((s_employee_List.BasicSearch.SessionType == "AND") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'AND')">@Html.Raw(Language.Phrase("QuickSearchAll"))</a>
+			<a class="dropdown-item @((s_employee_List.BasicSearch.SessionType == "OR") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'OR')">@Html.Raw(Language.Phrase("QuickSearchAny"))</a>
+		</div>
+	</div>
+	</div>
+</div>
+</div>
+</div>
+</form>
+} @* End search form *@
+}
+@s_employee_List.ShowPageHeader()
+@s_employee_List.ShowMessages()
+@if (s_employee_List.TotalRecords > 0 || s_employee_List.CurrentAction != "") {
+<div class="card ew-card ew-grid@(s_employee_List.IsAddOrEdit ? " ew-grid-add-edit" : "") s_employee">
+<form name="fs_employeelist" id="fs_employeelist" class="form-inline ew-form ew-list-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_employee_List.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<div id="gmp_s_employee" class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+@if (s_employee_List.TotalRecords > 0 || s_employee.IsGridEdit) { // Begin If TotalRecords > 0
+<table id="tbl_s_employeelist" class="table ew-table"><!-- .ew-table -->
+<thead>
+	<tr class="ew-table-header">
+@{
+
+	// Header row
+	s_employee_List.RowType = Config.RowTypeHeader;
+
+	// Render list options
+	await s_employee_List.RenderListOptions();
+
+	// Render list options (header, left)
+	s_employee_List.ListOptions.Render("header", "left");
+}
+@if (s_employee.Id.Visible) { // Id.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.Id) == "") {
+		<th data-name="Id" class="@s_employee.Id.HeaderCellClass"><div id="elh_s_employee_Id" class="s_employee_Id"><div class="ew-table-header-caption">@Html.Raw(s_employee.Id.Caption)</div></div></th>
+	} else {
+		<th data-name="Id" class="@s_employee.Id.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.Id))',1);"><div id="elh_s_employee_Id" class="s_employee_Id">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.Id.Caption)</span><span class="ew-table-header-sort">@if (s_employee.Id.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.Id.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* Id.Visible (end) *@
+@if (s_employee.employeeid.Visible) { // employeeid.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.employeeid) == "") {
+		<th data-name="employeeid" class="@s_employee.employeeid.HeaderCellClass"><div id="elh_s_employee_employeeid" class="s_employee_employeeid"><div class="ew-table-header-caption">@Html.Raw(s_employee.employeeid.Caption)</div></div></th>
+	} else {
+		<th data-name="employeeid" class="@s_employee.employeeid.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.employeeid))',1);"><div id="elh_s_employee_employeeid" class="s_employee_employeeid">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.employeeid.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee.employeeid.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.employeeid.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* employeeid.Visible (end) *@
+@if (s_employee.fname.Visible) { // fname.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.fname) == "") {
+		<th data-name="fname" class="@s_employee.fname.HeaderCellClass"><div id="elh_s_employee_fname" class="s_employee_fname"><div class="ew-table-header-caption">@Html.Raw(s_employee.fname.Caption)</div></div></th>
+	} else {
+		<th data-name="fname" class="@s_employee.fname.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.fname))',1);"><div id="elh_s_employee_fname" class="s_employee_fname">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.fname.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee.fname.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.fname.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* fname.Visible (end) *@
+@if (s_employee.lname.Visible) { // lname.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.lname) == "") {
+		<th data-name="lname" class="@s_employee.lname.HeaderCellClass"><div id="elh_s_employee_lname" class="s_employee_lname"><div class="ew-table-header-caption">@Html.Raw(s_employee.lname.Caption)</div></div></th>
+	} else {
+		<th data-name="lname" class="@s_employee.lname.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.lname))',1);"><div id="elh_s_employee_lname" class="s_employee_lname">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.lname.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee.lname.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.lname.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* lname.Visible (end) *@
+@if (s_employee.oldic.Visible) { // oldic.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.oldic) == "") {
+		<th data-name="oldic" class="@s_employee.oldic.HeaderCellClass"><div id="elh_s_employee_oldic" class="s_employee_oldic"><div class="ew-table-header-caption">@Html.Raw(s_employee.oldic.Caption)</div></div></th>
+	} else {
+		<th data-name="oldic" class="@s_employee.oldic.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.oldic))',1);"><div id="elh_s_employee_oldic" class="s_employee_oldic">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.oldic.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee.oldic.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.oldic.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* oldic.Visible (end) *@
+@if (s_employee.newic.Visible) { // newic.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.newic) == "") {
+		<th data-name="newic" class="@s_employee.newic.HeaderCellClass"><div id="elh_s_employee_newic" class="s_employee_newic"><div class="ew-table-header-caption">@Html.Raw(s_employee.newic.Caption)</div></div></th>
+	} else {
+		<th data-name="newic" class="@s_employee.newic.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.newic))',1);"><div id="elh_s_employee_newic" class="s_employee_newic">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.newic.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee.newic.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.newic.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* newic.Visible (end) *@
+@if (s_employee.passport.Visible) { // passport.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.passport) == "") {
+		<th data-name="passport" class="@s_employee.passport.HeaderCellClass"><div id="elh_s_employee_passport" class="s_employee_passport"><div class="ew-table-header-caption">@Html.Raw(s_employee.passport.Caption)</div></div></th>
+	} else {
+		<th data-name="passport" class="@s_employee.passport.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.passport))',1);"><div id="elh_s_employee_passport" class="s_employee_passport">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.passport.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee.passport.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.passport.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* passport.Visible (end) *@
+@if (s_employee.address1.Visible) { // address1.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.address1) == "") {
+		<th data-name="address1" class="@s_employee.address1.HeaderCellClass"><div id="elh_s_employee_address1" class="s_employee_address1"><div class="ew-table-header-caption">@Html.Raw(s_employee.address1.Caption)</div></div></th>
+	} else {
+		<th data-name="address1" class="@s_employee.address1.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.address1))',1);"><div id="elh_s_employee_address1" class="s_employee_address1">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.address1.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee.address1.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.address1.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* address1.Visible (end) *@
+@if (s_employee.address2.Visible) { // address2.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.address2) == "") {
+		<th data-name="address2" class="@s_employee.address2.HeaderCellClass"><div id="elh_s_employee_address2" class="s_employee_address2"><div class="ew-table-header-caption">@Html.Raw(s_employee.address2.Caption)</div></div></th>
+	} else {
+		<th data-name="address2" class="@s_employee.address2.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.address2))',1);"><div id="elh_s_employee_address2" class="s_employee_address2">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.address2.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee.address2.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.address2.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* address2.Visible (end) *@
+@if (s_employee.Id_city.Visible) { // Id_city.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.Id_city) == "") {
+		<th data-name="Id_city" class="@s_employee.Id_city.HeaderCellClass"><div id="elh_s_employee_Id_city" class="s_employee_Id_city"><div class="ew-table-header-caption">@Html.Raw(s_employee.Id_city.Caption)</div></div></th>
+	} else {
+		<th data-name="Id_city" class="@s_employee.Id_city.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.Id_city))',1);"><div id="elh_s_employee_Id_city" class="s_employee_Id_city">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.Id_city.Caption)</span><span class="ew-table-header-sort">@if (s_employee.Id_city.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.Id_city.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* Id_city.Visible (end) *@
+@if (s_employee.Id_state.Visible) { // Id_state.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.Id_state) == "") {
+		<th data-name="Id_state" class="@s_employee.Id_state.HeaderCellClass"><div id="elh_s_employee_Id_state" class="s_employee_Id_state"><div class="ew-table-header-caption">@Html.Raw(s_employee.Id_state.Caption)</div></div></th>
+	} else {
+		<th data-name="Id_state" class="@s_employee.Id_state.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.Id_state))',1);"><div id="elh_s_employee_Id_state" class="s_employee_Id_state">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.Id_state.Caption)</span><span class="ew-table-header-sort">@if (s_employee.Id_state.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.Id_state.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* Id_state.Visible (end) *@
+@if (s_employee.Id_country.Visible) { // Id_country.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.Id_country) == "") {
+		<th data-name="Id_country" class="@s_employee.Id_country.HeaderCellClass"><div id="elh_s_employee_Id_country" class="s_employee_Id_country"><div class="ew-table-header-caption">@Html.Raw(s_employee.Id_country.Caption)</div></div></th>
+	} else {
+		<th data-name="Id_country" class="@s_employee.Id_country.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.Id_country))',1);"><div id="elh_s_employee_Id_country" class="s_employee_Id_country">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.Id_country.Caption)</span><span class="ew-table-header-sort">@if (s_employee.Id_country.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.Id_country.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* Id_country.Visible (end) *@
+@if (s_employee.postcode.Visible) { // postcode.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.postcode) == "") {
+		<th data-name="postcode" class="@s_employee.postcode.HeaderCellClass"><div id="elh_s_employee_postcode" class="s_employee_postcode"><div class="ew-table-header-caption">@Html.Raw(s_employee.postcode.Caption)</div></div></th>
+	} else {
+		<th data-name="postcode" class="@s_employee.postcode.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.postcode))',1);"><div id="elh_s_employee_postcode" class="s_employee_postcode">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.postcode.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee.postcode.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.postcode.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* postcode.Visible (end) *@
+@if (s_employee.gender.Visible) { // gender.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.gender) == "") {
+		<th data-name="gender" class="@s_employee.gender.HeaderCellClass"><div id="elh_s_employee_gender" class="s_employee_gender"><div class="ew-table-header-caption">@Html.Raw(s_employee.gender.Caption)</div></div></th>
+	} else {
+		<th data-name="gender" class="@s_employee.gender.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.gender))',1);"><div id="elh_s_employee_gender" class="s_employee_gender">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.gender.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee.gender.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.gender.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* gender.Visible (end) *@
+@if (s_employee.tel.Visible) { // tel.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.tel) == "") {
+		<th data-name="tel" class="@s_employee.tel.HeaderCellClass"><div id="elh_s_employee_tel" class="s_employee_tel"><div class="ew-table-header-caption">@Html.Raw(s_employee.tel.Caption)</div></div></th>
+	} else {
+		<th data-name="tel" class="@s_employee.tel.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.tel))',1);"><div id="elh_s_employee_tel" class="s_employee_tel">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.tel.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee.tel.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.tel.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tel.Visible (end) *@
+@if (s_employee.handphone.Visible) { // handphone.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.handphone) == "") {
+		<th data-name="handphone" class="@s_employee.handphone.HeaderCellClass"><div id="elh_s_employee_handphone" class="s_employee_handphone"><div class="ew-table-header-caption">@Html.Raw(s_employee.handphone.Caption)</div></div></th>
+	} else {
+		<th data-name="handphone" class="@s_employee.handphone.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.handphone))',1);"><div id="elh_s_employee_handphone" class="s_employee_handphone">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.handphone.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee.handphone.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.handphone.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* handphone.Visible (end) *@
+@if (s_employee._email.Visible) { // _email.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee._email) == "") {
+		<th data-name="_email" class="@s_employee._email.HeaderCellClass"><div id="elh_s_employee__email" class="s_employee__email"><div class="ew-table-header-caption">@Html.Raw(s_employee._email.Caption)</div></div></th>
+	} else {
+		<th data-name="_email" class="@s_employee._email.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee._email))',1);"><div id="elh_s_employee__email" class="s_employee__email">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee._email.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee._email.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee._email.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* _email.Visible (end) *@
+@if (s_employee.dob.Visible) { // dob.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.dob) == "") {
+		<th data-name="dob" class="@s_employee.dob.HeaderCellClass"><div id="elh_s_employee_dob" class="s_employee_dob"><div class="ew-table-header-caption">@Html.Raw(s_employee.dob.Caption)</div></div></th>
+	} else {
+		<th data-name="dob" class="@s_employee.dob.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.dob))',1);"><div id="elh_s_employee_dob" class="s_employee_dob">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.dob.Caption)</span><span class="ew-table-header-sort">@if (s_employee.dob.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.dob.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* dob.Visible (end) *@
+@if (s_employee.children.Visible) { // children.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.children) == "") {
+		<th data-name="children" class="@s_employee.children.HeaderCellClass"><div id="elh_s_employee_children" class="s_employee_children"><div class="ew-table-header-caption">@Html.Raw(s_employee.children.Caption)</div></div></th>
+	} else {
+		<th data-name="children" class="@s_employee.children.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.children))',1);"><div id="elh_s_employee_children" class="s_employee_children">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.children.Caption)</span><span class="ew-table-header-sort">@if (s_employee.children.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.children.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* children.Visible (end) *@
+@if (s_employee.datejoin.Visible) { // datejoin.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.datejoin) == "") {
+		<th data-name="datejoin" class="@s_employee.datejoin.HeaderCellClass"><div id="elh_s_employee_datejoin" class="s_employee_datejoin"><div class="ew-table-header-caption">@Html.Raw(s_employee.datejoin.Caption)</div></div></th>
+	} else {
+		<th data-name="datejoin" class="@s_employee.datejoin.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.datejoin))',1);"><div id="elh_s_employee_datejoin" class="s_employee_datejoin">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.datejoin.Caption)</span><span class="ew-table-header-sort">@if (s_employee.datejoin.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.datejoin.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* datejoin.Visible (end) *@
+@if (s_employee.dateresign.Visible) { // dateresign.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.dateresign) == "") {
+		<th data-name="dateresign" class="@s_employee.dateresign.HeaderCellClass"><div id="elh_s_employee_dateresign" class="s_employee_dateresign"><div class="ew-table-header-caption">@Html.Raw(s_employee.dateresign.Caption)</div></div></th>
+	} else {
+		<th data-name="dateresign" class="@s_employee.dateresign.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.dateresign))',1);"><div id="elh_s_employee_dateresign" class="s_employee_dateresign">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.dateresign.Caption)</span><span class="ew-table-header-sort">@if (s_employee.dateresign.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.dateresign.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* dateresign.Visible (end) *@
+@if (s_employee.marriedstatus.Visible) { // marriedstatus.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.marriedstatus) == "") {
+		<th data-name="marriedstatus" class="@s_employee.marriedstatus.HeaderCellClass"><div id="elh_s_employee_marriedstatus" class="s_employee_marriedstatus"><div class="ew-table-header-caption">@Html.Raw(s_employee.marriedstatus.Caption)</div></div></th>
+	} else {
+		<th data-name="marriedstatus" class="@s_employee.marriedstatus.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.marriedstatus))',1);"><div id="elh_s_employee_marriedstatus" class="s_employee_marriedstatus">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.marriedstatus.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee.marriedstatus.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.marriedstatus.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* marriedstatus.Visible (end) *@
+@if (s_employee.Id_dept.Visible) { // Id_dept.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.Id_dept) == "") {
+		<th data-name="Id_dept" class="@s_employee.Id_dept.HeaderCellClass"><div id="elh_s_employee_Id_dept" class="s_employee_Id_dept"><div class="ew-table-header-caption">@Html.Raw(s_employee.Id_dept.Caption)</div></div></th>
+	} else {
+		<th data-name="Id_dept" class="@s_employee.Id_dept.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.Id_dept))',1);"><div id="elh_s_employee_Id_dept" class="s_employee_Id_dept">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.Id_dept.Caption)</span><span class="ew-table-header-sort">@if (s_employee.Id_dept.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.Id_dept.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* Id_dept.Visible (end) *@
+@if (s_employee.Id_position.Visible) { // Id_position.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.Id_position) == "") {
+		<th data-name="Id_position" class="@s_employee.Id_position.HeaderCellClass"><div id="elh_s_employee_Id_position" class="s_employee_Id_position"><div class="ew-table-header-caption">@Html.Raw(s_employee.Id_position.Caption)</div></div></th>
+	} else {
+		<th data-name="Id_position" class="@s_employee.Id_position.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.Id_position))',1);"><div id="elh_s_employee_Id_position" class="s_employee_Id_position">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.Id_position.Caption)</span><span class="ew-table-header-sort">@if (s_employee.Id_position.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.Id_position.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* Id_position.Visible (end) *@
+@if (s_employee.Id_race.Visible) { // Id_race.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.Id_race) == "") {
+		<th data-name="Id_race" class="@s_employee.Id_race.HeaderCellClass"><div id="elh_s_employee_Id_race" class="s_employee_Id_race"><div class="ew-table-header-caption">@Html.Raw(s_employee.Id_race.Caption)</div></div></th>
+	} else {
+		<th data-name="Id_race" class="@s_employee.Id_race.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.Id_race))',1);"><div id="elh_s_employee_Id_race" class="s_employee_Id_race">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.Id_race.Caption)</span><span class="ew-table-header-sort">@if (s_employee.Id_race.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.Id_race.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* Id_race.Visible (end) *@
+@if (s_employee.report_to.Visible) { // report_to.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.report_to) == "") {
+		<th data-name="report_to" class="@s_employee.report_to.HeaderCellClass"><div id="elh_s_employee_report_to" class="s_employee_report_to"><div class="ew-table-header-caption">@Html.Raw(s_employee.report_to.Caption)</div></div></th>
+	} else {
+		<th data-name="report_to" class="@s_employee.report_to.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.report_to))',1);"><div id="elh_s_employee_report_to" class="s_employee_report_to">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.report_to.Caption)</span><span class="ew-table-header-sort">@if (s_employee.report_to.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.report_to.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* report_to.Visible (end) *@
+@if (s_employee.login_effectivedate.Visible) { // login_effectivedate.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.login_effectivedate) == "") {
+		<th data-name="login_effectivedate" class="@s_employee.login_effectivedate.HeaderCellClass"><div id="elh_s_employee_login_effectivedate" class="s_employee_login_effectivedate"><div class="ew-table-header-caption">@Html.Raw(s_employee.login_effectivedate.Caption)</div></div></th>
+	} else {
+		<th data-name="login_effectivedate" class="@s_employee.login_effectivedate.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.login_effectivedate))',1);"><div id="elh_s_employee_login_effectivedate" class="s_employee_login_effectivedate">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.login_effectivedate.Caption)</span><span class="ew-table-header-sort">@if (s_employee.login_effectivedate.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.login_effectivedate.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* login_effectivedate.Visible (end) *@
+@if (s_employee.login_disableddate.Visible) { // login_disableddate.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.login_disableddate) == "") {
+		<th data-name="login_disableddate" class="@s_employee.login_disableddate.HeaderCellClass"><div id="elh_s_employee_login_disableddate" class="s_employee_login_disableddate"><div class="ew-table-header-caption">@Html.Raw(s_employee.login_disableddate.Caption)</div></div></th>
+	} else {
+		<th data-name="login_disableddate" class="@s_employee.login_disableddate.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.login_disableddate))',1);"><div id="elh_s_employee_login_disableddate" class="s_employee_login_disableddate">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.login_disableddate.Caption)</span><span class="ew-table-header-sort">@if (s_employee.login_disableddate.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.login_disableddate.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* login_disableddate.Visible (end) *@
+@if (s_employee.UserLevelId.Visible) { // UserLevelId.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.UserLevelId) == "") {
+		<th data-name="UserLevelId" class="@s_employee.UserLevelId.HeaderCellClass"><div id="elh_s_employee_UserLevelId" class="s_employee_UserLevelId"><div class="ew-table-header-caption">@Html.Raw(s_employee.UserLevelId.Caption)</div></div></th>
+	} else {
+		<th data-name="UserLevelId" class="@s_employee.UserLevelId.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.UserLevelId))',1);"><div id="elh_s_employee_UserLevelId" class="s_employee_UserLevelId">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.UserLevelId.Caption)</span><span class="ew-table-header-sort">@if (s_employee.UserLevelId.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.UserLevelId.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* UserLevelId.Visible (end) *@
+@if (s_employee._Username.Visible) { // _Username.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee._Username) == "") {
+		<th data-name="_Username" class="@s_employee._Username.HeaderCellClass"><div id="elh_s_employee__Username" class="s_employee__Username"><div class="ew-table-header-caption">@Html.Raw(s_employee._Username.Caption)</div></div></th>
+	} else {
+		<th data-name="_Username" class="@s_employee._Username.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee._Username))',1);"><div id="elh_s_employee__Username" class="s_employee__Username">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee._Username.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee._Username.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee._Username.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* _Username.Visible (end) *@
+@if (s_employee.password.Visible) { // password.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.password) == "") {
+		<th data-name="password" class="@s_employee.password.HeaderCellClass"><div id="elh_s_employee_password" class="s_employee_password"><div class="ew-table-header-caption">@Html.Raw(s_employee.password.Caption)</div></div></th>
+	} else {
+		<th data-name="password" class="@s_employee.password.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.password))',1);"><div id="elh_s_employee_password" class="s_employee_password">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.password.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_employee.password.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.password.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* password.Visible (end) *@
+@if (s_employee.active.Visible) { // active.Visible (begin)
+	if (s_employee_List.SortUrl(s_employee.active) == "") {
+		<th data-name="active" class="@s_employee.active.HeaderCellClass"><div id="elh_s_employee_active" class="s_employee_active"><div class="ew-table-header-caption">@Html.Raw(s_employee.active.Caption)</div></div></th>
+	} else {
+		<th data-name="active" class="@s_employee.active.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_employee.SortUrl(s_employee.active))',1);"><div id="elh_s_employee_active" class="s_employee_active">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_employee.active.Caption)</span><span class="ew-table-header-sort">@if (s_employee.active.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_employee.active.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* active.Visible (end) *@
+@{
+
+	// Render list options (header, right)
+	s_employee_List.ListOptions.Render("header", "right");
+}
+	</tr>
+</thead>
+<tbody>
+@{ // Begin Code
+if (s_employee_List.ExportAll && s_employee_List.IsExport()) {
+	s_employee_List.StopRecord = s_employee_List.TotalRecords;
+} else {
+
+	// Set the last record to display
+	if (s_employee_List.TotalRecords > s_employee_List.StartRecord + s_employee_List.DisplayRecords - 1) {
+		s_employee_List.StopRecord = s_employee_List.StartRecord + s_employee_List.DisplayRecords - 1;
+	} else {
+		s_employee_List.StopRecord = s_employee_List.TotalRecords;
+	}
+}
+if (s_employee_List.Recordset != null && s_employee_List.Recordset.HasRows) {
+	if (!s_employee_List.Connection.SelectOffset) { // DN
+		for (var i = 1; i <= s_employee_List.StartRecord - 1; i++) { // Move to first record
+			if (await s_employee_List.Recordset.ReadAsync()) {
+				s_employee_List.RecordCount++;
+			}
+		}
+	} else {
+		s_employee_List.RecordCount = s_employee_List.StartRecord - 1;
+	}
+} else if (!s_employee_List.AllowAddDeleteRow && s_employee_List.StopRecord == 0) {
+	s_employee_List.StopRecord = s_employee_List.GridAddRowCount;
+}
+
+// Initialize aggregate
+s_employee_List.RowType = Config.RowTypeAggregateInit;
+s_employee_List.ResetAttributes();
+await s_employee_List.RenderRow();
+
+// Output data rows
+bool eof = (s_employee_List.Recordset == null); // DN
+while (s_employee_List.RecordCount < s_employee_List.StopRecord) { // Begin While
+	if (!s_employee_List.IsGridAdd && !eof) { // DN
+		eof = !await s_employee_List.Recordset.ReadAsync();
+	}
+	s_employee_List.RecordCount++;
+	if (s_employee_List.RecordCount >= s_employee_List.StartRecord) {
+		s_employee_List.RowCnt++;
+
+		// Set up key count
+		s_employee_List.KeyCount = ConvertToInt(s_employee_List.RowIndex);
+
+		// Init row class and style
+		s_employee_List.ResetAttributes();
+		s_employee_List.CssClass = "";
+		if (s_employee_List.IsGridAdd) {
+		} else {
+			await s_employee_List.LoadRowValues(s_employee_List.Recordset); // Load row values
+		}
+		s_employee_List.RowType = Config.RowTypeView; // Render view
+
+		// Set up row id / data-rowindex
+		s_employee_List.RowAttrs.Add("data-rowindex", Convert.ToString(s_employee_List.RowCnt));
+		s_employee_List.RowAttrs.Add("id", "r" + Convert.ToString(s_employee_List.RowCnt) + "_s_employee");
+		s_employee_List.RowAttrs.Add("data-rowtype", Convert.ToString(s_employee_List.RowType));
+
+		// Render row
+		await s_employee_List.RenderRow();
+
+		// Render list options
+		await s_employee_List.RenderListOptions();
+	<tr @Html.Raw(s_employee_List.RowAttributes)>
+	@{
+
+		// Render list options (body, left)
+		s_employee_List.ListOptions.Render("body", "left", s_employee_List.RowCnt);
+	}
+	@if (s_employee.Id.Visible) { // Id.Visible (begin)
+		<td data-name="Id"@Html.Raw(s_employee.Id.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_Id" class="s_employee_Id">
+<span @Html.Raw(s_employee.Id.ViewAttributes)>
+@Html.Raw(s_employee.Id.GetViewValue())</span>
+</span>
+</td>
+	} @* Id.Visible (end) *@
+	@if (s_employee.employeeid.Visible) { // employeeid.Visible (begin)
+		<td data-name="employeeid"@Html.Raw(s_employee.employeeid.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_employeeid" class="s_employee_employeeid">
+<span @Html.Raw(s_employee.employeeid.ViewAttributes)>
+@Html.Raw(s_employee.employeeid.GetViewValue())</span>
+</span>
+</td>
+	} @* employeeid.Visible (end) *@
+	@if (s_employee.fname.Visible) { // fname.Visible (begin)
+		<td data-name="fname"@Html.Raw(s_employee.fname.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_fname" class="s_employee_fname">
+<span @Html.Raw(s_employee.fname.ViewAttributes)>
+@Html.Raw(s_employee.fname.GetViewValue())</span>
+</span>
+</td>
+	} @* fname.Visible (end) *@
+	@if (s_employee.lname.Visible) { // lname.Visible (begin)
+		<td data-name="lname"@Html.Raw(s_employee.lname.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_lname" class="s_employee_lname">
+<span @Html.Raw(s_employee.lname.ViewAttributes)>
+@Html.Raw(s_employee.lname.GetViewValue())</span>
+</span>
+</td>
+	} @* lname.Visible (end) *@
+	@if (s_employee.oldic.Visible) { // oldic.Visible (begin)
+		<td data-name="oldic"@Html.Raw(s_employee.oldic.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_oldic" class="s_employee_oldic">
+<span @Html.Raw(s_employee.oldic.ViewAttributes)>
+@Html.Raw(s_employee.oldic.GetViewValue())</span>
+</span>
+</td>
+	} @* oldic.Visible (end) *@
+	@if (s_employee.newic.Visible) { // newic.Visible (begin)
+		<td data-name="newic"@Html.Raw(s_employee.newic.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_newic" class="s_employee_newic">
+<span @Html.Raw(s_employee.newic.ViewAttributes)>
+@Html.Raw(s_employee.newic.GetViewValue())</span>
+</span>
+</td>
+	} @* newic.Visible (end) *@
+	@if (s_employee.passport.Visible) { // passport.Visible (begin)
+		<td data-name="passport"@Html.Raw(s_employee.passport.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_passport" class="s_employee_passport">
+<span @Html.Raw(s_employee.passport.ViewAttributes)>
+@Html.Raw(s_employee.passport.GetViewValue())</span>
+</span>
+</td>
+	} @* passport.Visible (end) *@
+	@if (s_employee.address1.Visible) { // address1.Visible (begin)
+		<td data-name="address1"@Html.Raw(s_employee.address1.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_address1" class="s_employee_address1">
+<span @Html.Raw(s_employee.address1.ViewAttributes)>
+@Html.Raw(s_employee.address1.GetViewValue())</span>
+</span>
+</td>
+	} @* address1.Visible (end) *@
+	@if (s_employee.address2.Visible) { // address2.Visible (begin)
+		<td data-name="address2"@Html.Raw(s_employee.address2.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_address2" class="s_employee_address2">
+<span @Html.Raw(s_employee.address2.ViewAttributes)>
+@Html.Raw(s_employee.address2.GetViewValue())</span>
+</span>
+</td>
+	} @* address2.Visible (end) *@
+	@if (s_employee.Id_city.Visible) { // Id_city.Visible (begin)
+		<td data-name="Id_city"@Html.Raw(s_employee.Id_city.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_Id_city" class="s_employee_Id_city">
+<span @Html.Raw(s_employee.Id_city.ViewAttributes)>
+@Html.Raw(s_employee.Id_city.GetViewValue())</span>
+</span>
+</td>
+	} @* Id_city.Visible (end) *@
+	@if (s_employee.Id_state.Visible) { // Id_state.Visible (begin)
+		<td data-name="Id_state"@Html.Raw(s_employee.Id_state.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_Id_state" class="s_employee_Id_state">
+<span @Html.Raw(s_employee.Id_state.ViewAttributes)>
+@Html.Raw(s_employee.Id_state.GetViewValue())</span>
+</span>
+</td>
+	} @* Id_state.Visible (end) *@
+	@if (s_employee.Id_country.Visible) { // Id_country.Visible (begin)
+		<td data-name="Id_country"@Html.Raw(s_employee.Id_country.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_Id_country" class="s_employee_Id_country">
+<span @Html.Raw(s_employee.Id_country.ViewAttributes)>
+@Html.Raw(s_employee.Id_country.GetViewValue())</span>
+</span>
+</td>
+	} @* Id_country.Visible (end) *@
+	@if (s_employee.postcode.Visible) { // postcode.Visible (begin)
+		<td data-name="postcode"@Html.Raw(s_employee.postcode.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_postcode" class="s_employee_postcode">
+<span @Html.Raw(s_employee.postcode.ViewAttributes)>
+@Html.Raw(s_employee.postcode.GetViewValue())</span>
+</span>
+</td>
+	} @* postcode.Visible (end) *@
+	@if (s_employee.gender.Visible) { // gender.Visible (begin)
+		<td data-name="gender"@Html.Raw(s_employee.gender.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_gender" class="s_employee_gender">
+<span @Html.Raw(s_employee.gender.ViewAttributes)>
+@Html.Raw(s_employee.gender.GetViewValue())</span>
+</span>
+</td>
+	} @* gender.Visible (end) *@
+	@if (s_employee.tel.Visible) { // tel.Visible (begin)
+		<td data-name="tel"@Html.Raw(s_employee.tel.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_tel" class="s_employee_tel">
+<span @Html.Raw(s_employee.tel.ViewAttributes)>
+@Html.Raw(s_employee.tel.GetViewValue())</span>
+</span>
+</td>
+	} @* tel.Visible (end) *@
+	@if (s_employee.handphone.Visible) { // handphone.Visible (begin)
+		<td data-name="handphone"@Html.Raw(s_employee.handphone.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_handphone" class="s_employee_handphone">
+<span @Html.Raw(s_employee.handphone.ViewAttributes)>
+@Html.Raw(s_employee.handphone.GetViewValue())</span>
+</span>
+</td>
+	} @* handphone.Visible (end) *@
+	@if (s_employee._email.Visible) { // _email.Visible (begin)
+		<td data-name="_email"@Html.Raw(s_employee._email.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee__email" class="s_employee__email">
+<span @Html.Raw(s_employee._email.ViewAttributes)>
+@Html.Raw(s_employee._email.GetViewValue())</span>
+</span>
+</td>
+	} @* _email.Visible (end) *@
+	@if (s_employee.dob.Visible) { // dob.Visible (begin)
+		<td data-name="dob"@Html.Raw(s_employee.dob.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_dob" class="s_employee_dob">
+<span @Html.Raw(s_employee.dob.ViewAttributes)>
+@Html.Raw(s_employee.dob.GetViewValue())</span>
+</span>
+</td>
+	} @* dob.Visible (end) *@
+	@if (s_employee.children.Visible) { // children.Visible (begin)
+		<td data-name="children"@Html.Raw(s_employee.children.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_children" class="s_employee_children">
+<span @Html.Raw(s_employee.children.ViewAttributes)>
+@Html.Raw(s_employee.children.GetViewValue())</span>
+</span>
+</td>
+	} @* children.Visible (end) *@
+	@if (s_employee.datejoin.Visible) { // datejoin.Visible (begin)
+		<td data-name="datejoin"@Html.Raw(s_employee.datejoin.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_datejoin" class="s_employee_datejoin">
+<span @Html.Raw(s_employee.datejoin.ViewAttributes)>
+@Html.Raw(s_employee.datejoin.GetViewValue())</span>
+</span>
+</td>
+	} @* datejoin.Visible (end) *@
+	@if (s_employee.dateresign.Visible) { // dateresign.Visible (begin)
+		<td data-name="dateresign"@Html.Raw(s_employee.dateresign.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_dateresign" class="s_employee_dateresign">
+<span @Html.Raw(s_employee.dateresign.ViewAttributes)>
+@Html.Raw(s_employee.dateresign.GetViewValue())</span>
+</span>
+</td>
+	} @* dateresign.Visible (end) *@
+	@if (s_employee.marriedstatus.Visible) { // marriedstatus.Visible (begin)
+		<td data-name="marriedstatus"@Html.Raw(s_employee.marriedstatus.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_marriedstatus" class="s_employee_marriedstatus">
+<span @Html.Raw(s_employee.marriedstatus.ViewAttributes)>
+@Html.Raw(s_employee.marriedstatus.GetViewValue())</span>
+</span>
+</td>
+	} @* marriedstatus.Visible (end) *@
+	@if (s_employee.Id_dept.Visible) { // Id_dept.Visible (begin)
+		<td data-name="Id_dept"@Html.Raw(s_employee.Id_dept.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_Id_dept" class="s_employee_Id_dept">
+<span @Html.Raw(s_employee.Id_dept.ViewAttributes)>
+@Html.Raw(s_employee.Id_dept.GetViewValue())</span>
+</span>
+</td>
+	} @* Id_dept.Visible (end) *@
+	@if (s_employee.Id_position.Visible) { // Id_position.Visible (begin)
+		<td data-name="Id_position"@Html.Raw(s_employee.Id_position.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_Id_position" class="s_employee_Id_position">
+<span @Html.Raw(s_employee.Id_position.ViewAttributes)>
+@Html.Raw(s_employee.Id_position.GetViewValue())</span>
+</span>
+</td>
+	} @* Id_position.Visible (end) *@
+	@if (s_employee.Id_race.Visible) { // Id_race.Visible (begin)
+		<td data-name="Id_race"@Html.Raw(s_employee.Id_race.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_Id_race" class="s_employee_Id_race">
+<span @Html.Raw(s_employee.Id_race.ViewAttributes)>
+@Html.Raw(s_employee.Id_race.GetViewValue())</span>
+</span>
+</td>
+	} @* Id_race.Visible (end) *@
+	@if (s_employee.report_to.Visible) { // report_to.Visible (begin)
+		<td data-name="report_to"@Html.Raw(s_employee.report_to.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_report_to" class="s_employee_report_to">
+<span @Html.Raw(s_employee.report_to.ViewAttributes)>
+@Html.Raw(s_employee.report_to.GetViewValue())</span>
+</span>
+</td>
+	} @* report_to.Visible (end) *@
+	@if (s_employee.login_effectivedate.Visible) { // login_effectivedate.Visible (begin)
+		<td data-name="login_effectivedate"@Html.Raw(s_employee.login_effectivedate.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_login_effectivedate" class="s_employee_login_effectivedate">
+<span @Html.Raw(s_employee.login_effectivedate.ViewAttributes)>
+@Html.Raw(s_employee.login_effectivedate.GetViewValue())</span>
+</span>
+</td>
+	} @* login_effectivedate.Visible (end) *@
+	@if (s_employee.login_disableddate.Visible) { // login_disableddate.Visible (begin)
+		<td data-name="login_disableddate"@Html.Raw(s_employee.login_disableddate.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_login_disableddate" class="s_employee_login_disableddate">
+<span @Html.Raw(s_employee.login_disableddate.ViewAttributes)>
+@Html.Raw(s_employee.login_disableddate.GetViewValue())</span>
+</span>
+</td>
+	} @* login_disableddate.Visible (end) *@
+	@if (s_employee.UserLevelId.Visible) { // UserLevelId.Visible (begin)
+		<td data-name="UserLevelId"@Html.Raw(s_employee.UserLevelId.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_UserLevelId" class="s_employee_UserLevelId">
+<span @Html.Raw(s_employee.UserLevelId.ViewAttributes)>
+@Html.Raw(s_employee.UserLevelId.GetViewValue())</span>
+</span>
+</td>
+	} @* UserLevelId.Visible (end) *@
+	@if (s_employee._Username.Visible) { // _Username.Visible (begin)
+		<td data-name="_Username"@Html.Raw(s_employee._Username.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee__Username" class="s_employee__Username">
+<span @Html.Raw(s_employee._Username.ViewAttributes)>
+@Html.Raw(s_employee._Username.GetViewValue())</span>
+</span>
+</td>
+	} @* _Username.Visible (end) *@
+	@if (s_employee.password.Visible) { // password.Visible (begin)
+		<td data-name="password"@Html.Raw(s_employee.password.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_password" class="s_employee_password">
+<span @Html.Raw(s_employee.password.ViewAttributes)>
+@Html.Raw(s_employee.password.GetViewValue())</span>
+</span>
+</td>
+	} @* password.Visible (end) *@
+	@if (s_employee.active.Visible) { // active.Visible (begin)
+		<td data-name="active"@Html.Raw(s_employee.active.CellAttributes)>
+<span id="el@(s_employee_List.RowCnt)_s_employee_active" class="s_employee_active">
+<span @Html.Raw(s_employee.active.ViewAttributes)>
+<input type="checkbox" value="@s_employee.active.GetViewValue()" disabled checked="@ConvertToBool(s_employee.active.CurrentValue)"></span>
+</span>
+</td>
+	} @* active.Visible (end) *@
+	@{
+
+		// Render list options (body, right)
+		s_employee_List.ListOptions.Render("body", "right", s_employee_List.RowCnt);
+	}
+	</tr>
+	} @* End if *@
+} @* End While *@
+} @* End Code *@
+</tbody>
+</table><!-- /.ew-table -->
+} @* End If TotalRecords > 0 *@
+@if (Empty(s_employee_List.CurrentAction)) {
+<input type="hidden" name="action" id="action" value="">
+}
+</div><!-- /.ew-grid-middle-panel -->
+</form><!-- /.ew-list-form -->
+@{ s_employee_List.CloseRecordset(); }
+		@if (!s_employee.IsExport()) {
+		<div class="card-footer ew-grid-lower-panel">
+		<div class="ew-list-other-options">
+		@s_employee_List.OtherOptions.RenderBody("bottom")
+		</div>
+		@if (!s_employee_List.IsGridAdd) {
+			<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="@AppPath(CurrentPageName())">
+			@s_employee_List.Pager.Render()
+			</form>
+		}
+		<div class="clearfix"></div>
+		</div>
+		}
+</div><!-- /.ew-grid -->
+}
+@if (s_employee_List.TotalRecords <= 0 && s_employee_List.CurrentAction == "") { // Show other options
+<div class="ew-list-other-options">
+@s_employee_List.OtherOptions.ForEach(opt => opt.ButtonClass = "").RenderBody()
+</div>
+<div class="clearfix"></div>
+}
+@s_employee_List.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_employee.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

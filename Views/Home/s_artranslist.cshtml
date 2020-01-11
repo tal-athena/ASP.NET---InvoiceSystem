@@ -1,0 +1,738 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_artrans_List.Page_Render();
+
+	// Check action result
+	if (s_artrans_List.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_artrans.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "list";
+var fs_artranslist = currentForm = new ew.Form("fs_artranslist", "list");
+fs_artranslist.formKeyCountName = "@s_artrans_List.FormKeyCountName";
+
+// Form_CustomValidate event
+fs_artranslist.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_artranslist.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_artranslist.lists["x_markdelete"] = @Html.Raw(s_artrans_List.markdelete.Lookup.ToClientList());
+fs_artranslist.lists["x_markdelete"].options = @Html.Raw(ConvertToJson(s_artrans_List.markdelete.Options(false))); // DN
+
+// Form object for search
+var fs_artranslistsrch = currentSearchForm = new ew.Form("fs_artranslistsrch");
+
+// Filters
+fs_artranslistsrch.filterList = @Html.Raw(await s_artrans_List.GetFilterList());
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_artrans.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+@if (s_artrans_List.TotalRecords > 0 && s_artrans_List.ExportOptions.Visible) {
+	s_artrans_List.ExportOptions.Render("body");
+}
+@if (s_artrans_List.ImportOptions.Visible) {
+	s_artrans_List.ImportOptions.Render("body");
+}
+@if (s_artrans_List.SearchOptions.Visible) {
+	s_artrans_List.SearchOptions.Render("body");
+}
+@if (s_artrans_List.FilterOptions.Visible) {
+	s_artrans_List.FilterOptions.Render("body");
+}
+<div class="clearfix"></div>
+</div>
+}
+@{ s_artrans_List.RenderOtherOptions(); }
+@if (Security.CanSearch) {
+if (!s_artrans_List.IsExport() && Empty(s_artrans_List.CurrentAction)) { // Begin search form
+<form name="fs_artranslistsrch" id="fs_artranslistsrch" class="form-inline ew-form ew-ext-search-form" action="@AppPath(CurrentPageName())">
+<div id="fs_artranslistsrch-search-panel" class="ew-search-panel collapse@(!Empty(s_artrans_List.SearchWhere) ? " show" : " show")">
+<input type="hidden" name="cmd" value="search">
+<div class="ew-basic-search">
+<div id="xsr_1" class="ew-row d-sm-flex">
+	<div class="ew-quick-search input-group">
+	<input type="text" name="@Config.TableBasicSearch" id="@Config.TableBasicSearch" class="form-control" value="@s_artrans_List.BasicSearch.SessionKeyword" placeholder="@Language.Phrase("Search")">
+	<input type="hidden" name="@Config.TableBasicSearchType" id="@Config.TableBasicSearchType" value="@s_artrans_List.BasicSearch.SessionType">
+	<div class="input-group-append">
+		<button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit">@Html.Raw(Language.Phrase("SearchBtn"))</button>
+		<button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype">@Html.Raw(s_artrans_List.BasicSearch.TypeNameShort)</span></button>
+		<div class="dropdown-menu dropdown-menu-right">
+			<a class="dropdown-item @((s_artrans_List.BasicSearch.SessionType == "") ? " active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this)">@Html.Raw(Language.Phrase("QuickSearchAuto"))</a>
+			<a class="dropdown-item @((s_artrans_List.BasicSearch.SessionType == "=") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'=')">@Html.Raw(Language.Phrase("QuickSearchExact"))</a>
+			<a class="dropdown-item @((s_artrans_List.BasicSearch.SessionType == "AND") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'AND')">@Html.Raw(Language.Phrase("QuickSearchAll"))</a>
+			<a class="dropdown-item @((s_artrans_List.BasicSearch.SessionType == "OR") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'OR')">@Html.Raw(Language.Phrase("QuickSearchAny"))</a>
+		</div>
+	</div>
+	</div>
+</div>
+</div>
+</div>
+</form>
+} @* End search form *@
+}
+@s_artrans_List.ShowPageHeader()
+@s_artrans_List.ShowMessages()
+@if (s_artrans_List.TotalRecords > 0 || s_artrans_List.CurrentAction != "") {
+<div class="card ew-card ew-grid@(s_artrans_List.IsAddOrEdit ? " ew-grid-add-edit" : "") s_artrans">
+<form name="fs_artranslist" id="fs_artranslist" class="form-inline ew-form ew-list-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_artrans_List.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<div id="gmp_s_artrans" class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+@if (s_artrans_List.TotalRecords > 0 || s_artrans.IsGridEdit) { // Begin If TotalRecords > 0
+<table id="tbl_s_artranslist" class="table ew-table"><!-- .ew-table -->
+<thead>
+	<tr class="ew-table-header">
+@{
+
+	// Header row
+	s_artrans_List.RowType = Config.RowTypeHeader;
+
+	// Render list options
+	await s_artrans_List.RenderListOptions();
+
+	// Render list options (header, left)
+	s_artrans_List.ListOptions.Render("header", "left");
+}
+@if (s_artrans.dt_rec.Visible) { // dt_rec.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.dt_rec) == "") {
+		<th data-name="dt_rec" class="@s_artrans.dt_rec.HeaderCellClass"><div id="elh_s_artrans_dt_rec" class="s_artrans_dt_rec"><div class="ew-table-header-caption">@Html.Raw(s_artrans.dt_rec.Caption)</div></div></th>
+	} else {
+		<th data-name="dt_rec" class="@s_artrans.dt_rec.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.dt_rec))',1);"><div id="elh_s_artrans_dt_rec" class="s_artrans_dt_rec">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.dt_rec.Caption)</span><span class="ew-table-header-sort">@if (s_artrans.dt_rec.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.dt_rec.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* dt_rec.Visible (end) *@
+@if (s_artrans.doc_date.Visible) { // doc_date.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.doc_date) == "") {
+		<th data-name="doc_date" class="@s_artrans.doc_date.HeaderCellClass"><div id="elh_s_artrans_doc_date" class="s_artrans_doc_date"><div class="ew-table-header-caption">@Html.Raw(s_artrans.doc_date.Caption)</div></div></th>
+	} else {
+		<th data-name="doc_date" class="@s_artrans.doc_date.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.doc_date))',1);"><div id="elh_s_artrans_doc_date" class="s_artrans_doc_date">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.doc_date.Caption)</span><span class="ew-table-header-sort">@if (s_artrans.doc_date.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.doc_date.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* doc_date.Visible (end) *@
+@if (s_artrans.dbcode.Visible) { // dbcode.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.dbcode) == "") {
+		<th data-name="dbcode" class="@s_artrans.dbcode.HeaderCellClass"><div id="elh_s_artrans_dbcode" class="s_artrans_dbcode"><div class="ew-table-header-caption">@Html.Raw(s_artrans.dbcode.Caption)</div></div></th>
+	} else {
+		<th data-name="dbcode" class="@s_artrans.dbcode.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.dbcode))',1);"><div id="elh_s_artrans_dbcode" class="s_artrans_dbcode">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.dbcode.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_artrans.dbcode.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.dbcode.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* dbcode.Visible (end) *@
+@if (s_artrans.ar_dept.Visible) { // ar_dept.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.ar_dept) == "") {
+		<th data-name="ar_dept" class="@s_artrans.ar_dept.HeaderCellClass"><div id="elh_s_artrans_ar_dept" class="s_artrans_ar_dept"><div class="ew-table-header-caption">@Html.Raw(s_artrans.ar_dept.Caption)</div></div></th>
+	} else {
+		<th data-name="ar_dept" class="@s_artrans.ar_dept.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.ar_dept))',1);"><div id="elh_s_artrans_ar_dept" class="s_artrans_ar_dept">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.ar_dept.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_artrans.ar_dept.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.ar_dept.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* ar_dept.Visible (end) *@
+@if (s_artrans.ref_no.Visible) { // ref_no.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.ref_no) == "") {
+		<th data-name="ref_no" class="@s_artrans.ref_no.HeaderCellClass"><div id="elh_s_artrans_ref_no" class="s_artrans_ref_no"><div class="ew-table-header-caption">@Html.Raw(s_artrans.ref_no.Caption)</div></div></th>
+	} else {
+		<th data-name="ref_no" class="@s_artrans.ref_no.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.ref_no))',1);"><div id="elh_s_artrans_ref_no" class="s_artrans_ref_no">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.ref_no.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_artrans.ref_no.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.ref_no.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* ref_no.Visible (end) *@
+@if (s_artrans.description.Visible) { // description.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.description) == "") {
+		<th data-name="description" class="@s_artrans.description.HeaderCellClass"><div id="elh_s_artrans_description" class="s_artrans_description"><div class="ew-table-header-caption">@Html.Raw(s_artrans.description.Caption)</div></div></th>
+	} else {
+		<th data-name="description" class="@s_artrans.description.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.description))',1);"><div id="elh_s_artrans_description" class="s_artrans_description">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.description.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_artrans.description.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.description.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* description.Visible (end) *@
+@if (s_artrans.amt_ar.Visible) { // amt_ar.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.amt_ar) == "") {
+		<th data-name="amt_ar" class="@s_artrans.amt_ar.HeaderCellClass"><div id="elh_s_artrans_amt_ar" class="s_artrans_amt_ar"><div class="ew-table-header-caption">@Html.Raw(s_artrans.amt_ar.Caption)</div></div></th>
+	} else {
+		<th data-name="amt_ar" class="@s_artrans.amt_ar.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.amt_ar))',1);"><div id="elh_s_artrans_amt_ar" class="s_artrans_amt_ar">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.amt_ar.Caption)</span><span class="ew-table-header-sort">@if (s_artrans.amt_ar.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.amt_ar.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* amt_ar.Visible (end) *@
+@if (s_artrans.amt_rec.Visible) { // amt_rec.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.amt_rec) == "") {
+		<th data-name="amt_rec" class="@s_artrans.amt_rec.HeaderCellClass"><div id="elh_s_artrans_amt_rec" class="s_artrans_amt_rec"><div class="ew-table-header-caption">@Html.Raw(s_artrans.amt_rec.Caption)</div></div></th>
+	} else {
+		<th data-name="amt_rec" class="@s_artrans.amt_rec.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.amt_rec))',1);"><div id="elh_s_artrans_amt_rec" class="s_artrans_amt_rec">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.amt_rec.Caption)</span><span class="ew-table-header-sort">@if (s_artrans.amt_rec.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.amt_rec.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* amt_rec.Visible (end) *@
+@if (s_artrans.ar_gl_acct.Visible) { // ar_gl_acct.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.ar_gl_acct) == "") {
+		<th data-name="ar_gl_acct" class="@s_artrans.ar_gl_acct.HeaderCellClass"><div id="elh_s_artrans_ar_gl_acct" class="s_artrans_ar_gl_acct"><div class="ew-table-header-caption">@Html.Raw(s_artrans.ar_gl_acct.Caption)</div></div></th>
+	} else {
+		<th data-name="ar_gl_acct" class="@s_artrans.ar_gl_acct.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.ar_gl_acct))',1);"><div id="elh_s_artrans_ar_gl_acct" class="s_artrans_ar_gl_acct">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.ar_gl_acct.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_artrans.ar_gl_acct.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.ar_gl_acct.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* ar_gl_acct.Visible (end) *@
+@if (s_artrans.ar_gl_dept.Visible) { // ar_gl_dept.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.ar_gl_dept) == "") {
+		<th data-name="ar_gl_dept" class="@s_artrans.ar_gl_dept.HeaderCellClass"><div id="elh_s_artrans_ar_gl_dept" class="s_artrans_ar_gl_dept"><div class="ew-table-header-caption">@Html.Raw(s_artrans.ar_gl_dept.Caption)</div></div></th>
+	} else {
+		<th data-name="ar_gl_dept" class="@s_artrans.ar_gl_dept.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.ar_gl_dept))',1);"><div id="elh_s_artrans_ar_gl_dept" class="s_artrans_ar_gl_dept">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.ar_gl_dept.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_artrans.ar_gl_dept.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.ar_gl_dept.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* ar_gl_dept.Visible (end) *@
+@if (s_artrans.db_cr.Visible) { // db_cr.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.db_cr) == "") {
+		<th data-name="db_cr" class="@s_artrans.db_cr.HeaderCellClass"><div id="elh_s_artrans_db_cr" class="s_artrans_db_cr"><div class="ew-table-header-caption">@Html.Raw(s_artrans.db_cr.Caption)</div></div></th>
+	} else {
+		<th data-name="db_cr" class="@s_artrans.db_cr.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.db_cr))',1);"><div id="elh_s_artrans_db_cr" class="s_artrans_db_cr">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.db_cr.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_artrans.db_cr.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.db_cr.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* db_cr.Visible (end) *@
+@if (s_artrans.month.Visible) { // month.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.month) == "") {
+		<th data-name="month" class="@s_artrans.month.HeaderCellClass"><div id="elh_s_artrans_month" class="s_artrans_month"><div class="ew-table-header-caption">@Html.Raw(s_artrans.month.Caption)</div></div></th>
+	} else {
+		<th data-name="month" class="@s_artrans.month.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.month))',1);"><div id="elh_s_artrans_month" class="s_artrans_month">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.month.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_artrans.month.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.month.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* month.Visible (end) *@
+@if (s_artrans.source.Visible) { // source.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.source) == "") {
+		<th data-name="source" class="@s_artrans.source.HeaderCellClass"><div id="elh_s_artrans_source" class="s_artrans_source"><div class="ew-table-header-caption">@Html.Raw(s_artrans.source.Caption)</div></div></th>
+	} else {
+		<th data-name="source" class="@s_artrans.source.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.source))',1);"><div id="elh_s_artrans_source" class="s_artrans_source">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.source.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_artrans.source.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.source.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* source.Visible (end) *@
+@if (s_artrans.forx_amt.Visible) { // forx_amt.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.forx_amt) == "") {
+		<th data-name="forx_amt" class="@s_artrans.forx_amt.HeaderCellClass"><div id="elh_s_artrans_forx_amt" class="s_artrans_forx_amt"><div class="ew-table-header-caption">@Html.Raw(s_artrans.forx_amt.Caption)</div></div></th>
+	} else {
+		<th data-name="forx_amt" class="@s_artrans.forx_amt.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.forx_amt))',1);"><div id="elh_s_artrans_forx_amt" class="s_artrans_forx_amt">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.forx_amt.Caption)</span><span class="ew-table-header-sort">@if (s_artrans.forx_amt.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.forx_amt.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* forx_amt.Visible (end) *@
+@if (s_artrans.forx_rec.Visible) { // forx_rec.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.forx_rec) == "") {
+		<th data-name="forx_rec" class="@s_artrans.forx_rec.HeaderCellClass"><div id="elh_s_artrans_forx_rec" class="s_artrans_forx_rec"><div class="ew-table-header-caption">@Html.Raw(s_artrans.forx_rec.Caption)</div></div></th>
+	} else {
+		<th data-name="forx_rec" class="@s_artrans.forx_rec.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.forx_rec))',1);"><div id="elh_s_artrans_forx_rec" class="s_artrans_forx_rec">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.forx_rec.Caption)</span><span class="ew-table-header-sort">@if (s_artrans.forx_rec.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.forx_rec.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* forx_rec.Visible (end) *@
+@if (s_artrans.forx_cost.Visible) { // forx_cost.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.forx_cost) == "") {
+		<th data-name="forx_cost" class="@s_artrans.forx_cost.HeaderCellClass"><div id="elh_s_artrans_forx_cost" class="s_artrans_forx_cost"><div class="ew-table-header-caption">@Html.Raw(s_artrans.forx_cost.Caption)</div></div></th>
+	} else {
+		<th data-name="forx_cost" class="@s_artrans.forx_cost.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.forx_cost))',1);"><div id="elh_s_artrans_forx_cost" class="s_artrans_forx_cost">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.forx_cost.Caption)</span><span class="ew-table-header-sort">@if (s_artrans.forx_cost.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.forx_cost.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* forx_cost.Visible (end) *@
+@if (s_artrans.gain_loss.Visible) { // gain_loss.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.gain_loss) == "") {
+		<th data-name="gain_loss" class="@s_artrans.gain_loss.HeaderCellClass"><div id="elh_s_artrans_gain_loss" class="s_artrans_gain_loss"><div class="ew-table-header-caption">@Html.Raw(s_artrans.gain_loss.Caption)</div></div></th>
+	} else {
+		<th data-name="gain_loss" class="@s_artrans.gain_loss.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.gain_loss))',1);"><div id="elh_s_artrans_gain_loss" class="s_artrans_gain_loss">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.gain_loss.Caption)</span><span class="ew-table-header-sort">@if (s_artrans.gain_loss.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.gain_loss.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* gain_loss.Visible (end) *@
+@if (s_artrans.ex_gl_ac.Visible) { // ex_gl_ac.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.ex_gl_ac) == "") {
+		<th data-name="ex_gl_ac" class="@s_artrans.ex_gl_ac.HeaderCellClass"><div id="elh_s_artrans_ex_gl_ac" class="s_artrans_ex_gl_ac"><div class="ew-table-header-caption">@Html.Raw(s_artrans.ex_gl_ac.Caption)</div></div></th>
+	} else {
+		<th data-name="ex_gl_ac" class="@s_artrans.ex_gl_ac.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.ex_gl_ac))',1);"><div id="elh_s_artrans_ex_gl_ac" class="s_artrans_ex_gl_ac">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.ex_gl_ac.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_artrans.ex_gl_ac.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.ex_gl_ac.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* ex_gl_ac.Visible (end) *@
+@if (s_artrans.ex_gl_dp.Visible) { // ex_gl_dp.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.ex_gl_dp) == "") {
+		<th data-name="ex_gl_dp" class="@s_artrans.ex_gl_dp.HeaderCellClass"><div id="elh_s_artrans_ex_gl_dp" class="s_artrans_ex_gl_dp"><div class="ew-table-header-caption">@Html.Raw(s_artrans.ex_gl_dp.Caption)</div></div></th>
+	} else {
+		<th data-name="ex_gl_dp" class="@s_artrans.ex_gl_dp.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.ex_gl_dp))',1);"><div id="elh_s_artrans_ex_gl_dp" class="s_artrans_ex_gl_dp">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.ex_gl_dp.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_artrans.ex_gl_dp.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.ex_gl_dp.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* ex_gl_dp.Visible (end) *@
+@if (s_artrans.cost.Visible) { // cost.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.cost) == "") {
+		<th data-name="cost" class="@s_artrans.cost.HeaderCellClass"><div id="elh_s_artrans_cost" class="s_artrans_cost"><div class="ew-table-header-caption">@Html.Raw(s_artrans.cost.Caption)</div></div></th>
+	} else {
+		<th data-name="cost" class="@s_artrans.cost.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.cost))',1);"><div id="elh_s_artrans_cost" class="s_artrans_cost">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.cost.Caption)</span><span class="ew-table-header-sort">@if (s_artrans.cost.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.cost.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* cost.Visible (end) *@
+@if (s_artrans.prefix.Visible) { // prefix.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.prefix) == "") {
+		<th data-name="prefix" class="@s_artrans.prefix.HeaderCellClass"><div id="elh_s_artrans_prefix" class="s_artrans_prefix"><div class="ew-table-header-caption">@Html.Raw(s_artrans.prefix.Caption)</div></div></th>
+	} else {
+		<th data-name="prefix" class="@s_artrans.prefix.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.prefix))',1);"><div id="elh_s_artrans_prefix" class="s_artrans_prefix">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.prefix.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_artrans.prefix.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.prefix.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* prefix.Visible (end) *@
+@if (s_artrans.exrate.Visible) { // exrate.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.exrate) == "") {
+		<th data-name="exrate" class="@s_artrans.exrate.HeaderCellClass"><div id="elh_s_artrans_exrate" class="s_artrans_exrate"><div class="ew-table-header-caption">@Html.Raw(s_artrans.exrate.Caption)</div></div></th>
+	} else {
+		<th data-name="exrate" class="@s_artrans.exrate.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.exrate))',1);"><div id="elh_s_artrans_exrate" class="s_artrans_exrate">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.exrate.Caption)</span><span class="ew-table-header-sort">@if (s_artrans.exrate.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.exrate.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* exrate.Visible (end) *@
+@if (s_artrans.trn_no.Visible) { // trn_no.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.trn_no) == "") {
+		<th data-name="trn_no" class="@s_artrans.trn_no.HeaderCellClass"><div id="elh_s_artrans_trn_no" class="s_artrans_trn_no"><div class="ew-table-header-caption">@Html.Raw(s_artrans.trn_no.Caption)</div></div></th>
+	} else {
+		<th data-name="trn_no" class="@s_artrans.trn_no.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.trn_no))',1);"><div id="elh_s_artrans_trn_no" class="s_artrans_trn_no">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.trn_no.Caption)</span><span class="ew-table-header-sort">@if (s_artrans.trn_no.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.trn_no.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* trn_no.Visible (end) *@
+@if (s_artrans.rpl_trn_no.Visible) { // rpl_trn_no.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.rpl_trn_no) == "") {
+		<th data-name="rpl_trn_no" class="@s_artrans.rpl_trn_no.HeaderCellClass"><div id="elh_s_artrans_rpl_trn_no" class="s_artrans_rpl_trn_no"><div class="ew-table-header-caption">@Html.Raw(s_artrans.rpl_trn_no.Caption)</div></div></th>
+	} else {
+		<th data-name="rpl_trn_no" class="@s_artrans.rpl_trn_no.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.rpl_trn_no))',1);"><div id="elh_s_artrans_rpl_trn_no" class="s_artrans_rpl_trn_no">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.rpl_trn_no.Caption)</span><span class="ew-table-header-sort">@if (s_artrans.rpl_trn_no.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.rpl_trn_no.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* rpl_trn_no.Visible (end) *@
+@if (s_artrans.slsman.Visible) { // slsman.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.slsman) == "") {
+		<th data-name="slsman" class="@s_artrans.slsman.HeaderCellClass"><div id="elh_s_artrans_slsman" class="s_artrans_slsman"><div class="ew-table-header-caption">@Html.Raw(s_artrans.slsman.Caption)</div></div></th>
+	} else {
+		<th data-name="slsman" class="@s_artrans.slsman.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.slsman))',1);"><div id="elh_s_artrans_slsman" class="s_artrans_slsman">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.slsman.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_artrans.slsman.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.slsman.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* slsman.Visible (end) *@
+@if (s_artrans.markdelete.Visible) { // markdelete.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.markdelete) == "") {
+		<th data-name="markdelete" class="@s_artrans.markdelete.HeaderCellClass"><div id="elh_s_artrans_markdelete" class="s_artrans_markdelete"><div class="ew-table-header-caption">@Html.Raw(s_artrans.markdelete.Caption)</div></div></th>
+	} else {
+		<th data-name="markdelete" class="@s_artrans.markdelete.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.markdelete))',1);"><div id="elh_s_artrans_markdelete" class="s_artrans_markdelete">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.markdelete.Caption)</span><span class="ew-table-header-sort">@if (s_artrans.markdelete.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.markdelete.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* markdelete.Visible (end) *@
+@if (s_artrans.dt_upd.Visible) { // dt_upd.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.dt_upd) == "") {
+		<th data-name="dt_upd" class="@s_artrans.dt_upd.HeaderCellClass"><div id="elh_s_artrans_dt_upd" class="s_artrans_dt_upd"><div class="ew-table-header-caption">@Html.Raw(s_artrans.dt_upd.Caption)</div></div></th>
+	} else {
+		<th data-name="dt_upd" class="@s_artrans.dt_upd.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.dt_upd))',1);"><div id="elh_s_artrans_dt_upd" class="s_artrans_dt_upd">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.dt_upd.Caption)</span><span class="ew-table-header-sort">@if (s_artrans.dt_upd.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.dt_upd.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* dt_upd.Visible (end) *@
+@if (s_artrans.id_upd.Visible) { // id_upd.Visible (begin)
+	if (s_artrans_List.SortUrl(s_artrans.id_upd) == "") {
+		<th data-name="id_upd" class="@s_artrans.id_upd.HeaderCellClass"><div id="elh_s_artrans_id_upd" class="s_artrans_id_upd"><div class="ew-table-header-caption">@Html.Raw(s_artrans.id_upd.Caption)</div></div></th>
+	} else {
+		<th data-name="id_upd" class="@s_artrans.id_upd.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_artrans.SortUrl(s_artrans.id_upd))',1);"><div id="elh_s_artrans_id_upd" class="s_artrans_id_upd">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_artrans.id_upd.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_artrans.id_upd.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_artrans.id_upd.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* id_upd.Visible (end) *@
+@{
+
+	// Render list options (header, right)
+	s_artrans_List.ListOptions.Render("header", "right");
+}
+	</tr>
+</thead>
+<tbody>
+@{ // Begin Code
+if (s_artrans_List.ExportAll && s_artrans_List.IsExport()) {
+	s_artrans_List.StopRecord = s_artrans_List.TotalRecords;
+} else {
+
+	// Set the last record to display
+	if (s_artrans_List.TotalRecords > s_artrans_List.StartRecord + s_artrans_List.DisplayRecords - 1) {
+		s_artrans_List.StopRecord = s_artrans_List.StartRecord + s_artrans_List.DisplayRecords - 1;
+	} else {
+		s_artrans_List.StopRecord = s_artrans_List.TotalRecords;
+	}
+}
+if (s_artrans_List.Recordset != null && s_artrans_List.Recordset.HasRows) {
+	if (!s_artrans_List.Connection.SelectOffset) { // DN
+		for (var i = 1; i <= s_artrans_List.StartRecord - 1; i++) { // Move to first record
+			if (await s_artrans_List.Recordset.ReadAsync()) {
+				s_artrans_List.RecordCount++;
+			}
+		}
+	} else {
+		s_artrans_List.RecordCount = s_artrans_List.StartRecord - 1;
+	}
+} else if (!s_artrans_List.AllowAddDeleteRow && s_artrans_List.StopRecord == 0) {
+	s_artrans_List.StopRecord = s_artrans_List.GridAddRowCount;
+}
+
+// Initialize aggregate
+s_artrans_List.RowType = Config.RowTypeAggregateInit;
+s_artrans_List.ResetAttributes();
+await s_artrans_List.RenderRow();
+
+// Output data rows
+bool eof = (s_artrans_List.Recordset == null); // DN
+while (s_artrans_List.RecordCount < s_artrans_List.StopRecord) { // Begin While
+	if (!s_artrans_List.IsGridAdd && !eof) { // DN
+		eof = !await s_artrans_List.Recordset.ReadAsync();
+	}
+	s_artrans_List.RecordCount++;
+	if (s_artrans_List.RecordCount >= s_artrans_List.StartRecord) {
+		s_artrans_List.RowCnt++;
+
+		// Set up key count
+		s_artrans_List.KeyCount = ConvertToInt(s_artrans_List.RowIndex);
+
+		// Init row class and style
+		s_artrans_List.ResetAttributes();
+		s_artrans_List.CssClass = "";
+		if (s_artrans_List.IsGridAdd) {
+		} else {
+			await s_artrans_List.LoadRowValues(s_artrans_List.Recordset); // Load row values
+		}
+		s_artrans_List.RowType = Config.RowTypeView; // Render view
+
+		// Set up row id / data-rowindex
+		s_artrans_List.RowAttrs.Add("data-rowindex", Convert.ToString(s_artrans_List.RowCnt));
+		s_artrans_List.RowAttrs.Add("id", "r" + Convert.ToString(s_artrans_List.RowCnt) + "_s_artrans");
+		s_artrans_List.RowAttrs.Add("data-rowtype", Convert.ToString(s_artrans_List.RowType));
+
+		// Render row
+		await s_artrans_List.RenderRow();
+
+		// Render list options
+		await s_artrans_List.RenderListOptions();
+	<tr @Html.Raw(s_artrans_List.RowAttributes)>
+	@{
+
+		// Render list options (body, left)
+		s_artrans_List.ListOptions.Render("body", "left", s_artrans_List.RowCnt);
+	}
+	@if (s_artrans.dt_rec.Visible) { // dt_rec.Visible (begin)
+		<td data-name="dt_rec"@Html.Raw(s_artrans.dt_rec.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_dt_rec" class="s_artrans_dt_rec">
+<span @Html.Raw(s_artrans.dt_rec.ViewAttributes)>
+@Html.Raw(s_artrans.dt_rec.GetViewValue())</span>
+</span>
+</td>
+	} @* dt_rec.Visible (end) *@
+	@if (s_artrans.doc_date.Visible) { // doc_date.Visible (begin)
+		<td data-name="doc_date"@Html.Raw(s_artrans.doc_date.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_doc_date" class="s_artrans_doc_date">
+<span @Html.Raw(s_artrans.doc_date.ViewAttributes)>
+@Html.Raw(s_artrans.doc_date.GetViewValue())</span>
+</span>
+</td>
+	} @* doc_date.Visible (end) *@
+	@if (s_artrans.dbcode.Visible) { // dbcode.Visible (begin)
+		<td data-name="dbcode"@Html.Raw(s_artrans.dbcode.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_dbcode" class="s_artrans_dbcode">
+<span @Html.Raw(s_artrans.dbcode.ViewAttributes)>
+@Html.Raw(s_artrans.dbcode.GetViewValue())</span>
+</span>
+</td>
+	} @* dbcode.Visible (end) *@
+	@if (s_artrans.ar_dept.Visible) { // ar_dept.Visible (begin)
+		<td data-name="ar_dept"@Html.Raw(s_artrans.ar_dept.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_ar_dept" class="s_artrans_ar_dept">
+<span @Html.Raw(s_artrans.ar_dept.ViewAttributes)>
+@Html.Raw(s_artrans.ar_dept.GetViewValue())</span>
+</span>
+</td>
+	} @* ar_dept.Visible (end) *@
+	@if (s_artrans.ref_no.Visible) { // ref_no.Visible (begin)
+		<td data-name="ref_no"@Html.Raw(s_artrans.ref_no.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_ref_no" class="s_artrans_ref_no">
+<span @Html.Raw(s_artrans.ref_no.ViewAttributes)>
+@Html.Raw(s_artrans.ref_no.GetViewValue())</span>
+</span>
+</td>
+	} @* ref_no.Visible (end) *@
+	@if (s_artrans.description.Visible) { // description.Visible (begin)
+		<td data-name="description"@Html.Raw(s_artrans.description.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_description" class="s_artrans_description">
+<span @Html.Raw(s_artrans.description.ViewAttributes)>
+@Html.Raw(s_artrans.description.GetViewValue())</span>
+</span>
+</td>
+	} @* description.Visible (end) *@
+	@if (s_artrans.amt_ar.Visible) { // amt_ar.Visible (begin)
+		<td data-name="amt_ar"@Html.Raw(s_artrans.amt_ar.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_amt_ar" class="s_artrans_amt_ar">
+<span @Html.Raw(s_artrans.amt_ar.ViewAttributes)>
+@Html.Raw(s_artrans.amt_ar.GetViewValue())</span>
+</span>
+</td>
+	} @* amt_ar.Visible (end) *@
+	@if (s_artrans.amt_rec.Visible) { // amt_rec.Visible (begin)
+		<td data-name="amt_rec"@Html.Raw(s_artrans.amt_rec.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_amt_rec" class="s_artrans_amt_rec">
+<span @Html.Raw(s_artrans.amt_rec.ViewAttributes)>
+@Html.Raw(s_artrans.amt_rec.GetViewValue())</span>
+</span>
+</td>
+	} @* amt_rec.Visible (end) *@
+	@if (s_artrans.ar_gl_acct.Visible) { // ar_gl_acct.Visible (begin)
+		<td data-name="ar_gl_acct"@Html.Raw(s_artrans.ar_gl_acct.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_ar_gl_acct" class="s_artrans_ar_gl_acct">
+<span @Html.Raw(s_artrans.ar_gl_acct.ViewAttributes)>
+@Html.Raw(s_artrans.ar_gl_acct.GetViewValue())</span>
+</span>
+</td>
+	} @* ar_gl_acct.Visible (end) *@
+	@if (s_artrans.ar_gl_dept.Visible) { // ar_gl_dept.Visible (begin)
+		<td data-name="ar_gl_dept"@Html.Raw(s_artrans.ar_gl_dept.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_ar_gl_dept" class="s_artrans_ar_gl_dept">
+<span @Html.Raw(s_artrans.ar_gl_dept.ViewAttributes)>
+@Html.Raw(s_artrans.ar_gl_dept.GetViewValue())</span>
+</span>
+</td>
+	} @* ar_gl_dept.Visible (end) *@
+	@if (s_artrans.db_cr.Visible) { // db_cr.Visible (begin)
+		<td data-name="db_cr"@Html.Raw(s_artrans.db_cr.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_db_cr" class="s_artrans_db_cr">
+<span @Html.Raw(s_artrans.db_cr.ViewAttributes)>
+@Html.Raw(s_artrans.db_cr.GetViewValue())</span>
+</span>
+</td>
+	} @* db_cr.Visible (end) *@
+	@if (s_artrans.month.Visible) { // month.Visible (begin)
+		<td data-name="month"@Html.Raw(s_artrans.month.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_month" class="s_artrans_month">
+<span @Html.Raw(s_artrans.month.ViewAttributes)>
+@Html.Raw(s_artrans.month.GetViewValue())</span>
+</span>
+</td>
+	} @* month.Visible (end) *@
+	@if (s_artrans.source.Visible) { // source.Visible (begin)
+		<td data-name="source"@Html.Raw(s_artrans.source.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_source" class="s_artrans_source">
+<span @Html.Raw(s_artrans.source.ViewAttributes)>
+@Html.Raw(s_artrans.source.GetViewValue())</span>
+</span>
+</td>
+	} @* source.Visible (end) *@
+	@if (s_artrans.forx_amt.Visible) { // forx_amt.Visible (begin)
+		<td data-name="forx_amt"@Html.Raw(s_artrans.forx_amt.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_forx_amt" class="s_artrans_forx_amt">
+<span @Html.Raw(s_artrans.forx_amt.ViewAttributes)>
+@Html.Raw(s_artrans.forx_amt.GetViewValue())</span>
+</span>
+</td>
+	} @* forx_amt.Visible (end) *@
+	@if (s_artrans.forx_rec.Visible) { // forx_rec.Visible (begin)
+		<td data-name="forx_rec"@Html.Raw(s_artrans.forx_rec.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_forx_rec" class="s_artrans_forx_rec">
+<span @Html.Raw(s_artrans.forx_rec.ViewAttributes)>
+@Html.Raw(s_artrans.forx_rec.GetViewValue())</span>
+</span>
+</td>
+	} @* forx_rec.Visible (end) *@
+	@if (s_artrans.forx_cost.Visible) { // forx_cost.Visible (begin)
+		<td data-name="forx_cost"@Html.Raw(s_artrans.forx_cost.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_forx_cost" class="s_artrans_forx_cost">
+<span @Html.Raw(s_artrans.forx_cost.ViewAttributes)>
+@Html.Raw(s_artrans.forx_cost.GetViewValue())</span>
+</span>
+</td>
+	} @* forx_cost.Visible (end) *@
+	@if (s_artrans.gain_loss.Visible) { // gain_loss.Visible (begin)
+		<td data-name="gain_loss"@Html.Raw(s_artrans.gain_loss.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_gain_loss" class="s_artrans_gain_loss">
+<span @Html.Raw(s_artrans.gain_loss.ViewAttributes)>
+@Html.Raw(s_artrans.gain_loss.GetViewValue())</span>
+</span>
+</td>
+	} @* gain_loss.Visible (end) *@
+	@if (s_artrans.ex_gl_ac.Visible) { // ex_gl_ac.Visible (begin)
+		<td data-name="ex_gl_ac"@Html.Raw(s_artrans.ex_gl_ac.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_ex_gl_ac" class="s_artrans_ex_gl_ac">
+<span @Html.Raw(s_artrans.ex_gl_ac.ViewAttributes)>
+@Html.Raw(s_artrans.ex_gl_ac.GetViewValue())</span>
+</span>
+</td>
+	} @* ex_gl_ac.Visible (end) *@
+	@if (s_artrans.ex_gl_dp.Visible) { // ex_gl_dp.Visible (begin)
+		<td data-name="ex_gl_dp"@Html.Raw(s_artrans.ex_gl_dp.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_ex_gl_dp" class="s_artrans_ex_gl_dp">
+<span @Html.Raw(s_artrans.ex_gl_dp.ViewAttributes)>
+@Html.Raw(s_artrans.ex_gl_dp.GetViewValue())</span>
+</span>
+</td>
+	} @* ex_gl_dp.Visible (end) *@
+	@if (s_artrans.cost.Visible) { // cost.Visible (begin)
+		<td data-name="cost"@Html.Raw(s_artrans.cost.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_cost" class="s_artrans_cost">
+<span @Html.Raw(s_artrans.cost.ViewAttributes)>
+@Html.Raw(s_artrans.cost.GetViewValue())</span>
+</span>
+</td>
+	} @* cost.Visible (end) *@
+	@if (s_artrans.prefix.Visible) { // prefix.Visible (begin)
+		<td data-name="prefix"@Html.Raw(s_artrans.prefix.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_prefix" class="s_artrans_prefix">
+<span @Html.Raw(s_artrans.prefix.ViewAttributes)>
+@Html.Raw(s_artrans.prefix.GetViewValue())</span>
+</span>
+</td>
+	} @* prefix.Visible (end) *@
+	@if (s_artrans.exrate.Visible) { // exrate.Visible (begin)
+		<td data-name="exrate"@Html.Raw(s_artrans.exrate.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_exrate" class="s_artrans_exrate">
+<span @Html.Raw(s_artrans.exrate.ViewAttributes)>
+@Html.Raw(s_artrans.exrate.GetViewValue())</span>
+</span>
+</td>
+	} @* exrate.Visible (end) *@
+	@if (s_artrans.trn_no.Visible) { // trn_no.Visible (begin)
+		<td data-name="trn_no"@Html.Raw(s_artrans.trn_no.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_trn_no" class="s_artrans_trn_no">
+<span @Html.Raw(s_artrans.trn_no.ViewAttributes)>
+@Html.Raw(s_artrans.trn_no.GetViewValue())</span>
+</span>
+</td>
+	} @* trn_no.Visible (end) *@
+	@if (s_artrans.rpl_trn_no.Visible) { // rpl_trn_no.Visible (begin)
+		<td data-name="rpl_trn_no"@Html.Raw(s_artrans.rpl_trn_no.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_rpl_trn_no" class="s_artrans_rpl_trn_no">
+<span @Html.Raw(s_artrans.rpl_trn_no.ViewAttributes)>
+@Html.Raw(s_artrans.rpl_trn_no.GetViewValue())</span>
+</span>
+</td>
+	} @* rpl_trn_no.Visible (end) *@
+	@if (s_artrans.slsman.Visible) { // slsman.Visible (begin)
+		<td data-name="slsman"@Html.Raw(s_artrans.slsman.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_slsman" class="s_artrans_slsman">
+<span @Html.Raw(s_artrans.slsman.ViewAttributes)>
+@Html.Raw(s_artrans.slsman.GetViewValue())</span>
+</span>
+</td>
+	} @* slsman.Visible (end) *@
+	@if (s_artrans.markdelete.Visible) { // markdelete.Visible (begin)
+		<td data-name="markdelete"@Html.Raw(s_artrans.markdelete.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_markdelete" class="s_artrans_markdelete">
+<span @Html.Raw(s_artrans.markdelete.ViewAttributes)>
+<input type="checkbox" value="@s_artrans.markdelete.GetViewValue()" disabled checked="@ConvertToBool(s_artrans.markdelete.CurrentValue)"></span>
+</span>
+</td>
+	} @* markdelete.Visible (end) *@
+	@if (s_artrans.dt_upd.Visible) { // dt_upd.Visible (begin)
+		<td data-name="dt_upd"@Html.Raw(s_artrans.dt_upd.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_dt_upd" class="s_artrans_dt_upd">
+<span @Html.Raw(s_artrans.dt_upd.ViewAttributes)>
+@Html.Raw(s_artrans.dt_upd.GetViewValue())</span>
+</span>
+</td>
+	} @* dt_upd.Visible (end) *@
+	@if (s_artrans.id_upd.Visible) { // id_upd.Visible (begin)
+		<td data-name="id_upd"@Html.Raw(s_artrans.id_upd.CellAttributes)>
+<span id="el@(s_artrans_List.RowCnt)_s_artrans_id_upd" class="s_artrans_id_upd">
+<span @Html.Raw(s_artrans.id_upd.ViewAttributes)>
+@Html.Raw(s_artrans.id_upd.GetViewValue())</span>
+</span>
+</td>
+	} @* id_upd.Visible (end) *@
+	@{
+
+		// Render list options (body, right)
+		s_artrans_List.ListOptions.Render("body", "right", s_artrans_List.RowCnt);
+	}
+	</tr>
+	} @* End if *@
+} @* End While *@
+} @* End Code *@
+</tbody>
+</table><!-- /.ew-table -->
+} @* End If TotalRecords > 0 *@
+@if (Empty(s_artrans_List.CurrentAction)) {
+<input type="hidden" name="action" id="action" value="">
+}
+</div><!-- /.ew-grid-middle-panel -->
+</form><!-- /.ew-list-form -->
+@{ s_artrans_List.CloseRecordset(); }
+		@if (!s_artrans.IsExport()) {
+		<div class="card-footer ew-grid-lower-panel">
+		<div class="ew-list-other-options">
+		@s_artrans_List.OtherOptions.RenderBody("bottom")
+		</div>
+		@if (!s_artrans_List.IsGridAdd) {
+			<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="@AppPath(CurrentPageName())">
+			@s_artrans_List.Pager.Render()
+			</form>
+		}
+		<div class="clearfix"></div>
+		</div>
+		}
+</div><!-- /.ew-grid -->
+}
+@if (s_artrans_List.TotalRecords <= 0 && s_artrans_List.CurrentAction == "") { // Show other options
+<div class="ew-list-other-options">
+@s_artrans_List.OtherOptions.ForEach(opt => opt.ButtonClass = "").RenderBody()
+</div>
+<div class="clearfix"></div>
+}
+@s_artrans_List.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_artrans.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

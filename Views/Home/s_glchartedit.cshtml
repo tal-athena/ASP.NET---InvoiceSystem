@@ -1,0 +1,338 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_glchart_Edit.Page_Render();
+
+	// Check action result
+	if (s_glchart_Edit.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "edit";
+var fs_glchartedit = currentForm = new ew.Form("fs_glchartedit", "edit");
+
+// Validate form
+fs_glchartedit.validate = function() {
+	if (!this.validateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.getForm(), $fobj = $(fobj);
+	if ($fobj.find("#confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.formKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = ["insert", "gridinsert"].includes($fobj.find("#action").val()) && $k[0];
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+	@if (s_glchart_Edit.Id.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Id");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.Id.RequiredErrorMessage.Replace("%s", s_glchart.Id.Caption)))");
+		</text>
+	}
+	@if (s_glchart_Edit.acct_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_acct_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.acct_code.RequiredErrorMessage.Replace("%s", s_glchart.acct_code.Caption)))");
+		</text>
+	}
+	@if (s_glchart_Edit.description.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_description");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.description.RequiredErrorMessage.Replace("%s", s_glchart.description.Caption)))");
+		</text>
+	}
+	@if (s_glchart_Edit.report_type.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_report_type");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.report_type.RequiredErrorMessage.Replace("%s", s_glchart.report_type.Caption)))");
+		</text>
+	}
+	@if (s_glchart_Edit.acct_group.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_acct_group");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.acct_group.RequiredErrorMessage.Replace("%s", s_glchart.acct_group.Caption)))");
+		</text>
+	}
+	@if (s_glchart_Edit.acct_type.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_acct_type");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.acct_type.RequiredErrorMessage.Replace("%s", s_glchart.acct_type.Caption)))");
+		</text>
+	}
+	@if (s_glchart_Edit.CurrencyCode.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_CurrencyCode");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.CurrencyCode.RequiredErrorMessage.Replace("%s", s_glchart.CurrencyCode.Caption)))");
+		</text>
+	}
+	@if (s_glchart_Edit.opn_debit.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_opn_debit");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.opn_debit.RequiredErrorMessage.Replace("%s", s_glchart.opn_debit.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_opn_debit");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.opn_debit.ErrorMessage))");
+	@if (s_glchart_Edit.opn_credit.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_opn_credit");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.opn_credit.RequiredErrorMessage.Replace("%s", s_glchart.opn_credit.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_opn_credit");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.opn_credit.ErrorMessage))");
+	@if (s_glchart_Edit.bal_mtd.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_bal_mtd");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.bal_mtd.RequiredErrorMessage.Replace("%s", s_glchart.bal_mtd.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_bal_mtd");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.bal_mtd.ErrorMessage))");
+	@if (s_glchart_Edit.bal_ytd.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_bal_ytd");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.bal_ytd.RequiredErrorMessage.Replace("%s", s_glchart.bal_ytd.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_bal_ytd");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.bal_ytd.ErrorMessage))");
+	@if (s_glchart_Edit.remark.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_remark");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_glchart.remark.RequiredErrorMessage.Replace("%s", s_glchart.remark.Caption)))");
+		</text>
+	}
+
+		// Fire Form_CustomValidate event
+		if (!this.Form_CustomValidate(fobj))
+			return false;
+	}
+
+	// Process detail forms
+	var dfs = $fobj.find("input[name='detailpage']").get();
+	for (var i = 0; i < dfs.length; i++) {
+		var df = dfs[i], val = df.value;
+		if (val && ew.forms[val])
+			if (!ew.forms[val].validate())
+				return false;
+	}
+	return true;
+}
+
+// Form_CustomValidate event
+fs_glchartedit.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_glchartedit.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_glchart_Edit.ShowPageHeader()
+@s_glchart_Edit.ShowMessages()
+<form name="fs_glchartedit" id="fs_glchartedit" class="@s_glchart_Edit.FormClassName" action="@AppPath(CurrentPageName())" method="post">
+@if (s_glchart_Edit.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="update">
+@if (s_glchart_Edit.IsModal) {
+<input type="hidden" name="modal" value="@ConvertToInt(s_glchart_Edit.IsModal)">
+}
+<div class="ew-edit-div"><!-- page* -->
+@if (s_glchart.Id.Visible) { // Id.Visible (begin)
+	<div id="r_Id" class="form-group row">
+		<label id="elh_s_glchart_Id" class="@s_glchart_Edit.LeftColumnClass">@Html.Raw(s_glchart.Id.Caption)@Html.Raw(s_glchart.Id.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glchart_Edit.RightColumnClass"><div @Html.Raw(s_glchart.Id.CellAttributes)>
+<span id="el_s_glchart_Id">
+<span @Html.Raw(s_glchart.Id.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_glchart.Id.EditValue))"></span>
+</span>
+<input type="hidden" data-table="s_glchart" data-field="x_Id" name="x_Id" id="x_Id" value="@s_glchart.Id.CurrentValue">
+@Html.Raw(s_glchart.Id.CustomMessage)</div></div>
+	</div>
+} @* Id.Visible (end) *@
+@if (s_glchart.acct_code.Visible) { // acct_code.Visible (begin)
+	<div id="r_acct_code" class="form-group row">
+		<label id="elh_s_glchart_acct_code" for="x_acct_code" class="@s_glchart_Edit.LeftColumnClass">@Html.Raw(s_glchart.acct_code.Caption)@Html.Raw(s_glchart.acct_code.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glchart_Edit.RightColumnClass"><div @Html.Raw(s_glchart.acct_code.CellAttributes)>
+<span id="el_s_glchart_acct_code">
+<input type="text" data-table="s_glchart" data-field="x_acct_code" name="x_acct_code" id="x_acct_code" size="30" maxlength="20" placeholder="@s_glchart.acct_code.PlaceHolder" value="@s_glchart.acct_code.EditValue" @Html.Raw(s_glchart.acct_code.EditAttributes)>
+</span>
+@Html.Raw(s_glchart.acct_code.CustomMessage)</div></div>
+	</div>
+} @* acct_code.Visible (end) *@
+@if (s_glchart.description.Visible) { // description.Visible (begin)
+	<div id="r_description" class="form-group row">
+		<label id="elh_s_glchart_description" for="x_description" class="@s_glchart_Edit.LeftColumnClass">@Html.Raw(s_glchart.description.Caption)@Html.Raw(s_glchart.description.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glchart_Edit.RightColumnClass"><div @Html.Raw(s_glchart.description.CellAttributes)>
+<span id="el_s_glchart_description">
+<input type="text" data-table="s_glchart" data-field="x_description" name="x_description" id="x_description" size="30" maxlength="100" placeholder="@s_glchart.description.PlaceHolder" value="@s_glchart.description.EditValue" @Html.Raw(s_glchart.description.EditAttributes)>
+</span>
+@Html.Raw(s_glchart.description.CustomMessage)</div></div>
+	</div>
+} @* description.Visible (end) *@
+@if (s_glchart.report_type.Visible) { // report_type.Visible (begin)
+	<div id="r_report_type" class="form-group row">
+		<label id="elh_s_glchart_report_type" for="x_report_type" class="@s_glchart_Edit.LeftColumnClass">@Html.Raw(s_glchart.report_type.Caption)@Html.Raw(s_glchart.report_type.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glchart_Edit.RightColumnClass"><div @Html.Raw(s_glchart.report_type.CellAttributes)>
+<span id="el_s_glchart_report_type">
+<input type="text" data-table="s_glchart" data-field="x_report_type" name="x_report_type" id="x_report_type" size="30" maxlength="2" placeholder="@s_glchart.report_type.PlaceHolder" value="@s_glchart.report_type.EditValue" @Html.Raw(s_glchart.report_type.EditAttributes)>
+</span>
+@Html.Raw(s_glchart.report_type.CustomMessage)</div></div>
+	</div>
+} @* report_type.Visible (end) *@
+@if (s_glchart.acct_group.Visible) { // acct_group.Visible (begin)
+	<div id="r_acct_group" class="form-group row">
+		<label id="elh_s_glchart_acct_group" for="x_acct_group" class="@s_glchart_Edit.LeftColumnClass">@Html.Raw(s_glchart.acct_group.Caption)@Html.Raw(s_glchart.acct_group.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glchart_Edit.RightColumnClass"><div @Html.Raw(s_glchart.acct_group.CellAttributes)>
+<span id="el_s_glchart_acct_group">
+<input type="text" data-table="s_glchart" data-field="x_acct_group" name="x_acct_group" id="x_acct_group" size="30" maxlength="20" placeholder="@s_glchart.acct_group.PlaceHolder" value="@s_glchart.acct_group.EditValue" @Html.Raw(s_glchart.acct_group.EditAttributes)>
+</span>
+@Html.Raw(s_glchart.acct_group.CustomMessage)</div></div>
+	</div>
+} @* acct_group.Visible (end) *@
+@if (s_glchart.acct_type.Visible) { // acct_type.Visible (begin)
+	<div id="r_acct_type" class="form-group row">
+		<label id="elh_s_glchart_acct_type" for="x_acct_type" class="@s_glchart_Edit.LeftColumnClass">@Html.Raw(s_glchart.acct_type.Caption)@Html.Raw(s_glchart.acct_type.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glchart_Edit.RightColumnClass"><div @Html.Raw(s_glchart.acct_type.CellAttributes)>
+<span id="el_s_glchart_acct_type">
+<input type="text" data-table="s_glchart" data-field="x_acct_type" name="x_acct_type" id="x_acct_type" size="30" maxlength="20" placeholder="@s_glchart.acct_type.PlaceHolder" value="@s_glchart.acct_type.EditValue" @Html.Raw(s_glchart.acct_type.EditAttributes)>
+</span>
+@Html.Raw(s_glchart.acct_type.CustomMessage)</div></div>
+	</div>
+} @* acct_type.Visible (end) *@
+@if (s_glchart.CurrencyCode.Visible) { // CurrencyCode.Visible (begin)
+	<div id="r_CurrencyCode" class="form-group row">
+		<label id="elh_s_glchart_CurrencyCode" for="x_CurrencyCode" class="@s_glchart_Edit.LeftColumnClass">@Html.Raw(s_glchart.CurrencyCode.Caption)@Html.Raw(s_glchart.CurrencyCode.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glchart_Edit.RightColumnClass"><div @Html.Raw(s_glchart.CurrencyCode.CellAttributes)>
+<span id="el_s_glchart_CurrencyCode">
+<input type="text" data-table="s_glchart" data-field="x_CurrencyCode" name="x_CurrencyCode" id="x_CurrencyCode" size="30" maxlength="5" placeholder="@s_glchart.CurrencyCode.PlaceHolder" value="@s_glchart.CurrencyCode.EditValue" @Html.Raw(s_glchart.CurrencyCode.EditAttributes)>
+</span>
+@Html.Raw(s_glchart.CurrencyCode.CustomMessage)</div></div>
+	</div>
+} @* CurrencyCode.Visible (end) *@
+@if (s_glchart.opn_debit.Visible) { // opn_debit.Visible (begin)
+	<div id="r_opn_debit" class="form-group row">
+		<label id="elh_s_glchart_opn_debit" for="x_opn_debit" class="@s_glchart_Edit.LeftColumnClass">@Html.Raw(s_glchart.opn_debit.Caption)@Html.Raw(s_glchart.opn_debit.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glchart_Edit.RightColumnClass"><div @Html.Raw(s_glchart.opn_debit.CellAttributes)>
+<span id="el_s_glchart_opn_debit">
+<input type="text" data-table="s_glchart" data-field="x_opn_debit" name="x_opn_debit" id="x_opn_debit" size="30" placeholder="@s_glchart.opn_debit.PlaceHolder" value="@s_glchart.opn_debit.EditValue" @Html.Raw(s_glchart.opn_debit.EditAttributes)>
+</span>
+@Html.Raw(s_glchart.opn_debit.CustomMessage)</div></div>
+	</div>
+} @* opn_debit.Visible (end) *@
+@if (s_glchart.opn_credit.Visible) { // opn_credit.Visible (begin)
+	<div id="r_opn_credit" class="form-group row">
+		<label id="elh_s_glchart_opn_credit" for="x_opn_credit" class="@s_glchart_Edit.LeftColumnClass">@Html.Raw(s_glchart.opn_credit.Caption)@Html.Raw(s_glchart.opn_credit.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glchart_Edit.RightColumnClass"><div @Html.Raw(s_glchart.opn_credit.CellAttributes)>
+<span id="el_s_glchart_opn_credit">
+<input type="text" data-table="s_glchart" data-field="x_opn_credit" name="x_opn_credit" id="x_opn_credit" size="30" placeholder="@s_glchart.opn_credit.PlaceHolder" value="@s_glchart.opn_credit.EditValue" @Html.Raw(s_glchart.opn_credit.EditAttributes)>
+</span>
+@Html.Raw(s_glchart.opn_credit.CustomMessage)</div></div>
+	</div>
+} @* opn_credit.Visible (end) *@
+@if (s_glchart.bal_mtd.Visible) { // bal_mtd.Visible (begin)
+	<div id="r_bal_mtd" class="form-group row">
+		<label id="elh_s_glchart_bal_mtd" for="x_bal_mtd" class="@s_glchart_Edit.LeftColumnClass">@Html.Raw(s_glchart.bal_mtd.Caption)@Html.Raw(s_glchart.bal_mtd.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glchart_Edit.RightColumnClass"><div @Html.Raw(s_glchart.bal_mtd.CellAttributes)>
+<span id="el_s_glchart_bal_mtd">
+<input type="text" data-table="s_glchart" data-field="x_bal_mtd" name="x_bal_mtd" id="x_bal_mtd" size="30" placeholder="@s_glchart.bal_mtd.PlaceHolder" value="@s_glchart.bal_mtd.EditValue" @Html.Raw(s_glchart.bal_mtd.EditAttributes)>
+</span>
+@Html.Raw(s_glchart.bal_mtd.CustomMessage)</div></div>
+	</div>
+} @* bal_mtd.Visible (end) *@
+@if (s_glchart.bal_ytd.Visible) { // bal_ytd.Visible (begin)
+	<div id="r_bal_ytd" class="form-group row">
+		<label id="elh_s_glchart_bal_ytd" for="x_bal_ytd" class="@s_glchart_Edit.LeftColumnClass">@Html.Raw(s_glchart.bal_ytd.Caption)@Html.Raw(s_glchart.bal_ytd.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glchart_Edit.RightColumnClass"><div @Html.Raw(s_glchart.bal_ytd.CellAttributes)>
+<span id="el_s_glchart_bal_ytd">
+<input type="text" data-table="s_glchart" data-field="x_bal_ytd" name="x_bal_ytd" id="x_bal_ytd" size="30" placeholder="@s_glchart.bal_ytd.PlaceHolder" value="@s_glchart.bal_ytd.EditValue" @Html.Raw(s_glchart.bal_ytd.EditAttributes)>
+</span>
+@Html.Raw(s_glchart.bal_ytd.CustomMessage)</div></div>
+	</div>
+} @* bal_ytd.Visible (end) *@
+@if (s_glchart.remark.Visible) { // remark.Visible (begin)
+	<div id="r_remark" class="form-group row">
+		<label id="elh_s_glchart_remark" for="x_remark" class="@s_glchart_Edit.LeftColumnClass">@Html.Raw(s_glchart.remark.Caption)@Html.Raw(s_glchart.remark.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_glchart_Edit.RightColumnClass"><div @Html.Raw(s_glchart.remark.CellAttributes)>
+<span id="el_s_glchart_remark">
+<input type="text" data-table="s_glchart" data-field="x_remark" name="x_remark" id="x_remark" size="30" maxlength="100" placeholder="@s_glchart.remark.PlaceHolder" value="@s_glchart.remark.EditValue" @Html.Raw(s_glchart.remark.EditAttributes)>
+</span>
+@Html.Raw(s_glchart.remark.CustomMessage)</div></div>
+	</div>
+} @* remark.Visible (end) *@
+</div><!-- /page* -->
+@{ s_glchart_Edit.CloseRecordset(); }
+@if (!s_glchart_Edit.IsModal) {
+@:<div class="form-group row"><!-- buttons .form-group -->
+	@:<div class="@s_glchart_Edit.OffsetColumnClass"><!-- buttons offset -->
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("SaveBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_glchart_Edit.ReturnUrl)">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+	@:</div><!-- /buttons offset -->
+@:</div><!-- /buttons .form-group -->
+}
+</form>
+@s_glchart_Edit.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

@@ -1,0 +1,143 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_servicetype_View.Page_Render();
+
+	// Check action result
+	if (s_servicetype_View.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_servicetype.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "view";
+var fs_servicetypeview = currentForm = new ew.Form("fs_servicetypeview", "view");
+
+// Form_CustomValidate event
+fs_servicetypeview.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_servicetypeview.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_servicetype.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+	@s_servicetype_View.ExportOptions.RenderBody()
+	@s_servicetype_View.OtherOptions.RenderBody()
+	<div class="clearfix"></div>
+</div>
+}
+@s_servicetype_View.ShowPageHeader()
+@s_servicetype_View.ShowMessages()
+<form name="fs_servicetypeview" id="fs_servicetypeview" class="form-inline ew-form ew-view-form" method="post">
+@if (s_servicetype_View.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="modal" value="@ConvertToInt(s_servicetype_View.IsModal)">
+<table class="table table-striped table-sm ew-view-table">
+@if (s_servicetype.Id.Visible) { @* s_servicetype.Id.Visible (begin) *@
+	<tr id="r_Id">
+		<td class="@s_servicetype_View.TableLeftColumnClass"><span id="elh_s_servicetype_Id">@Html.Raw(s_servicetype.Id.Caption)</span></td>
+		<td data-name="Id" @Html.Raw(s_servicetype.Id.CellAttributes)>
+<span id="el_s_servicetype_Id">
+<span @Html.Raw(s_servicetype.Id.ViewAttributes)>
+@Html.Raw(s_servicetype.Id.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_servicetype.Id.Visible (end) *@
+@if (s_servicetype.service_type.Visible) { @* s_servicetype.service_type.Visible (begin) *@
+	<tr id="r_service_type">
+		<td class="@s_servicetype_View.TableLeftColumnClass"><span id="elh_s_servicetype_service_type">@Html.Raw(s_servicetype.service_type.Caption)</span></td>
+		<td data-name="service_type" @Html.Raw(s_servicetype.service_type.CellAttributes)>
+<span id="el_s_servicetype_service_type">
+<span @Html.Raw(s_servicetype.service_type.ViewAttributes)>
+@Html.Raw(s_servicetype.service_type.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_servicetype.service_type.Visible (end) *@
+@if (s_servicetype.description.Visible) { @* s_servicetype.description.Visible (begin) *@
+	<tr id="r_description">
+		<td class="@s_servicetype_View.TableLeftColumnClass"><span id="elh_s_servicetype_description">@Html.Raw(s_servicetype.description.Caption)</span></td>
+		<td data-name="description" @Html.Raw(s_servicetype.description.CellAttributes)>
+<span id="el_s_servicetype_description">
+<span @Html.Raw(s_servicetype.description.ViewAttributes)>
+@Html.Raw(s_servicetype.description.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_servicetype.description.Visible (end) *@
+@if (s_servicetype.dt_upd.Visible) { @* s_servicetype.dt_upd.Visible (begin) *@
+	<tr id="r_dt_upd">
+		<td class="@s_servicetype_View.TableLeftColumnClass"><span id="elh_s_servicetype_dt_upd">@Html.Raw(s_servicetype.dt_upd.Caption)</span></td>
+		<td data-name="dt_upd" @Html.Raw(s_servicetype.dt_upd.CellAttributes)>
+<span id="el_s_servicetype_dt_upd">
+<span @Html.Raw(s_servicetype.dt_upd.ViewAttributes)>
+@Html.Raw(s_servicetype.dt_upd.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_servicetype.dt_upd.Visible (end) *@
+@if (s_servicetype.id_upd.Visible) { @* s_servicetype.id_upd.Visible (begin) *@
+	<tr id="r_id_upd">
+		<td class="@s_servicetype_View.TableLeftColumnClass"><span id="elh_s_servicetype_id_upd">@Html.Raw(s_servicetype.id_upd.Caption)</span></td>
+		<td data-name="id_upd" @Html.Raw(s_servicetype.id_upd.CellAttributes)>
+<span id="el_s_servicetype_id_upd">
+<span @Html.Raw(s_servicetype.id_upd.ViewAttributes)>
+@Html.Raw(s_servicetype.id_upd.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_servicetype.id_upd.Visible (end) *@
+</table>
+@{ s_servicetype_View.CloseRecordset(); }
+</form>
+@s_servicetype_View.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_servicetype.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

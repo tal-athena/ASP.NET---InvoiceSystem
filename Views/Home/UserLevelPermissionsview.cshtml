@@ -1,0 +1,121 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	UserLevelPermissions_View.Page_Render();
+
+	// Check action result
+	if (UserLevelPermissions_View.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!UserLevelPermissions.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "view";
+var fUserLevelPermissionsview = currentForm = new ew.Form("fUserLevelPermissionsview", "view");
+
+// Form_CustomValidate event
+fUserLevelPermissionsview.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fUserLevelPermissionsview.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!UserLevelPermissions.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+	@UserLevelPermissions_View.ExportOptions.RenderBody()
+	@UserLevelPermissions_View.OtherOptions.RenderBody()
+	<div class="clearfix"></div>
+</div>
+}
+@UserLevelPermissions_View.ShowPageHeader()
+@UserLevelPermissions_View.ShowMessages()
+<form name="fUserLevelPermissionsview" id="fUserLevelPermissionsview" class="form-inline ew-form ew-view-form" method="post">
+@if (UserLevelPermissions_View.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="modal" value="@ConvertToInt(UserLevelPermissions_View.IsModal)">
+<table class="table table-striped table-sm ew-view-table">
+@if (UserLevelPermissions.UserLevelID.Visible) { @* UserLevelPermissions.UserLevelID.Visible (begin) *@
+	<tr id="r_UserLevelID">
+		<td class="@UserLevelPermissions_View.TableLeftColumnClass"><span id="elh_UserLevelPermissions_UserLevelID">@Html.Raw(UserLevelPermissions.UserLevelID.Caption)</span></td>
+		<td data-name="UserLevelID" @Html.Raw(UserLevelPermissions.UserLevelID.CellAttributes)>
+<span id="el_UserLevelPermissions_UserLevelID">
+<span @Html.Raw(UserLevelPermissions.UserLevelID.ViewAttributes)>
+@Html.Raw(UserLevelPermissions.UserLevelID.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* UserLevelPermissions.UserLevelID.Visible (end) *@
+@if (UserLevelPermissions._TableName.Visible) { @* UserLevelPermissions._TableName.Visible (begin) *@
+	<tr id="r__TableName">
+		<td class="@UserLevelPermissions_View.TableLeftColumnClass"><span id="elh_UserLevelPermissions__TableName">@Html.Raw(UserLevelPermissions._TableName.Caption)</span></td>
+		<td data-name="_TableName" @Html.Raw(UserLevelPermissions._TableName.CellAttributes)>
+<span id="el_UserLevelPermissions__TableName">
+<span @Html.Raw(UserLevelPermissions._TableName.ViewAttributes)>
+@Html.Raw(UserLevelPermissions._TableName.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* UserLevelPermissions._TableName.Visible (end) *@
+@if (UserLevelPermissions.Permission.Visible) { @* UserLevelPermissions.Permission.Visible (begin) *@
+	<tr id="r_Permission">
+		<td class="@UserLevelPermissions_View.TableLeftColumnClass"><span id="elh_UserLevelPermissions_Permission">@Html.Raw(UserLevelPermissions.Permission.Caption)</span></td>
+		<td data-name="Permission" @Html.Raw(UserLevelPermissions.Permission.CellAttributes)>
+<span id="el_UserLevelPermissions_Permission">
+<span @Html.Raw(UserLevelPermissions.Permission.ViewAttributes)>
+@Html.Raw(UserLevelPermissions.Permission.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* UserLevelPermissions.Permission.Visible (end) *@
+</table>
+@{ UserLevelPermissions_View.CloseRecordset(); }
+</form>
+@UserLevelPermissions_View.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!UserLevelPermissions.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

@@ -1,0 +1,250 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_taxmaster_Delete.Page_Render();
+
+	// Check action result
+	if (s_taxmaster_Delete.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "delete";
+var fs_taxmasterdelete = currentForm = new ew.Form("fs_taxmasterdelete", "delete");
+
+// Form_CustomValidate event
+fs_taxmasterdelete.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_taxmasterdelete.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_taxmaster_Delete.ShowPageHeader()
+@s_taxmaster_Delete.ShowMessages()
+<form name="fs_taxmasterdelete" id="fs_taxmasterdelete" class="form-inline ew-form ew-delete-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_taxmaster_Delete.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="delete">
+@foreach (string key in s_taxmaster_Delete.RecordKeys) {
+<input type="hidden" name="key_m" value="@key">
+}
+<div class="card ew-card ew-grid">
+<div class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+<table class="table ew-table">
+	<thead>
+	<tr class="ew-table-header">
+@if (s_taxmaster.Id.Visible) { // Id (begin)
+		<th class="@Html.Raw(s_taxmaster.Id.HeaderCellClass)"><span id="elh_s_taxmaster_Id" class="s_taxmaster_Id">@Html.Raw(s_taxmaster.Id.Caption)</span></th>
+} @* Id.Visible (end) *@
+@if (s_taxmaster.tax_code.Visible) { // tax_code (begin)
+		<th class="@Html.Raw(s_taxmaster.tax_code.HeaderCellClass)"><span id="elh_s_taxmaster_tax_code" class="s_taxmaster_tax_code">@Html.Raw(s_taxmaster.tax_code.Caption)</span></th>
+} @* tax_code.Visible (end) *@
+@if (s_taxmaster.description.Visible) { // description (begin)
+		<th class="@Html.Raw(s_taxmaster.description.HeaderCellClass)"><span id="elh_s_taxmaster_description" class="s_taxmaster_description">@Html.Raw(s_taxmaster.description.Caption)</span></th>
+} @* description.Visible (end) *@
+@if (s_taxmaster.tax_type.Visible) { // tax_type (begin)
+		<th class="@Html.Raw(s_taxmaster.tax_type.HeaderCellClass)"><span id="elh_s_taxmaster_tax_type" class="s_taxmaster_tax_type">@Html.Raw(s_taxmaster.tax_type.Caption)</span></th>
+} @* tax_type.Visible (end) *@
+@if (s_taxmaster.in_out.Visible) { // in_out (begin)
+		<th class="@Html.Raw(s_taxmaster.in_out.HeaderCellClass)"><span id="elh_s_taxmaster_in_out" class="s_taxmaster_in_out">@Html.Raw(s_taxmaster.in_out.Caption)</span></th>
+} @* in_out.Visible (end) *@
+@if (s_taxmaster.gl_acct.Visible) { // gl_acct (begin)
+		<th class="@Html.Raw(s_taxmaster.gl_acct.HeaderCellClass)"><span id="elh_s_taxmaster_gl_acct" class="s_taxmaster_gl_acct">@Html.Raw(s_taxmaster.gl_acct.Caption)</span></th>
+} @* gl_acct.Visible (end) *@
+@if (s_taxmaster.tax_rate.Visible) { // tax_rate (begin)
+		<th class="@Html.Raw(s_taxmaster.tax_rate.HeaderCellClass)"><span id="elh_s_taxmaster_tax_rate" class="s_taxmaster_tax_rate">@Html.Raw(s_taxmaster.tax_rate.Caption)</span></th>
+} @* tax_rate.Visible (end) *@
+@if (s_taxmaster.short_desc.Visible) { // short_desc (begin)
+		<th class="@Html.Raw(s_taxmaster.short_desc.HeaderCellClass)"><span id="elh_s_taxmaster_short_desc" class="s_taxmaster_short_desc">@Html.Raw(s_taxmaster.short_desc.Caption)</span></th>
+} @* short_desc.Visible (end) *@
+@if (s_taxmaster.sls_acct.Visible) { // sls_acct (begin)
+		<th class="@Html.Raw(s_taxmaster.sls_acct.HeaderCellClass)"><span id="elh_s_taxmaster_sls_acct" class="s_taxmaster_sls_acct">@Html.Raw(s_taxmaster.sls_acct.Caption)</span></th>
+} @* sls_acct.Visible (end) *@
+@if (s_taxmaster.sls_dept.Visible) { // sls_dept (begin)
+		<th class="@Html.Raw(s_taxmaster.sls_dept.HeaderCellClass)"><span id="elh_s_taxmaster_sls_dept" class="s_taxmaster_sls_dept">@Html.Raw(s_taxmaster.sls_dept.Caption)</span></th>
+} @* sls_dept.Visible (end) *@
+@if (s_taxmaster.dt_obsolete.Visible) { // dt_obsolete (begin)
+		<th class="@Html.Raw(s_taxmaster.dt_obsolete.HeaderCellClass)"><span id="elh_s_taxmaster_dt_obsolete" class="s_taxmaster_dt_obsolete">@Html.Raw(s_taxmaster.dt_obsolete.Caption)</span></th>
+} @* dt_obsolete.Visible (end) *@
+@if (s_taxmaster.id_obsolete.Visible) { // id_obsolete (begin)
+		<th class="@Html.Raw(s_taxmaster.id_obsolete.HeaderCellClass)"><span id="elh_s_taxmaster_id_obsolete" class="s_taxmaster_id_obsolete">@Html.Raw(s_taxmaster.id_obsolete.Caption)</span></th>
+} @* id_obsolete.Visible (end) *@
+	</tr>
+	</thead>
+	<tbody>
+@{ s_taxmaster_Delete.RecordCount = 0; }
+@while (s_taxmaster_Delete.Recordset != null && await s_taxmaster_Delete.Recordset.ReadAsync()) { // DN
+	s_taxmaster_Delete.RecordCount++;
+	s_taxmaster_Delete.RowCnt++;
+
+	// Set row properties
+	s_taxmaster_Delete.ResetAttributes();
+	s_taxmaster_Delete.RowType = Config.RowTypeView; // View
+
+	// Get the field contents
+	await s_taxmaster_Delete.LoadRowValues(s_taxmaster_Delete.Recordset);
+
+	// Render row
+	await s_taxmaster_Delete.RenderRow();
+	<tr @Html.Raw(s_taxmaster_Delete.RowAttributes)>
+@if (s_taxmaster.Id.Visible) { // Id (begin)
+		<td @Html.Raw(s_taxmaster.Id.CellAttributes)>
+<span id="el@(s_taxmaster_Delete.RowCnt)_s_taxmaster_Id" class="s_taxmaster_Id">
+<span @Html.Raw(s_taxmaster.Id.ViewAttributes)>
+@Html.Raw(s_taxmaster.Id.GetViewValue())</span>
+</span>
+</td>
+} @* Id.Visible (end) *@
+@if (s_taxmaster.tax_code.Visible) { // tax_code (begin)
+		<td @Html.Raw(s_taxmaster.tax_code.CellAttributes)>
+<span id="el@(s_taxmaster_Delete.RowCnt)_s_taxmaster_tax_code" class="s_taxmaster_tax_code">
+<span @Html.Raw(s_taxmaster.tax_code.ViewAttributes)>
+@Html.Raw(s_taxmaster.tax_code.GetViewValue())</span>
+</span>
+</td>
+} @* tax_code.Visible (end) *@
+@if (s_taxmaster.description.Visible) { // description (begin)
+		<td @Html.Raw(s_taxmaster.description.CellAttributes)>
+<span id="el@(s_taxmaster_Delete.RowCnt)_s_taxmaster_description" class="s_taxmaster_description">
+<span @Html.Raw(s_taxmaster.description.ViewAttributes)>
+@Html.Raw(s_taxmaster.description.GetViewValue())</span>
+</span>
+</td>
+} @* description.Visible (end) *@
+@if (s_taxmaster.tax_type.Visible) { // tax_type (begin)
+		<td @Html.Raw(s_taxmaster.tax_type.CellAttributes)>
+<span id="el@(s_taxmaster_Delete.RowCnt)_s_taxmaster_tax_type" class="s_taxmaster_tax_type">
+<span @Html.Raw(s_taxmaster.tax_type.ViewAttributes)>
+@Html.Raw(s_taxmaster.tax_type.GetViewValue())</span>
+</span>
+</td>
+} @* tax_type.Visible (end) *@
+@if (s_taxmaster.in_out.Visible) { // in_out (begin)
+		<td @Html.Raw(s_taxmaster.in_out.CellAttributes)>
+<span id="el@(s_taxmaster_Delete.RowCnt)_s_taxmaster_in_out" class="s_taxmaster_in_out">
+<span @Html.Raw(s_taxmaster.in_out.ViewAttributes)>
+@Html.Raw(s_taxmaster.in_out.GetViewValue())</span>
+</span>
+</td>
+} @* in_out.Visible (end) *@
+@if (s_taxmaster.gl_acct.Visible) { // gl_acct (begin)
+		<td @Html.Raw(s_taxmaster.gl_acct.CellAttributes)>
+<span id="el@(s_taxmaster_Delete.RowCnt)_s_taxmaster_gl_acct" class="s_taxmaster_gl_acct">
+<span @Html.Raw(s_taxmaster.gl_acct.ViewAttributes)>
+@Html.Raw(s_taxmaster.gl_acct.GetViewValue())</span>
+</span>
+</td>
+} @* gl_acct.Visible (end) *@
+@if (s_taxmaster.tax_rate.Visible) { // tax_rate (begin)
+		<td @Html.Raw(s_taxmaster.tax_rate.CellAttributes)>
+<span id="el@(s_taxmaster_Delete.RowCnt)_s_taxmaster_tax_rate" class="s_taxmaster_tax_rate">
+<span @Html.Raw(s_taxmaster.tax_rate.ViewAttributes)>
+@Html.Raw(s_taxmaster.tax_rate.GetViewValue())</span>
+</span>
+</td>
+} @* tax_rate.Visible (end) *@
+@if (s_taxmaster.short_desc.Visible) { // short_desc (begin)
+		<td @Html.Raw(s_taxmaster.short_desc.CellAttributes)>
+<span id="el@(s_taxmaster_Delete.RowCnt)_s_taxmaster_short_desc" class="s_taxmaster_short_desc">
+<span @Html.Raw(s_taxmaster.short_desc.ViewAttributes)>
+@Html.Raw(s_taxmaster.short_desc.GetViewValue())</span>
+</span>
+</td>
+} @* short_desc.Visible (end) *@
+@if (s_taxmaster.sls_acct.Visible) { // sls_acct (begin)
+		<td @Html.Raw(s_taxmaster.sls_acct.CellAttributes)>
+<span id="el@(s_taxmaster_Delete.RowCnt)_s_taxmaster_sls_acct" class="s_taxmaster_sls_acct">
+<span @Html.Raw(s_taxmaster.sls_acct.ViewAttributes)>
+@Html.Raw(s_taxmaster.sls_acct.GetViewValue())</span>
+</span>
+</td>
+} @* sls_acct.Visible (end) *@
+@if (s_taxmaster.sls_dept.Visible) { // sls_dept (begin)
+		<td @Html.Raw(s_taxmaster.sls_dept.CellAttributes)>
+<span id="el@(s_taxmaster_Delete.RowCnt)_s_taxmaster_sls_dept" class="s_taxmaster_sls_dept">
+<span @Html.Raw(s_taxmaster.sls_dept.ViewAttributes)>
+@Html.Raw(s_taxmaster.sls_dept.GetViewValue())</span>
+</span>
+</td>
+} @* sls_dept.Visible (end) *@
+@if (s_taxmaster.dt_obsolete.Visible) { // dt_obsolete (begin)
+		<td @Html.Raw(s_taxmaster.dt_obsolete.CellAttributes)>
+<span id="el@(s_taxmaster_Delete.RowCnt)_s_taxmaster_dt_obsolete" class="s_taxmaster_dt_obsolete">
+<span @Html.Raw(s_taxmaster.dt_obsolete.ViewAttributes)>
+@Html.Raw(s_taxmaster.dt_obsolete.GetViewValue())</span>
+</span>
+</td>
+} @* dt_obsolete.Visible (end) *@
+@if (s_taxmaster.id_obsolete.Visible) { // id_obsolete (begin)
+		<td @Html.Raw(s_taxmaster.id_obsolete.CellAttributes)>
+<span id="el@(s_taxmaster_Delete.RowCnt)_s_taxmaster_id_obsolete" class="s_taxmaster_id_obsolete">
+<span @Html.Raw(s_taxmaster.id_obsolete.ViewAttributes)>
+@Html.Raw(s_taxmaster.id_obsolete.GetViewValue())</span>
+</span>
+</td>
+} @* id_obsolete.Visible (end) *@
+	</tr>
+}
+@{ s_taxmaster_Delete.CloseRecordset(); }
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<div class="divconfirmdelete">
+  <div>
+	<label>
+		@Html.Raw(Language.Phrase("askconfirmdelete"))
+	</label>
+  </div>
+</div>
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("DeleteBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_taxmaster_Delete.ReturnUrl)">@Language.Phrase("CancelBtn")</button>
+</div>
+</form>
+@s_taxmaster_Delete.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

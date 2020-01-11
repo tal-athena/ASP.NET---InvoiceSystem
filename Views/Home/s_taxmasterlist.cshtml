@@ -1,0 +1,464 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_taxmaster_List.Page_Render();
+
+	// Check action result
+	if (s_taxmaster_List.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_taxmaster.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "list";
+var fs_taxmasterlist = currentForm = new ew.Form("fs_taxmasterlist", "list");
+fs_taxmasterlist.formKeyCountName = "@s_taxmaster_List.FormKeyCountName";
+
+// Form_CustomValidate event
+fs_taxmasterlist.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_taxmasterlist.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+var fs_taxmasterlistsrch = currentSearchForm = new ew.Form("fs_taxmasterlistsrch");
+
+// Filters
+fs_taxmasterlistsrch.filterList = @Html.Raw(await s_taxmaster_List.GetFilterList());
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_taxmaster.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+@if (s_taxmaster_List.TotalRecords > 0 && s_taxmaster_List.ExportOptions.Visible) {
+	s_taxmaster_List.ExportOptions.Render("body");
+}
+@if (s_taxmaster_List.ImportOptions.Visible) {
+	s_taxmaster_List.ImportOptions.Render("body");
+}
+@if (s_taxmaster_List.SearchOptions.Visible) {
+	s_taxmaster_List.SearchOptions.Render("body");
+}
+@if (s_taxmaster_List.FilterOptions.Visible) {
+	s_taxmaster_List.FilterOptions.Render("body");
+}
+<div class="clearfix"></div>
+</div>
+}
+@{ s_taxmaster_List.RenderOtherOptions(); }
+@if (Security.CanSearch) {
+if (!s_taxmaster_List.IsExport() && Empty(s_taxmaster_List.CurrentAction)) { // Begin search form
+<form name="fs_taxmasterlistsrch" id="fs_taxmasterlistsrch" class="form-inline ew-form ew-ext-search-form" action="@AppPath(CurrentPageName())">
+<div id="fs_taxmasterlistsrch-search-panel" class="ew-search-panel collapse@(!Empty(s_taxmaster_List.SearchWhere) ? " show" : " show")">
+<input type="hidden" name="cmd" value="search">
+<div class="ew-basic-search">
+<div id="xsr_1" class="ew-row d-sm-flex">
+	<div class="ew-quick-search input-group">
+	<input type="text" name="@Config.TableBasicSearch" id="@Config.TableBasicSearch" class="form-control" value="@s_taxmaster_List.BasicSearch.SessionKeyword" placeholder="@Language.Phrase("Search")">
+	<input type="hidden" name="@Config.TableBasicSearchType" id="@Config.TableBasicSearchType" value="@s_taxmaster_List.BasicSearch.SessionType">
+	<div class="input-group-append">
+		<button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit">@Html.Raw(Language.Phrase("SearchBtn"))</button>
+		<button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype">@Html.Raw(s_taxmaster_List.BasicSearch.TypeNameShort)</span></button>
+		<div class="dropdown-menu dropdown-menu-right">
+			<a class="dropdown-item @((s_taxmaster_List.BasicSearch.SessionType == "") ? " active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this)">@Html.Raw(Language.Phrase("QuickSearchAuto"))</a>
+			<a class="dropdown-item @((s_taxmaster_List.BasicSearch.SessionType == "=") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'=')">@Html.Raw(Language.Phrase("QuickSearchExact"))</a>
+			<a class="dropdown-item @((s_taxmaster_List.BasicSearch.SessionType == "AND") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'AND')">@Html.Raw(Language.Phrase("QuickSearchAll"))</a>
+			<a class="dropdown-item @((s_taxmaster_List.BasicSearch.SessionType == "OR") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'OR')">@Html.Raw(Language.Phrase("QuickSearchAny"))</a>
+		</div>
+	</div>
+	</div>
+</div>
+</div>
+</div>
+</form>
+} @* End search form *@
+}
+@s_taxmaster_List.ShowPageHeader()
+@s_taxmaster_List.ShowMessages()
+@if (s_taxmaster_List.TotalRecords > 0 || s_taxmaster_List.CurrentAction != "") {
+<div class="card ew-card ew-grid@(s_taxmaster_List.IsAddOrEdit ? " ew-grid-add-edit" : "") s_taxmaster">
+<form name="fs_taxmasterlist" id="fs_taxmasterlist" class="form-inline ew-form ew-list-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_taxmaster_List.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<div id="gmp_s_taxmaster" class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+@if (s_taxmaster_List.TotalRecords > 0 || s_taxmaster.IsGridEdit) { // Begin If TotalRecords > 0
+<table id="tbl_s_taxmasterlist" class="table ew-table"><!-- .ew-table -->
+<thead>
+	<tr class="ew-table-header">
+@{
+
+	// Header row
+	s_taxmaster_List.RowType = Config.RowTypeHeader;
+
+	// Render list options
+	await s_taxmaster_List.RenderListOptions();
+
+	// Render list options (header, left)
+	s_taxmaster_List.ListOptions.Render("header", "left");
+}
+@if (s_taxmaster.Id.Visible) { // Id.Visible (begin)
+	if (s_taxmaster_List.SortUrl(s_taxmaster.Id) == "") {
+		<th data-name="Id" class="@s_taxmaster.Id.HeaderCellClass"><div id="elh_s_taxmaster_Id" class="s_taxmaster_Id"><div class="ew-table-header-caption">@Html.Raw(s_taxmaster.Id.Caption)</div></div></th>
+	} else {
+		<th data-name="Id" class="@s_taxmaster.Id.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_taxmaster.SortUrl(s_taxmaster.Id))',1);"><div id="elh_s_taxmaster_Id" class="s_taxmaster_Id">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_taxmaster.Id.Caption)</span><span class="ew-table-header-sort">@if (s_taxmaster.Id.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_taxmaster.Id.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* Id.Visible (end) *@
+@if (s_taxmaster.tax_code.Visible) { // tax_code.Visible (begin)
+	if (s_taxmaster_List.SortUrl(s_taxmaster.tax_code) == "") {
+		<th data-name="tax_code" class="@s_taxmaster.tax_code.HeaderCellClass"><div id="elh_s_taxmaster_tax_code" class="s_taxmaster_tax_code"><div class="ew-table-header-caption">@Html.Raw(s_taxmaster.tax_code.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_code" class="@s_taxmaster.tax_code.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_taxmaster.SortUrl(s_taxmaster.tax_code))',1);"><div id="elh_s_taxmaster_tax_code" class="s_taxmaster_tax_code">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_taxmaster.tax_code.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_taxmaster.tax_code.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_taxmaster.tax_code.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_code.Visible (end) *@
+@if (s_taxmaster.description.Visible) { // description.Visible (begin)
+	if (s_taxmaster_List.SortUrl(s_taxmaster.description) == "") {
+		<th data-name="description" class="@s_taxmaster.description.HeaderCellClass"><div id="elh_s_taxmaster_description" class="s_taxmaster_description"><div class="ew-table-header-caption">@Html.Raw(s_taxmaster.description.Caption)</div></div></th>
+	} else {
+		<th data-name="description" class="@s_taxmaster.description.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_taxmaster.SortUrl(s_taxmaster.description))',1);"><div id="elh_s_taxmaster_description" class="s_taxmaster_description">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_taxmaster.description.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_taxmaster.description.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_taxmaster.description.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* description.Visible (end) *@
+@if (s_taxmaster.tax_type.Visible) { // tax_type.Visible (begin)
+	if (s_taxmaster_List.SortUrl(s_taxmaster.tax_type) == "") {
+		<th data-name="tax_type" class="@s_taxmaster.tax_type.HeaderCellClass"><div id="elh_s_taxmaster_tax_type" class="s_taxmaster_tax_type"><div class="ew-table-header-caption">@Html.Raw(s_taxmaster.tax_type.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_type" class="@s_taxmaster.tax_type.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_taxmaster.SortUrl(s_taxmaster.tax_type))',1);"><div id="elh_s_taxmaster_tax_type" class="s_taxmaster_tax_type">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_taxmaster.tax_type.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_taxmaster.tax_type.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_taxmaster.tax_type.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_type.Visible (end) *@
+@if (s_taxmaster.in_out.Visible) { // in_out.Visible (begin)
+	if (s_taxmaster_List.SortUrl(s_taxmaster.in_out) == "") {
+		<th data-name="in_out" class="@s_taxmaster.in_out.HeaderCellClass"><div id="elh_s_taxmaster_in_out" class="s_taxmaster_in_out"><div class="ew-table-header-caption">@Html.Raw(s_taxmaster.in_out.Caption)</div></div></th>
+	} else {
+		<th data-name="in_out" class="@s_taxmaster.in_out.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_taxmaster.SortUrl(s_taxmaster.in_out))',1);"><div id="elh_s_taxmaster_in_out" class="s_taxmaster_in_out">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_taxmaster.in_out.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_taxmaster.in_out.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_taxmaster.in_out.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* in_out.Visible (end) *@
+@if (s_taxmaster.gl_acct.Visible) { // gl_acct.Visible (begin)
+	if (s_taxmaster_List.SortUrl(s_taxmaster.gl_acct) == "") {
+		<th data-name="gl_acct" class="@s_taxmaster.gl_acct.HeaderCellClass"><div id="elh_s_taxmaster_gl_acct" class="s_taxmaster_gl_acct"><div class="ew-table-header-caption">@Html.Raw(s_taxmaster.gl_acct.Caption)</div></div></th>
+	} else {
+		<th data-name="gl_acct" class="@s_taxmaster.gl_acct.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_taxmaster.SortUrl(s_taxmaster.gl_acct))',1);"><div id="elh_s_taxmaster_gl_acct" class="s_taxmaster_gl_acct">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_taxmaster.gl_acct.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_taxmaster.gl_acct.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_taxmaster.gl_acct.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* gl_acct.Visible (end) *@
+@if (s_taxmaster.tax_rate.Visible) { // tax_rate.Visible (begin)
+	if (s_taxmaster_List.SortUrl(s_taxmaster.tax_rate) == "") {
+		<th data-name="tax_rate" class="@s_taxmaster.tax_rate.HeaderCellClass"><div id="elh_s_taxmaster_tax_rate" class="s_taxmaster_tax_rate"><div class="ew-table-header-caption">@Html.Raw(s_taxmaster.tax_rate.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_rate" class="@s_taxmaster.tax_rate.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_taxmaster.SortUrl(s_taxmaster.tax_rate))',1);"><div id="elh_s_taxmaster_tax_rate" class="s_taxmaster_tax_rate">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_taxmaster.tax_rate.Caption)</span><span class="ew-table-header-sort">@if (s_taxmaster.tax_rate.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_taxmaster.tax_rate.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_rate.Visible (end) *@
+@if (s_taxmaster.short_desc.Visible) { // short_desc.Visible (begin)
+	if (s_taxmaster_List.SortUrl(s_taxmaster.short_desc) == "") {
+		<th data-name="short_desc" class="@s_taxmaster.short_desc.HeaderCellClass"><div id="elh_s_taxmaster_short_desc" class="s_taxmaster_short_desc"><div class="ew-table-header-caption">@Html.Raw(s_taxmaster.short_desc.Caption)</div></div></th>
+	} else {
+		<th data-name="short_desc" class="@s_taxmaster.short_desc.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_taxmaster.SortUrl(s_taxmaster.short_desc))',1);"><div id="elh_s_taxmaster_short_desc" class="s_taxmaster_short_desc">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_taxmaster.short_desc.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_taxmaster.short_desc.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_taxmaster.short_desc.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* short_desc.Visible (end) *@
+@if (s_taxmaster.sls_acct.Visible) { // sls_acct.Visible (begin)
+	if (s_taxmaster_List.SortUrl(s_taxmaster.sls_acct) == "") {
+		<th data-name="sls_acct" class="@s_taxmaster.sls_acct.HeaderCellClass"><div id="elh_s_taxmaster_sls_acct" class="s_taxmaster_sls_acct"><div class="ew-table-header-caption">@Html.Raw(s_taxmaster.sls_acct.Caption)</div></div></th>
+	} else {
+		<th data-name="sls_acct" class="@s_taxmaster.sls_acct.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_taxmaster.SortUrl(s_taxmaster.sls_acct))',1);"><div id="elh_s_taxmaster_sls_acct" class="s_taxmaster_sls_acct">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_taxmaster.sls_acct.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_taxmaster.sls_acct.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_taxmaster.sls_acct.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* sls_acct.Visible (end) *@
+@if (s_taxmaster.sls_dept.Visible) { // sls_dept.Visible (begin)
+	if (s_taxmaster_List.SortUrl(s_taxmaster.sls_dept) == "") {
+		<th data-name="sls_dept" class="@s_taxmaster.sls_dept.HeaderCellClass"><div id="elh_s_taxmaster_sls_dept" class="s_taxmaster_sls_dept"><div class="ew-table-header-caption">@Html.Raw(s_taxmaster.sls_dept.Caption)</div></div></th>
+	} else {
+		<th data-name="sls_dept" class="@s_taxmaster.sls_dept.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_taxmaster.SortUrl(s_taxmaster.sls_dept))',1);"><div id="elh_s_taxmaster_sls_dept" class="s_taxmaster_sls_dept">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_taxmaster.sls_dept.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_taxmaster.sls_dept.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_taxmaster.sls_dept.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* sls_dept.Visible (end) *@
+@if (s_taxmaster.dt_obsolete.Visible) { // dt_obsolete.Visible (begin)
+	if (s_taxmaster_List.SortUrl(s_taxmaster.dt_obsolete) == "") {
+		<th data-name="dt_obsolete" class="@s_taxmaster.dt_obsolete.HeaderCellClass"><div id="elh_s_taxmaster_dt_obsolete" class="s_taxmaster_dt_obsolete"><div class="ew-table-header-caption">@Html.Raw(s_taxmaster.dt_obsolete.Caption)</div></div></th>
+	} else {
+		<th data-name="dt_obsolete" class="@s_taxmaster.dt_obsolete.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_taxmaster.SortUrl(s_taxmaster.dt_obsolete))',1);"><div id="elh_s_taxmaster_dt_obsolete" class="s_taxmaster_dt_obsolete">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_taxmaster.dt_obsolete.Caption)</span><span class="ew-table-header-sort">@if (s_taxmaster.dt_obsolete.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_taxmaster.dt_obsolete.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* dt_obsolete.Visible (end) *@
+@if (s_taxmaster.id_obsolete.Visible) { // id_obsolete.Visible (begin)
+	if (s_taxmaster_List.SortUrl(s_taxmaster.id_obsolete) == "") {
+		<th data-name="id_obsolete" class="@s_taxmaster.id_obsolete.HeaderCellClass"><div id="elh_s_taxmaster_id_obsolete" class="s_taxmaster_id_obsolete"><div class="ew-table-header-caption">@Html.Raw(s_taxmaster.id_obsolete.Caption)</div></div></th>
+	} else {
+		<th data-name="id_obsolete" class="@s_taxmaster.id_obsolete.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_taxmaster.SortUrl(s_taxmaster.id_obsolete))',1);"><div id="elh_s_taxmaster_id_obsolete" class="s_taxmaster_id_obsolete">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_taxmaster.id_obsolete.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_taxmaster.id_obsolete.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_taxmaster.id_obsolete.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* id_obsolete.Visible (end) *@
+@{
+
+	// Render list options (header, right)
+	s_taxmaster_List.ListOptions.Render("header", "right");
+}
+	</tr>
+</thead>
+<tbody>
+@{ // Begin Code
+if (s_taxmaster_List.ExportAll && s_taxmaster_List.IsExport()) {
+	s_taxmaster_List.StopRecord = s_taxmaster_List.TotalRecords;
+} else {
+
+	// Set the last record to display
+	if (s_taxmaster_List.TotalRecords > s_taxmaster_List.StartRecord + s_taxmaster_List.DisplayRecords - 1) {
+		s_taxmaster_List.StopRecord = s_taxmaster_List.StartRecord + s_taxmaster_List.DisplayRecords - 1;
+	} else {
+		s_taxmaster_List.StopRecord = s_taxmaster_List.TotalRecords;
+	}
+}
+if (s_taxmaster_List.Recordset != null && s_taxmaster_List.Recordset.HasRows) {
+	if (!s_taxmaster_List.Connection.SelectOffset) { // DN
+		for (var i = 1; i <= s_taxmaster_List.StartRecord - 1; i++) { // Move to first record
+			if (await s_taxmaster_List.Recordset.ReadAsync()) {
+				s_taxmaster_List.RecordCount++;
+			}
+		}
+	} else {
+		s_taxmaster_List.RecordCount = s_taxmaster_List.StartRecord - 1;
+	}
+} else if (!s_taxmaster_List.AllowAddDeleteRow && s_taxmaster_List.StopRecord == 0) {
+	s_taxmaster_List.StopRecord = s_taxmaster_List.GridAddRowCount;
+}
+
+// Initialize aggregate
+s_taxmaster_List.RowType = Config.RowTypeAggregateInit;
+s_taxmaster_List.ResetAttributes();
+await s_taxmaster_List.RenderRow();
+
+// Output data rows
+bool eof = (s_taxmaster_List.Recordset == null); // DN
+while (s_taxmaster_List.RecordCount < s_taxmaster_List.StopRecord) { // Begin While
+	if (!s_taxmaster_List.IsGridAdd && !eof) { // DN
+		eof = !await s_taxmaster_List.Recordset.ReadAsync();
+	}
+	s_taxmaster_List.RecordCount++;
+	if (s_taxmaster_List.RecordCount >= s_taxmaster_List.StartRecord) {
+		s_taxmaster_List.RowCnt++;
+
+		// Set up key count
+		s_taxmaster_List.KeyCount = ConvertToInt(s_taxmaster_List.RowIndex);
+
+		// Init row class and style
+		s_taxmaster_List.ResetAttributes();
+		s_taxmaster_List.CssClass = "";
+		if (s_taxmaster_List.IsGridAdd) {
+		} else {
+			await s_taxmaster_List.LoadRowValues(s_taxmaster_List.Recordset); // Load row values
+		}
+		s_taxmaster_List.RowType = Config.RowTypeView; // Render view
+
+		// Set up row id / data-rowindex
+		s_taxmaster_List.RowAttrs.Add("data-rowindex", Convert.ToString(s_taxmaster_List.RowCnt));
+		s_taxmaster_List.RowAttrs.Add("id", "r" + Convert.ToString(s_taxmaster_List.RowCnt) + "_s_taxmaster");
+		s_taxmaster_List.RowAttrs.Add("data-rowtype", Convert.ToString(s_taxmaster_List.RowType));
+
+		// Render row
+		await s_taxmaster_List.RenderRow();
+
+		// Render list options
+		await s_taxmaster_List.RenderListOptions();
+	<tr @Html.Raw(s_taxmaster_List.RowAttributes)>
+	@{
+
+		// Render list options (body, left)
+		s_taxmaster_List.ListOptions.Render("body", "left", s_taxmaster_List.RowCnt);
+	}
+	@if (s_taxmaster.Id.Visible) { // Id.Visible (begin)
+		<td data-name="Id"@Html.Raw(s_taxmaster.Id.CellAttributes)>
+<span id="el@(s_taxmaster_List.RowCnt)_s_taxmaster_Id" class="s_taxmaster_Id">
+<span @Html.Raw(s_taxmaster.Id.ViewAttributes)>
+@Html.Raw(s_taxmaster.Id.GetViewValue())</span>
+</span>
+</td>
+	} @* Id.Visible (end) *@
+	@if (s_taxmaster.tax_code.Visible) { // tax_code.Visible (begin)
+		<td data-name="tax_code"@Html.Raw(s_taxmaster.tax_code.CellAttributes)>
+<span id="el@(s_taxmaster_List.RowCnt)_s_taxmaster_tax_code" class="s_taxmaster_tax_code">
+<span @Html.Raw(s_taxmaster.tax_code.ViewAttributes)>
+@Html.Raw(s_taxmaster.tax_code.GetViewValue())</span>
+</span>
+</td>
+	} @* tax_code.Visible (end) *@
+	@if (s_taxmaster.description.Visible) { // description.Visible (begin)
+		<td data-name="description"@Html.Raw(s_taxmaster.description.CellAttributes)>
+<span id="el@(s_taxmaster_List.RowCnt)_s_taxmaster_description" class="s_taxmaster_description">
+<span @Html.Raw(s_taxmaster.description.ViewAttributes)>
+@Html.Raw(s_taxmaster.description.GetViewValue())</span>
+</span>
+</td>
+	} @* description.Visible (end) *@
+	@if (s_taxmaster.tax_type.Visible) { // tax_type.Visible (begin)
+		<td data-name="tax_type"@Html.Raw(s_taxmaster.tax_type.CellAttributes)>
+<span id="el@(s_taxmaster_List.RowCnt)_s_taxmaster_tax_type" class="s_taxmaster_tax_type">
+<span @Html.Raw(s_taxmaster.tax_type.ViewAttributes)>
+@Html.Raw(s_taxmaster.tax_type.GetViewValue())</span>
+</span>
+</td>
+	} @* tax_type.Visible (end) *@
+	@if (s_taxmaster.in_out.Visible) { // in_out.Visible (begin)
+		<td data-name="in_out"@Html.Raw(s_taxmaster.in_out.CellAttributes)>
+<span id="el@(s_taxmaster_List.RowCnt)_s_taxmaster_in_out" class="s_taxmaster_in_out">
+<span @Html.Raw(s_taxmaster.in_out.ViewAttributes)>
+@Html.Raw(s_taxmaster.in_out.GetViewValue())</span>
+</span>
+</td>
+	} @* in_out.Visible (end) *@
+	@if (s_taxmaster.gl_acct.Visible) { // gl_acct.Visible (begin)
+		<td data-name="gl_acct"@Html.Raw(s_taxmaster.gl_acct.CellAttributes)>
+<span id="el@(s_taxmaster_List.RowCnt)_s_taxmaster_gl_acct" class="s_taxmaster_gl_acct">
+<span @Html.Raw(s_taxmaster.gl_acct.ViewAttributes)>
+@Html.Raw(s_taxmaster.gl_acct.GetViewValue())</span>
+</span>
+</td>
+	} @* gl_acct.Visible (end) *@
+	@if (s_taxmaster.tax_rate.Visible) { // tax_rate.Visible (begin)
+		<td data-name="tax_rate"@Html.Raw(s_taxmaster.tax_rate.CellAttributes)>
+<span id="el@(s_taxmaster_List.RowCnt)_s_taxmaster_tax_rate" class="s_taxmaster_tax_rate">
+<span @Html.Raw(s_taxmaster.tax_rate.ViewAttributes)>
+@Html.Raw(s_taxmaster.tax_rate.GetViewValue())</span>
+</span>
+</td>
+	} @* tax_rate.Visible (end) *@
+	@if (s_taxmaster.short_desc.Visible) { // short_desc.Visible (begin)
+		<td data-name="short_desc"@Html.Raw(s_taxmaster.short_desc.CellAttributes)>
+<span id="el@(s_taxmaster_List.RowCnt)_s_taxmaster_short_desc" class="s_taxmaster_short_desc">
+<span @Html.Raw(s_taxmaster.short_desc.ViewAttributes)>
+@Html.Raw(s_taxmaster.short_desc.GetViewValue())</span>
+</span>
+</td>
+	} @* short_desc.Visible (end) *@
+	@if (s_taxmaster.sls_acct.Visible) { // sls_acct.Visible (begin)
+		<td data-name="sls_acct"@Html.Raw(s_taxmaster.sls_acct.CellAttributes)>
+<span id="el@(s_taxmaster_List.RowCnt)_s_taxmaster_sls_acct" class="s_taxmaster_sls_acct">
+<span @Html.Raw(s_taxmaster.sls_acct.ViewAttributes)>
+@Html.Raw(s_taxmaster.sls_acct.GetViewValue())</span>
+</span>
+</td>
+	} @* sls_acct.Visible (end) *@
+	@if (s_taxmaster.sls_dept.Visible) { // sls_dept.Visible (begin)
+		<td data-name="sls_dept"@Html.Raw(s_taxmaster.sls_dept.CellAttributes)>
+<span id="el@(s_taxmaster_List.RowCnt)_s_taxmaster_sls_dept" class="s_taxmaster_sls_dept">
+<span @Html.Raw(s_taxmaster.sls_dept.ViewAttributes)>
+@Html.Raw(s_taxmaster.sls_dept.GetViewValue())</span>
+</span>
+</td>
+	} @* sls_dept.Visible (end) *@
+	@if (s_taxmaster.dt_obsolete.Visible) { // dt_obsolete.Visible (begin)
+		<td data-name="dt_obsolete"@Html.Raw(s_taxmaster.dt_obsolete.CellAttributes)>
+<span id="el@(s_taxmaster_List.RowCnt)_s_taxmaster_dt_obsolete" class="s_taxmaster_dt_obsolete">
+<span @Html.Raw(s_taxmaster.dt_obsolete.ViewAttributes)>
+@Html.Raw(s_taxmaster.dt_obsolete.GetViewValue())</span>
+</span>
+</td>
+	} @* dt_obsolete.Visible (end) *@
+	@if (s_taxmaster.id_obsolete.Visible) { // id_obsolete.Visible (begin)
+		<td data-name="id_obsolete"@Html.Raw(s_taxmaster.id_obsolete.CellAttributes)>
+<span id="el@(s_taxmaster_List.RowCnt)_s_taxmaster_id_obsolete" class="s_taxmaster_id_obsolete">
+<span @Html.Raw(s_taxmaster.id_obsolete.ViewAttributes)>
+@Html.Raw(s_taxmaster.id_obsolete.GetViewValue())</span>
+</span>
+</td>
+	} @* id_obsolete.Visible (end) *@
+	@{
+
+		// Render list options (body, right)
+		s_taxmaster_List.ListOptions.Render("body", "right", s_taxmaster_List.RowCnt);
+	}
+	</tr>
+	} @* End if *@
+} @* End While *@
+} @* End Code *@
+</tbody>
+</table><!-- /.ew-table -->
+} @* End If TotalRecords > 0 *@
+@if (Empty(s_taxmaster_List.CurrentAction)) {
+<input type="hidden" name="action" id="action" value="">
+}
+</div><!-- /.ew-grid-middle-panel -->
+</form><!-- /.ew-list-form -->
+@{ s_taxmaster_List.CloseRecordset(); }
+		@if (!s_taxmaster.IsExport()) {
+		<div class="card-footer ew-grid-lower-panel">
+		<div class="ew-list-other-options">
+		@s_taxmaster_List.OtherOptions.RenderBody("bottom")
+		</div>
+		@if (!s_taxmaster_List.IsGridAdd) {
+			<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="@AppPath(CurrentPageName())">
+			@s_taxmaster_List.Pager.Render()
+			</form>
+		}
+		<div class="clearfix"></div>
+		</div>
+		}
+</div><!-- /.ew-grid -->
+}
+@if (s_taxmaster_List.TotalRecords <= 0 && s_taxmaster_List.CurrentAction == "") { // Show other options
+<div class="ew-list-other-options">
+@s_taxmaster_List.OtherOptions.ForEach(opt => opt.ButtonClass = "").RenderBody()
+</div>
+<div class="clearfix"></div>
+}
+@s_taxmaster_List.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_taxmaster.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

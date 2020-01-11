@@ -1,0 +1,495 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_dodetltest_List.Page_Render();
+
+	// Check action result
+	if (s_dodetltest_List.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_dodetltest.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "list";
+var fs_dodetltestlist = currentForm = new ew.Form("fs_dodetltestlist", "list");
+fs_dodetltestlist.formKeyCountName = "@s_dodetltest_List.FormKeyCountName";
+
+// Form_CustomValidate event
+fs_dodetltestlist.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_dodetltestlist.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_dodetltestlist.lists["x_part_code"] = @Html.Raw(s_dodetltest_List.part_code.Lookup.ToClientList());
+fs_dodetltestlist.lists["x_part_code"].options = @Html.Raw(ConvertToJson(s_dodetltest_List.part_code.LookupOptions));
+fs_dodetltestlist.autoSuggests["x_part_code"] = @Html.Raw(ConvertToJson(new Dictionary<string, string> { {"data", "ajax=autosuggest"} }));
+
+// Form object for search
+var fs_dodetltestlistsrch = currentSearchForm = new ew.Form("fs_dodetltestlistsrch");
+
+// Filters
+fs_dodetltestlistsrch.filterList = @Html.Raw(await s_dodetltest_List.GetFilterList());
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_dodetltest.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+@if (s_dodetltest_List.TotalRecords > 0 && s_dodetltest_List.ExportOptions.Visible) {
+	s_dodetltest_List.ExportOptions.Render("body");
+}
+@if (s_dodetltest_List.ImportOptions.Visible) {
+	s_dodetltest_List.ImportOptions.Render("body");
+}
+@if (s_dodetltest_List.SearchOptions.Visible) {
+	s_dodetltest_List.SearchOptions.Render("body");
+}
+@if (s_dodetltest_List.FilterOptions.Visible) {
+	s_dodetltest_List.FilterOptions.Render("body");
+}
+<div class="clearfix"></div>
+</div>
+}
+@if (!s_dodetltest.IsExport() || Config.ExportMasterRecord && s_dodetltest.IsExport("print")) {
+if (!Empty(s_dodetltest_List.DbMasterFilter) && s_dodetltest_List.CurrentMasterTable == "s_dohdrtest") {
+	if (s_dodetltest_List.MasterRecordExists) {
+		@await Html.PartialAsync("s_dohdrtestmaster")
+	}
+}
+}
+@{ s_dodetltest_List.RenderOtherOptions(); }
+@if (Security.CanSearch) {
+if (!s_dodetltest_List.IsExport() && Empty(s_dodetltest_List.CurrentAction)) { // Begin search form
+<form name="fs_dodetltestlistsrch" id="fs_dodetltestlistsrch" class="form-inline ew-form ew-ext-search-form" action="@AppPath(CurrentPageName())">
+<div id="fs_dodetltestlistsrch-search-panel" class="ew-search-panel collapse@(!Empty(s_dodetltest_List.SearchWhere) ? " show" : " show")">
+<input type="hidden" name="cmd" value="search">
+<div class="ew-basic-search">
+<div id="xsr_1" class="ew-row d-sm-flex">
+	<div class="ew-quick-search input-group">
+	<input type="text" name="@Config.TableBasicSearch" id="@Config.TableBasicSearch" class="form-control" value="@s_dodetltest_List.BasicSearch.SessionKeyword" placeholder="@Language.Phrase("Search")">
+	<input type="hidden" name="@Config.TableBasicSearchType" id="@Config.TableBasicSearchType" value="@s_dodetltest_List.BasicSearch.SessionType">
+	<div class="input-group-append">
+		<button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit">@Html.Raw(Language.Phrase("SearchBtn"))</button>
+		<button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype">@Html.Raw(s_dodetltest_List.BasicSearch.TypeNameShort)</span></button>
+		<div class="dropdown-menu dropdown-menu-right">
+			<a class="dropdown-item @((s_dodetltest_List.BasicSearch.SessionType == "") ? " active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this)">@Html.Raw(Language.Phrase("QuickSearchAuto"))</a>
+			<a class="dropdown-item @((s_dodetltest_List.BasicSearch.SessionType == "=") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'=')">@Html.Raw(Language.Phrase("QuickSearchExact"))</a>
+			<a class="dropdown-item @((s_dodetltest_List.BasicSearch.SessionType == "AND") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'AND')">@Html.Raw(Language.Phrase("QuickSearchAll"))</a>
+			<a class="dropdown-item @((s_dodetltest_List.BasicSearch.SessionType == "OR") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'OR')">@Html.Raw(Language.Phrase("QuickSearchAny"))</a>
+		</div>
+	</div>
+	</div>
+</div>
+</div>
+</div>
+</form>
+} @* End search form *@
+}
+@s_dodetltest_List.ShowPageHeader()
+@s_dodetltest_List.ShowMessages()
+@if (s_dodetltest_List.TotalRecords > 0 || s_dodetltest_List.CurrentAction != "") {
+<div class="card ew-card ew-grid@(s_dodetltest_List.IsAddOrEdit ? " ew-grid-add-edit" : "") s_dodetltest">
+<form name="fs_dodetltestlist" id="fs_dodetltestlist" class="form-inline ew-form ew-list-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_dodetltest_List.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+@if (s_dodetltest_List.CurrentMasterTable == "s_dohdrtest" && s_dodetltest_List.CurrentAction != "") {
+<input type="hidden" name="@Config.TableShowMaster" value="s_dohdrtest">
+<input type="hidden" name="fk_TrxId" value="@s_dodetltest_List.Id_dohdrTrxId.SessionValue">
+}
+<div id="gmp_s_dodetltest" class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+@if (s_dodetltest_List.TotalRecords > 0 || s_dodetltest.IsGridEdit) { // Begin If TotalRecords > 0
+<table id="tbl_s_dodetltestlist" class="table ew-table"><!-- .ew-table -->
+<thead>
+	<tr class="ew-table-header">
+@{
+
+	// Header row
+	s_dodetltest_List.RowType = Config.RowTypeHeader;
+
+	// Render list options
+	await s_dodetltest_List.RenderListOptions();
+
+	// Render list options (header, left)
+	s_dodetltest_List.ListOptions.Render("header", "left");
+}
+@if (s_dodetltest.item_no.Visible) { // item_no.Visible (begin)
+	if (s_dodetltest_List.SortUrl(s_dodetltest.item_no) == "") {
+		<th data-name="item_no" class="@s_dodetltest.item_no.HeaderCellClass"><div id="elh_s_dodetltest_item_no" class="s_dodetltest_item_no"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.item_no.Caption)</div></div></th>
+	} else {
+		<th data-name="item_no" class="@s_dodetltest.item_no.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_dodetltest.SortUrl(s_dodetltest.item_no))',1);"><div id="elh_s_dodetltest_item_no" class="s_dodetltest_item_no">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.item_no.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.item_no.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.item_no.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* item_no.Visible (end) *@
+@if (s_dodetltest.item_type.Visible) { // item_type.Visible (begin)
+	if (s_dodetltest_List.SortUrl(s_dodetltest.item_type) == "") {
+		<th data-name="item_type" class="@s_dodetltest.item_type.HeaderCellClass"><div id="elh_s_dodetltest_item_type" class="s_dodetltest_item_type"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.item_type.Caption)</div></div></th>
+	} else {
+		<th data-name="item_type" class="@s_dodetltest.item_type.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_dodetltest.SortUrl(s_dodetltest.item_type))',1);"><div id="elh_s_dodetltest_item_type" class="s_dodetltest_item_type">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.item_type.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_dodetltest.item_type.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.item_type.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* item_type.Visible (end) *@
+@if (s_dodetltest.part_code.Visible) { // part_code.Visible (begin)
+	if (s_dodetltest_List.SortUrl(s_dodetltest.part_code) == "") {
+		<th data-name="part_code" class="@s_dodetltest.part_code.HeaderCellClass"><div id="elh_s_dodetltest_part_code" class="s_dodetltest_part_code"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.part_code.Caption)</div></div></th>
+	} else {
+		<th data-name="part_code" class="@s_dodetltest.part_code.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_dodetltest.SortUrl(s_dodetltest.part_code))',1);"><div id="elh_s_dodetltest_part_code" class="s_dodetltest_part_code">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.part_code.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_dodetltest.part_code.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.part_code.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* part_code.Visible (end) *@
+@if (s_dodetltest.part_desc.Visible) { // part_desc.Visible (begin)
+	if (s_dodetltest_List.SortUrl(s_dodetltest.part_desc) == "") {
+		<th data-name="part_desc" class="@s_dodetltest.part_desc.HeaderCellClass"><div id="elh_s_dodetltest_part_desc" class="s_dodetltest_part_desc"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.part_desc.Caption)</div></div></th>
+	} else {
+		<th data-name="part_desc" class="@s_dodetltest.part_desc.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_dodetltest.SortUrl(s_dodetltest.part_desc))',1);"><div id="elh_s_dodetltest_part_desc" class="s_dodetltest_part_desc">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.part_desc.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_dodetltest.part_desc.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.part_desc.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* part_desc.Visible (end) *@
+@if (s_dodetltest.uom.Visible) { // uom.Visible (begin)
+	if (s_dodetltest_List.SortUrl(s_dodetltest.uom) == "") {
+		<th data-name="uom" class="@s_dodetltest.uom.HeaderCellClass"><div id="elh_s_dodetltest_uom" class="s_dodetltest_uom"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.uom.Caption)</div></div></th>
+	} else {
+		<th data-name="uom" class="@s_dodetltest.uom.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_dodetltest.SortUrl(s_dodetltest.uom))',1);"><div id="elh_s_dodetltest_uom" class="s_dodetltest_uom">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.uom.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_dodetltest.uom.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.uom.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* uom.Visible (end) *@
+@if (s_dodetltest.qty.Visible) { // qty.Visible (begin)
+	if (s_dodetltest_List.SortUrl(s_dodetltest.qty) == "") {
+		<th data-name="qty" class="@s_dodetltest.qty.HeaderCellClass"><div id="elh_s_dodetltest_qty" class="s_dodetltest_qty"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.qty.Caption)</div></div></th>
+	} else {
+		<th data-name="qty" class="@s_dodetltest.qty.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_dodetltest.SortUrl(s_dodetltest.qty))',1);"><div id="elh_s_dodetltest_qty" class="s_dodetltest_qty">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.qty.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.qty.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.qty.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* qty.Visible (end) *@
+@if (s_dodetltest.unit_price.Visible) { // unit_price.Visible (begin)
+	if (s_dodetltest_List.SortUrl(s_dodetltest.unit_price) == "") {
+		<th data-name="unit_price" class="@s_dodetltest.unit_price.HeaderCellClass"><div id="elh_s_dodetltest_unit_price" class="s_dodetltest_unit_price"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.unit_price.Caption)</div></div></th>
+	} else {
+		<th data-name="unit_price" class="@s_dodetltest.unit_price.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_dodetltest.SortUrl(s_dodetltest.unit_price))',1);"><div id="elh_s_dodetltest_unit_price" class="s_dodetltest_unit_price">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.unit_price.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.unit_price.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.unit_price.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* unit_price.Visible (end) *@
+@if (s_dodetltest.amount_origin.Visible) { // amount_origin.Visible (begin)
+	if (s_dodetltest_List.SortUrl(s_dodetltest.amount_origin) == "") {
+		<th data-name="amount_origin" class="@s_dodetltest.amount_origin.HeaderCellClass"><div id="elh_s_dodetltest_amount_origin" class="s_dodetltest_amount_origin"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.amount_origin.Caption)</div></div></th>
+	} else {
+		<th data-name="amount_origin" class="@s_dodetltest.amount_origin.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_dodetltest.SortUrl(s_dodetltest.amount_origin))',1);"><div id="elh_s_dodetltest_amount_origin" class="s_dodetltest_amount_origin">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.amount_origin.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.amount_origin.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.amount_origin.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* amount_origin.Visible (end) *@
+@if (s_dodetltest.tax_code.Visible) { // tax_code.Visible (begin)
+	if (s_dodetltest_List.SortUrl(s_dodetltest.tax_code) == "") {
+		<th data-name="tax_code" class="@s_dodetltest.tax_code.HeaderCellClass"><div id="elh_s_dodetltest_tax_code" class="s_dodetltest_tax_code"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_code.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_code" class="@s_dodetltest.tax_code.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_dodetltest.SortUrl(s_dodetltest.tax_code))',1);"><div id="elh_s_dodetltest_tax_code" class="s_dodetltest_tax_code">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_code.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_dodetltest.tax_code.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.tax_code.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_code.Visible (end) *@
+@if (s_dodetltest.tax_rate.Visible) { // tax_rate.Visible (begin)
+	if (s_dodetltest_List.SortUrl(s_dodetltest.tax_rate) == "") {
+		<th data-name="tax_rate" class="@s_dodetltest.tax_rate.HeaderCellClass"><div id="elh_s_dodetltest_tax_rate" class="s_dodetltest_tax_rate"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_rate.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_rate" class="@s_dodetltest.tax_rate.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_dodetltest.SortUrl(s_dodetltest.tax_rate))',1);"><div id="elh_s_dodetltest_tax_rate" class="s_dodetltest_tax_rate">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_rate.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.tax_rate.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.tax_rate.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_rate.Visible (end) *@
+@if (s_dodetltest.tax_amount_origin.Visible) { // tax_amount_origin.Visible (begin)
+	if (s_dodetltest_List.SortUrl(s_dodetltest.tax_amount_origin) == "") {
+		<th data-name="tax_amount_origin" class="@s_dodetltest.tax_amount_origin.HeaderCellClass"><div id="elh_s_dodetltest_tax_amount_origin" class="s_dodetltest_tax_amount_origin"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_amount_origin.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_amount_origin" class="@s_dodetltest.tax_amount_origin.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_dodetltest.SortUrl(s_dodetltest.tax_amount_origin))',1);"><div id="elh_s_dodetltest_tax_amount_origin" class="s_dodetltest_tax_amount_origin">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_amount_origin.Caption)</span><span class="ew-table-header-sort">@if (s_dodetltest.tax_amount_origin.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.tax_amount_origin.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_amount_origin.Visible (end) *@
+@if (s_dodetltest.to_gl_acct.Visible) { // to_gl_acct.Visible (begin)
+	if (s_dodetltest_List.SortUrl(s_dodetltest.to_gl_acct) == "") {
+		<th data-name="to_gl_acct" class="@s_dodetltest.to_gl_acct.HeaderCellClass"><div id="elh_s_dodetltest_to_gl_acct" class="s_dodetltest_to_gl_acct"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.to_gl_acct.Caption)</div></div></th>
+	} else {
+		<th data-name="to_gl_acct" class="@s_dodetltest.to_gl_acct.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_dodetltest.SortUrl(s_dodetltest.to_gl_acct))',1);"><div id="elh_s_dodetltest_to_gl_acct" class="s_dodetltest_to_gl_acct">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.to_gl_acct.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_dodetltest.to_gl_acct.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.to_gl_acct.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* to_gl_acct.Visible (end) *@
+@if (s_dodetltest.tax_acct.Visible) { // tax_acct.Visible (begin)
+	if (s_dodetltest_List.SortUrl(s_dodetltest.tax_acct) == "") {
+		<th data-name="tax_acct" class="@s_dodetltest.tax_acct.HeaderCellClass"><div id="elh_s_dodetltest_tax_acct" class="s_dodetltest_tax_acct"><div class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_acct.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_acct" class="@s_dodetltest.tax_acct.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_dodetltest.SortUrl(s_dodetltest.tax_acct))',1);"><div id="elh_s_dodetltest_tax_acct" class="s_dodetltest_tax_acct">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_dodetltest.tax_acct.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_dodetltest.tax_acct.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_dodetltest.tax_acct.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_acct.Visible (end) *@
+@{
+
+	// Render list options (header, right)
+	s_dodetltest_List.ListOptions.Render("header", "right");
+}
+	</tr>
+</thead>
+<tbody>
+@{ // Begin Code
+if (s_dodetltest_List.ExportAll && s_dodetltest_List.IsExport()) {
+	s_dodetltest_List.StopRecord = s_dodetltest_List.TotalRecords;
+} else {
+
+	// Set the last record to display
+	if (s_dodetltest_List.TotalRecords > s_dodetltest_List.StartRecord + s_dodetltest_List.DisplayRecords - 1) {
+		s_dodetltest_List.StopRecord = s_dodetltest_List.StartRecord + s_dodetltest_List.DisplayRecords - 1;
+	} else {
+		s_dodetltest_List.StopRecord = s_dodetltest_List.TotalRecords;
+	}
+}
+if (s_dodetltest_List.Recordset != null && s_dodetltest_List.Recordset.HasRows) {
+	if (!s_dodetltest_List.Connection.SelectOffset) { // DN
+		for (var i = 1; i <= s_dodetltest_List.StartRecord - 1; i++) { // Move to first record
+			if (await s_dodetltest_List.Recordset.ReadAsync()) {
+				s_dodetltest_List.RecordCount++;
+			}
+		}
+	} else {
+		s_dodetltest_List.RecordCount = s_dodetltest_List.StartRecord - 1;
+	}
+} else if (!s_dodetltest_List.AllowAddDeleteRow && s_dodetltest_List.StopRecord == 0) {
+	s_dodetltest_List.StopRecord = s_dodetltest_List.GridAddRowCount;
+}
+
+// Initialize aggregate
+s_dodetltest_List.RowType = Config.RowTypeAggregateInit;
+s_dodetltest_List.ResetAttributes();
+await s_dodetltest_List.RenderRow();
+
+// Output data rows
+bool eof = (s_dodetltest_List.Recordset == null); // DN
+while (s_dodetltest_List.RecordCount < s_dodetltest_List.StopRecord) { // Begin While
+	if (!s_dodetltest_List.IsGridAdd && !eof) { // DN
+		eof = !await s_dodetltest_List.Recordset.ReadAsync();
+	}
+	s_dodetltest_List.RecordCount++;
+	if (s_dodetltest_List.RecordCount >= s_dodetltest_List.StartRecord) {
+		s_dodetltest_List.RowCnt++;
+
+		// Set up key count
+		s_dodetltest_List.KeyCount = ConvertToInt(s_dodetltest_List.RowIndex);
+
+		// Init row class and style
+		s_dodetltest_List.ResetAttributes();
+		s_dodetltest_List.CssClass = "";
+		if (s_dodetltest_List.IsGridAdd) {
+		} else {
+			await s_dodetltest_List.LoadRowValues(s_dodetltest_List.Recordset); // Load row values
+		}
+		s_dodetltest_List.RowType = Config.RowTypeView; // Render view
+
+		// Set up row id / data-rowindex
+		s_dodetltest_List.RowAttrs.Add("data-rowindex", Convert.ToString(s_dodetltest_List.RowCnt));
+		s_dodetltest_List.RowAttrs.Add("id", "r" + Convert.ToString(s_dodetltest_List.RowCnt) + "_s_dodetltest");
+		s_dodetltest_List.RowAttrs.Add("data-rowtype", Convert.ToString(s_dodetltest_List.RowType));
+
+		// Render row
+		await s_dodetltest_List.RenderRow();
+
+		// Render list options
+		await s_dodetltest_List.RenderListOptions();
+	<tr @Html.Raw(s_dodetltest_List.RowAttributes)>
+	@{
+
+		// Render list options (body, left)
+		s_dodetltest_List.ListOptions.Render("body", "left", s_dodetltest_List.RowCnt);
+	}
+	@if (s_dodetltest.item_no.Visible) { // item_no.Visible (begin)
+		<td data-name="item_no"@Html.Raw(s_dodetltest.item_no.CellAttributes)>
+<span id="el@(s_dodetltest_List.RowCnt)_s_dodetltest_item_no" class="s_dodetltest_item_no">
+<span @Html.Raw(s_dodetltest.item_no.ViewAttributes)>
+@Html.Raw(s_dodetltest.item_no.GetViewValue())</span>
+</span>
+</td>
+	} @* item_no.Visible (end) *@
+	@if (s_dodetltest.item_type.Visible) { // item_type.Visible (begin)
+		<td data-name="item_type"@Html.Raw(s_dodetltest.item_type.CellAttributes)>
+<span id="el@(s_dodetltest_List.RowCnt)_s_dodetltest_item_type" class="s_dodetltest_item_type">
+<span @Html.Raw(s_dodetltest.item_type.ViewAttributes)>
+@Html.Raw(s_dodetltest.item_type.GetViewValue())</span>
+</span>
+</td>
+	} @* item_type.Visible (end) *@
+	@if (s_dodetltest.part_code.Visible) { // part_code.Visible (begin)
+		<td data-name="part_code"@Html.Raw(s_dodetltest.part_code.CellAttributes)>
+<span id="el@(s_dodetltest_List.RowCnt)_s_dodetltest_part_code" class="s_dodetltest_part_code">
+<span @Html.Raw(s_dodetltest.part_code.ViewAttributes)>
+@Html.Raw(s_dodetltest.part_code.GetViewValue())</span>
+</span>
+</td>
+	} @* part_code.Visible (end) *@
+	@if (s_dodetltest.part_desc.Visible) { // part_desc.Visible (begin)
+		<td data-name="part_desc"@Html.Raw(s_dodetltest.part_desc.CellAttributes)>
+<span id="el@(s_dodetltest_List.RowCnt)_s_dodetltest_part_desc" class="s_dodetltest_part_desc">
+<span @Html.Raw(s_dodetltest.part_desc.ViewAttributes)>
+@Html.Raw(s_dodetltest.part_desc.GetViewValue())</span>
+</span>
+</td>
+	} @* part_desc.Visible (end) *@
+	@if (s_dodetltest.uom.Visible) { // uom.Visible (begin)
+		<td data-name="uom"@Html.Raw(s_dodetltest.uom.CellAttributes)>
+<span id="el@(s_dodetltest_List.RowCnt)_s_dodetltest_uom" class="s_dodetltest_uom">
+<span @Html.Raw(s_dodetltest.uom.ViewAttributes)>
+@Html.Raw(s_dodetltest.uom.GetViewValue())</span>
+</span>
+</td>
+	} @* uom.Visible (end) *@
+	@if (s_dodetltest.qty.Visible) { // qty.Visible (begin)
+		<td data-name="qty"@Html.Raw(s_dodetltest.qty.CellAttributes)>
+<span id="el@(s_dodetltest_List.RowCnt)_s_dodetltest_qty" class="s_dodetltest_qty">
+<span @Html.Raw(s_dodetltest.qty.ViewAttributes)>
+@Html.Raw(s_dodetltest.qty.GetViewValue())</span>
+</span>
+</td>
+	} @* qty.Visible (end) *@
+	@if (s_dodetltest.unit_price.Visible) { // unit_price.Visible (begin)
+		<td data-name="unit_price"@Html.Raw(s_dodetltest.unit_price.CellAttributes)>
+<span id="el@(s_dodetltest_List.RowCnt)_s_dodetltest_unit_price" class="s_dodetltest_unit_price">
+<span @Html.Raw(s_dodetltest.unit_price.ViewAttributes)>
+@Html.Raw(s_dodetltest.unit_price.GetViewValue())</span>
+</span>
+</td>
+	} @* unit_price.Visible (end) *@
+	@if (s_dodetltest.amount_origin.Visible) { // amount_origin.Visible (begin)
+		<td data-name="amount_origin"@Html.Raw(s_dodetltest.amount_origin.CellAttributes)>
+<span id="el@(s_dodetltest_List.RowCnt)_s_dodetltest_amount_origin" class="s_dodetltest_amount_origin">
+<span @Html.Raw(s_dodetltest.amount_origin.ViewAttributes)>
+@Html.Raw(s_dodetltest.amount_origin.GetViewValue())</span>
+</span>
+</td>
+	} @* amount_origin.Visible (end) *@
+	@if (s_dodetltest.tax_code.Visible) { // tax_code.Visible (begin)
+		<td data-name="tax_code"@Html.Raw(s_dodetltest.tax_code.CellAttributes)>
+<span id="el@(s_dodetltest_List.RowCnt)_s_dodetltest_tax_code" class="s_dodetltest_tax_code">
+<span @Html.Raw(s_dodetltest.tax_code.ViewAttributes)>
+@Html.Raw(s_dodetltest.tax_code.GetViewValue())</span>
+</span>
+</td>
+	} @* tax_code.Visible (end) *@
+	@if (s_dodetltest.tax_rate.Visible) { // tax_rate.Visible (begin)
+		<td data-name="tax_rate"@Html.Raw(s_dodetltest.tax_rate.CellAttributes)>
+<span id="el@(s_dodetltest_List.RowCnt)_s_dodetltest_tax_rate" class="s_dodetltest_tax_rate">
+<span @Html.Raw(s_dodetltest.tax_rate.ViewAttributes)>
+@Html.Raw(s_dodetltest.tax_rate.GetViewValue())</span>
+</span>
+</td>
+	} @* tax_rate.Visible (end) *@
+	@if (s_dodetltest.tax_amount_origin.Visible) { // tax_amount_origin.Visible (begin)
+		<td data-name="tax_amount_origin"@Html.Raw(s_dodetltest.tax_amount_origin.CellAttributes)>
+<span id="el@(s_dodetltest_List.RowCnt)_s_dodetltest_tax_amount_origin" class="s_dodetltest_tax_amount_origin">
+<span @Html.Raw(s_dodetltest.tax_amount_origin.ViewAttributes)>
+@Html.Raw(s_dodetltest.tax_amount_origin.GetViewValue())</span>
+</span>
+</td>
+	} @* tax_amount_origin.Visible (end) *@
+	@if (s_dodetltest.to_gl_acct.Visible) { // to_gl_acct.Visible (begin)
+		<td data-name="to_gl_acct"@Html.Raw(s_dodetltest.to_gl_acct.CellAttributes)>
+<span id="el@(s_dodetltest_List.RowCnt)_s_dodetltest_to_gl_acct" class="s_dodetltest_to_gl_acct">
+<span @Html.Raw(s_dodetltest.to_gl_acct.ViewAttributes)>
+@Html.Raw(s_dodetltest.to_gl_acct.GetViewValue())</span>
+</span>
+</td>
+	} @* to_gl_acct.Visible (end) *@
+	@if (s_dodetltest.tax_acct.Visible) { // tax_acct.Visible (begin)
+		<td data-name="tax_acct"@Html.Raw(s_dodetltest.tax_acct.CellAttributes)>
+<span id="el@(s_dodetltest_List.RowCnt)_s_dodetltest_tax_acct" class="s_dodetltest_tax_acct">
+<span @Html.Raw(s_dodetltest.tax_acct.ViewAttributes)>
+@Html.Raw(s_dodetltest.tax_acct.GetViewValue())</span>
+</span>
+</td>
+	} @* tax_acct.Visible (end) *@
+	@{
+
+		// Render list options (body, right)
+		s_dodetltest_List.ListOptions.Render("body", "right", s_dodetltest_List.RowCnt);
+	}
+	</tr>
+	} @* End if *@
+} @* End While *@
+} @* End Code *@
+</tbody>
+</table><!-- /.ew-table -->
+} @* End If TotalRecords > 0 *@
+@if (Empty(s_dodetltest_List.CurrentAction)) {
+<input type="hidden" name="action" id="action" value="">
+}
+</div><!-- /.ew-grid-middle-panel -->
+</form><!-- /.ew-list-form -->
+@{ s_dodetltest_List.CloseRecordset(); }
+		@if (!s_dodetltest.IsExport()) {
+		<div class="card-footer ew-grid-lower-panel">
+		<div class="ew-list-other-options">
+		@s_dodetltest_List.OtherOptions.RenderBody("bottom")
+		</div>
+		@if (!s_dodetltest_List.IsGridAdd) {
+			<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="@AppPath(CurrentPageName())">
+			@s_dodetltest_List.Pager.Render()
+			</form>
+		}
+		<div class="clearfix"></div>
+		</div>
+		}
+</div><!-- /.ew-grid -->
+}
+@if (s_dodetltest_List.TotalRecords <= 0 && s_dodetltest_List.CurrentAction == "") { // Show other options
+<div class="ew-list-other-options">
+@s_dodetltest_List.OtherOptions.ForEach(opt => opt.ButtonClass = "").RenderBody()
+</div>
+<div class="clearfix"></div>
+}
+@s_dodetltest_List.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_dodetltest.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

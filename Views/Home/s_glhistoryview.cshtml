@@ -1,0 +1,165 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_glhistory_View.Page_Render();
+
+	// Check action result
+	if (s_glhistory_View.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_glhistory.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "view";
+var fs_glhistoryview = currentForm = new ew.Form("fs_glhistoryview", "view");
+
+// Form_CustomValidate event
+fs_glhistoryview.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_glhistoryview.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_glhistory.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+	@s_glhistory_View.ExportOptions.RenderBody()
+	@s_glhistory_View.OtherOptions.RenderBody()
+	<div class="clearfix"></div>
+</div>
+}
+@s_glhistory_View.ShowPageHeader()
+@s_glhistory_View.ShowMessages()
+<form name="fs_glhistoryview" id="fs_glhistoryview" class="form-inline ew-form ew-view-form" method="post">
+@if (s_glhistory_View.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="modal" value="@ConvertToInt(s_glhistory_View.IsModal)">
+<table class="table table-striped table-sm ew-view-table">
+@if (s_glhistory.Id.Visible) { @* s_glhistory.Id.Visible (begin) *@
+	<tr id="r_Id">
+		<td class="@s_glhistory_View.TableLeftColumnClass"><span id="elh_s_glhistory_Id">@Html.Raw(s_glhistory.Id.Caption)</span></td>
+		<td data-name="Id" @Html.Raw(s_glhistory.Id.CellAttributes)>
+<span id="el_s_glhistory_Id">
+<span @Html.Raw(s_glhistory.Id.ViewAttributes)>
+@Html.Raw(s_glhistory.Id.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glhistory.Id.Visible (end) *@
+@if (s_glhistory.month.Visible) { @* s_glhistory.month.Visible (begin) *@
+	<tr id="r_month">
+		<td class="@s_glhistory_View.TableLeftColumnClass"><span id="elh_s_glhistory_month">@Html.Raw(s_glhistory.month.Caption)</span></td>
+		<td data-name="month" @Html.Raw(s_glhistory.month.CellAttributes)>
+<span id="el_s_glhistory_month">
+<span @Html.Raw(s_glhistory.month.ViewAttributes)>
+@Html.Raw(s_glhistory.month.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glhistory.month.Visible (end) *@
+@if (s_glhistory.acct_code.Visible) { @* s_glhistory.acct_code.Visible (begin) *@
+	<tr id="r_acct_code">
+		<td class="@s_glhistory_View.TableLeftColumnClass"><span id="elh_s_glhistory_acct_code">@Html.Raw(s_glhistory.acct_code.Caption)</span></td>
+		<td data-name="acct_code" @Html.Raw(s_glhistory.acct_code.CellAttributes)>
+<span id="el_s_glhistory_acct_code">
+<span @Html.Raw(s_glhistory.acct_code.ViewAttributes)>
+@Html.Raw(s_glhistory.acct_code.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glhistory.acct_code.Visible (end) *@
+@if (s_glhistory.dept_code.Visible) { @* s_glhistory.dept_code.Visible (begin) *@
+	<tr id="r_dept_code">
+		<td class="@s_glhistory_View.TableLeftColumnClass"><span id="elh_s_glhistory_dept_code">@Html.Raw(s_glhistory.dept_code.Caption)</span></td>
+		<td data-name="dept_code" @Html.Raw(s_glhistory.dept_code.CellAttributes)>
+<span id="el_s_glhistory_dept_code">
+<span @Html.Raw(s_glhistory.dept_code.ViewAttributes)>
+@Html.Raw(s_glhistory.dept_code.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glhistory.dept_code.Visible (end) *@
+@if (s_glhistory.project_code.Visible) { @* s_glhistory.project_code.Visible (begin) *@
+	<tr id="r_project_code">
+		<td class="@s_glhistory_View.TableLeftColumnClass"><span id="elh_s_glhistory_project_code">@Html.Raw(s_glhistory.project_code.Caption)</span></td>
+		<td data-name="project_code" @Html.Raw(s_glhistory.project_code.CellAttributes)>
+<span id="el_s_glhistory_project_code">
+<span @Html.Raw(s_glhistory.project_code.ViewAttributes)>
+@Html.Raw(s_glhistory.project_code.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glhistory.project_code.Visible (end) *@
+@if (s_glhistory.fileno.Visible) { @* s_glhistory.fileno.Visible (begin) *@
+	<tr id="r_fileno">
+		<td class="@s_glhistory_View.TableLeftColumnClass"><span id="elh_s_glhistory_fileno">@Html.Raw(s_glhistory.fileno.Caption)</span></td>
+		<td data-name="fileno" @Html.Raw(s_glhistory.fileno.CellAttributes)>
+<span id="el_s_glhistory_fileno">
+<span @Html.Raw(s_glhistory.fileno.ViewAttributes)>
+@Html.Raw(s_glhistory.fileno.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glhistory.fileno.Visible (end) *@
+@if (s_glhistory.mth_bal.Visible) { @* s_glhistory.mth_bal.Visible (begin) *@
+	<tr id="r_mth_bal">
+		<td class="@s_glhistory_View.TableLeftColumnClass"><span id="elh_s_glhistory_mth_bal">@Html.Raw(s_glhistory.mth_bal.Caption)</span></td>
+		<td data-name="mth_bal" @Html.Raw(s_glhistory.mth_bal.CellAttributes)>
+<span id="el_s_glhistory_mth_bal">
+<span @Html.Raw(s_glhistory.mth_bal.ViewAttributes)>
+@Html.Raw(s_glhistory.mth_bal.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_glhistory.mth_bal.Visible (end) *@
+</table>
+@{ s_glhistory_View.CloseRecordset(); }
+</form>
+@s_glhistory_View.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_glhistory.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

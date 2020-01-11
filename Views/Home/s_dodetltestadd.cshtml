@@ -1,0 +1,506 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_dodetltest_Add.Page_Render();
+
+	// Check action result
+	if (s_dodetltest_Add.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "add";
+var fs_dodetltestadd = currentForm = new ew.Form("fs_dodetltestadd", "add");
+
+// Validate form
+fs_dodetltestadd.validate = function() {
+	if (!this.validateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.getForm(), $fobj = $(fobj);
+	if ($fobj.find("#confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.formKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = ["insert", "gridinsert"].includes($fobj.find("#action").val()) && $k[0];
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+	@if (s_dodetltest_Add.Id_dohdrTrxId.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Id_dohdrTrxId");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.Id_dohdrTrxId.RequiredErrorMessage.Replace("%s", s_dodetltest.Id_dohdrTrxId.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_Id_dohdrTrxId");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.Id_dohdrTrxId.ErrorMessage))");
+	@if (s_dodetltest_Add.item_no.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_item_no");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.item_no.RequiredErrorMessage.Replace("%s", s_dodetltest.item_no.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_item_no");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.item_no.ErrorMessage))");
+	@if (s_dodetltest_Add.item_type.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_item_type");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.item_type.RequiredErrorMessage.Replace("%s", s_dodetltest.item_type.Caption)))");
+		</text>
+	}
+	@if (s_dodetltest_Add.Id_sodetlTrxId.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Id_sodetlTrxId");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.Id_sodetlTrxId.RequiredErrorMessage.Replace("%s", s_dodetltest.Id_sodetlTrxId.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_Id_sodetlTrxId");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.Id_sodetlTrxId.ErrorMessage))");
+	@if (s_dodetltest_Add.Id_podetlTrxId.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Id_podetlTrxId");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.Id_podetlTrxId.RequiredErrorMessage.Replace("%s", s_dodetltest.Id_podetlTrxId.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_Id_podetlTrxId");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.Id_podetlTrxId.ErrorMessage))");
+	@if (s_dodetltest_Add.part_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_part_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.part_code.RequiredErrorMessage.Replace("%s", s_dodetltest.part_code.Caption)))");
+		</text>
+	}
+	@if (s_dodetltest_Add.part_desc.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_part_desc");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.part_desc.RequiredErrorMessage.Replace("%s", s_dodetltest.part_desc.Caption)))");
+		</text>
+	}
+	@if (s_dodetltest_Add.uom.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_uom");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.uom.RequiredErrorMessage.Replace("%s", s_dodetltest.uom.Caption)))");
+		</text>
+	}
+	@if (s_dodetltest_Add.qty.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_qty");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.qty.RequiredErrorMessage.Replace("%s", s_dodetltest.qty.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_qty");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.qty.ErrorMessage))");
+	@if (s_dodetltest_Add.unit_price.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_unit_price");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.unit_price.RequiredErrorMessage.Replace("%s", s_dodetltest.unit_price.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_unit_price");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.unit_price.ErrorMessage))");
+	@if (s_dodetltest_Add.amount_origin.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_amount_origin");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.amount_origin.RequiredErrorMessage.Replace("%s", s_dodetltest.amount_origin.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_amount_origin");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.amount_origin.ErrorMessage))");
+	@if (s_dodetltest_Add.amount_local.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_amount_local");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.amount_local.RequiredErrorMessage.Replace("%s", s_dodetltest.amount_local.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_amount_local");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.amount_local.ErrorMessage))");
+	@if (s_dodetltest_Add.tax_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tax_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.tax_code.RequiredErrorMessage.Replace("%s", s_dodetltest.tax_code.Caption)))");
+		</text>
+	}
+	@if (s_dodetltest_Add.tax_rate.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tax_rate");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.tax_rate.RequiredErrorMessage.Replace("%s", s_dodetltest.tax_rate.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_tax_rate");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.tax_rate.ErrorMessage))");
+	@if (s_dodetltest_Add.tax_amount_origin.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tax_amount_origin");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.tax_amount_origin.RequiredErrorMessage.Replace("%s", s_dodetltest.tax_amount_origin.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_tax_amount_origin");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.tax_amount_origin.ErrorMessage))");
+	@if (s_dodetltest_Add.tax_amount_local.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tax_amount_local");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.tax_amount_local.RequiredErrorMessage.Replace("%s", s_dodetltest.tax_amount_local.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_tax_amount_local");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.tax_amount_local.ErrorMessage))");
+	@if (s_dodetltest_Add.TrxUserId.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_TrxUserId");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.TrxUserId.RequiredErrorMessage.Replace("%s", s_dodetltest.TrxUserId.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_TrxUserId");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.TrxUserId.ErrorMessage))");
+	@if (s_dodetltest_Add.to_gl_acct.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_to_gl_acct");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.to_gl_acct.RequiredErrorMessage.Replace("%s", s_dodetltest.to_gl_acct.Caption)))");
+		</text>
+	}
+	@if (s_dodetltest_Add.tax_acct.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tax_acct");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dodetltest.tax_acct.RequiredErrorMessage.Replace("%s", s_dodetltest.tax_acct.Caption)))");
+		</text>
+	}
+
+		// Fire Form_CustomValidate event
+		if (!this.Form_CustomValidate(fobj))
+			return false;
+	}
+
+	// Process detail forms
+	var dfs = $fobj.find("input[name='detailpage']").get();
+	for (var i = 0; i < dfs.length; i++) {
+		var df = dfs[i], val = df.value;
+		if (val && ew.forms[val])
+			if (!ew.forms[val].validate())
+				return false;
+	}
+	return true;
+}
+
+// Form_CustomValidate event
+fs_dodetltestadd.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_dodetltestadd.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_dodetltestadd.lists["x_part_code"] = @Html.Raw(s_dodetltest_Add.part_code.Lookup.ToClientList());
+fs_dodetltestadd.lists["x_part_code"].options = @Html.Raw(ConvertToJson(s_dodetltest_Add.part_code.LookupOptions));
+fs_dodetltestadd.autoSuggests["x_part_code"] = @Html.Raw(ConvertToJson(new Dictionary<string, string> { {"data", "ajax=autosuggest"} }));
+
+// Form object for search
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_dodetltest_Add.ShowPageHeader()
+@s_dodetltest_Add.ShowMessages()
+<form name="fs_dodetltestadd" id="fs_dodetltestadd" class="@s_dodetltest_Add.FormClassName" action="@AppPath(CurrentPageName())" method="post">
+@if (s_dodetltest_Add.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="t" value="s_dodetltest">
+<input type="hidden" name="action" id="action" value="insert">
+<input type="hidden" name="modal" value="@ConvertToInt(s_dodetltest_Add.IsModal)">
+@if (s_dodetltest_Add.CurrentMasterTable == "s_dohdrtest") {
+<input type="hidden" name="@Config.TableShowMaster" value="s_dohdrtest">
+<input type="hidden" name="fk_TrxId" value="@s_dodetltest_Add.Id_dohdrTrxId.SessionValue">
+}
+<div class="ew-add-div"><!-- page* -->
+@if (s_dodetltest.Id_dohdrTrxId.Visible) { // Id_dohdrTrxId.Visible (begin)
+	<div id="r_Id_dohdrTrxId" class="form-group row">
+		<label id="elh_s_dodetltest_Id_dohdrTrxId" for="x_Id_dohdrTrxId" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.Id_dohdrTrxId.Caption)@Html.Raw(s_dodetltest.Id_dohdrTrxId.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.Id_dohdrTrxId.CellAttributes)>
+@if (!Empty(s_dodetltest.Id_dohdrTrxId.SessionValue)) {
+<span id="el_s_dodetltest_Id_dohdrTrxId">
+<span @Html.Raw(s_dodetltest.Id_dohdrTrxId.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_dodetltest.Id_dohdrTrxId.ViewValue))"></span>
+</span>
+<input type="hidden" id="x_Id_dohdrTrxId" name="x_Id_dohdrTrxId" value="@s_dodetltest.Id_dohdrTrxId.CurrentValue">
+} else {
+<span id="el_s_dodetltest_Id_dohdrTrxId">
+<input type="text" data-table="s_dodetltest" data-field="x_Id_dohdrTrxId" name="x_Id_dohdrTrxId" id="x_Id_dohdrTrxId" size="30" placeholder="@s_dodetltest.Id_dohdrTrxId.PlaceHolder" value="@s_dodetltest.Id_dohdrTrxId.EditValue" @Html.Raw(s_dodetltest.Id_dohdrTrxId.EditAttributes)>
+</span>
+}
+@Html.Raw(s_dodetltest.Id_dohdrTrxId.CustomMessage)</div></div>
+	</div>
+} @* Id_dohdrTrxId.Visible (end) *@
+@if (s_dodetltest.item_no.Visible) { // item_no.Visible (begin)
+	<div id="r_item_no" class="form-group row">
+		<label id="elh_s_dodetltest_item_no" for="x_item_no" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.item_no.Caption)@Html.Raw(s_dodetltest.item_no.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.item_no.CellAttributes)>
+<span id="el_s_dodetltest_item_no">
+<input type="text" data-table="s_dodetltest" data-field="x_item_no" name="x_item_no" id="x_item_no" size="30" placeholder="@s_dodetltest.item_no.PlaceHolder" value="@s_dodetltest.item_no.EditValue" @Html.Raw(s_dodetltest.item_no.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.item_no.CustomMessage)</div></div>
+	</div>
+} @* item_no.Visible (end) *@
+@if (s_dodetltest.item_type.Visible) { // item_type.Visible (begin)
+	<div id="r_item_type" class="form-group row">
+		<label id="elh_s_dodetltest_item_type" for="x_item_type" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.item_type.Caption)@Html.Raw(s_dodetltest.item_type.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.item_type.CellAttributes)>
+<span id="el_s_dodetltest_item_type">
+<input type="text" data-table="s_dodetltest" data-field="x_item_type" name="x_item_type" id="x_item_type" size="30" maxlength="1" placeholder="@s_dodetltest.item_type.PlaceHolder" value="@s_dodetltest.item_type.EditValue" @Html.Raw(s_dodetltest.item_type.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.item_type.CustomMessage)</div></div>
+	</div>
+} @* item_type.Visible (end) *@
+@if (s_dodetltest.Id_sodetlTrxId.Visible) { // Id_sodetlTrxId.Visible (begin)
+	<div id="r_Id_sodetlTrxId" class="form-group row">
+		<label id="elh_s_dodetltest_Id_sodetlTrxId" for="x_Id_sodetlTrxId" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.Id_sodetlTrxId.Caption)@Html.Raw(s_dodetltest.Id_sodetlTrxId.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.Id_sodetlTrxId.CellAttributes)>
+<span id="el_s_dodetltest_Id_sodetlTrxId">
+<input type="text" data-table="s_dodetltest" data-field="x_Id_sodetlTrxId" name="x_Id_sodetlTrxId" id="x_Id_sodetlTrxId" size="30" placeholder="@s_dodetltest.Id_sodetlTrxId.PlaceHolder" value="@s_dodetltest.Id_sodetlTrxId.EditValue" @Html.Raw(s_dodetltest.Id_sodetlTrxId.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.Id_sodetlTrxId.CustomMessage)</div></div>
+	</div>
+} @* Id_sodetlTrxId.Visible (end) *@
+@if (s_dodetltest.Id_podetlTrxId.Visible) { // Id_podetlTrxId.Visible (begin)
+	<div id="r_Id_podetlTrxId" class="form-group row">
+		<label id="elh_s_dodetltest_Id_podetlTrxId" for="x_Id_podetlTrxId" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.Id_podetlTrxId.Caption)@Html.Raw(s_dodetltest.Id_podetlTrxId.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.Id_podetlTrxId.CellAttributes)>
+<span id="el_s_dodetltest_Id_podetlTrxId">
+<input type="text" data-table="s_dodetltest" data-field="x_Id_podetlTrxId" name="x_Id_podetlTrxId" id="x_Id_podetlTrxId" size="30" placeholder="@s_dodetltest.Id_podetlTrxId.PlaceHolder" value="@s_dodetltest.Id_podetlTrxId.EditValue" @Html.Raw(s_dodetltest.Id_podetlTrxId.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.Id_podetlTrxId.CustomMessage)</div></div>
+	</div>
+} @* Id_podetlTrxId.Visible (end) *@
+@if (s_dodetltest.part_code.Visible) { // part_code.Visible (begin)
+	<div id="r_part_code" class="form-group row">
+		<label id="elh_s_dodetltest_part_code" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.part_code.Caption)@Html.Raw(s_dodetltest.part_code.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.part_code.CellAttributes)>
+<span id="el_s_dodetltest_part_code">
+<span>@{ s_dodetltest.part_code.EditAttrs.Prepend("onchange", "ew.autoFill(this);"); }</span>
+<span id="as_x_part_code" class="text-nowrap" style="z-index: 8930">
+	<div class="input-group mb-3">
+		<input type="text" class="form-control" name="sv_x_part_code" id="sv_x_part_code" value="@RemoveHtml(Convert.ToString(s_dodetltest.part_code.EditValue))" size="30" maxlength="30" placeholder="@s_dodetltest.part_code.PlaceHolder" data-placeholder="@s_dodetltest.part_code.PlaceHolder"@s_dodetltest.part_code.EditAttributes>
+		<div class="input-group-append">
+			<button type="button" title="@HtmlEncode(Language.Phrase("LookupLink", true).Replace("%s", RemoveHtml(s_dodetltest.part_code.Caption)))" onclick="ew.modalLookupShow({lnk:this,el:'x_part_code',m:0,n:10,srch:false});" class="ew-lookup-btn btn btn-default"@((s_dodetltest.part_code.ReadOnly || s_dodetltest.part_code.Disabled) ? " disabled" : "")><i class="fa fa-search ew-icon"></i></button>
+		</div>
+	</div>
+</span>
+<input type="hidden" data-table="s_dodetltest" data-field="x_part_code" data-multiple="0" data-lookup="1" data-value-separator="@s_dodetltest.part_code.DisplayValueSeparatorAttribute" name="x_part_code" id="x_part_code" value="@(s_dodetltest.part_code.CurrentValue)" onchange="@s_dodetltest.part_code.EditAttrs.Extract("onchange")">
+<script>
+fs_dodetltestadd.createAutoSuggest({"id":"x_part_code","forceSelect":true});
+</script>
+@Html.Raw(s_dodetltest.part_code.Lookup.GetParamTag("p_x_part_code"))
+</span>
+@Html.Raw(s_dodetltest.part_code.CustomMessage)</div></div>
+	</div>
+} @* part_code.Visible (end) *@
+@if (s_dodetltest.part_desc.Visible) { // part_desc.Visible (begin)
+	<div id="r_part_desc" class="form-group row">
+		<label id="elh_s_dodetltest_part_desc" for="x_part_desc" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.part_desc.Caption)@Html.Raw(s_dodetltest.part_desc.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.part_desc.CellAttributes)>
+<span id="el_s_dodetltest_part_desc">
+<input type="text" data-table="s_dodetltest" data-field="x_part_desc" name="x_part_desc" id="x_part_desc" size="30" maxlength="100" placeholder="@s_dodetltest.part_desc.PlaceHolder" value="@s_dodetltest.part_desc.EditValue" @Html.Raw(s_dodetltest.part_desc.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.part_desc.CustomMessage)</div></div>
+	</div>
+} @* part_desc.Visible (end) *@
+@if (s_dodetltest.uom.Visible) { // uom.Visible (begin)
+	<div id="r_uom" class="form-group row">
+		<label id="elh_s_dodetltest_uom" for="x_uom" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.uom.Caption)@Html.Raw(s_dodetltest.uom.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.uom.CellAttributes)>
+<span id="el_s_dodetltest_uom">
+<input type="text" data-table="s_dodetltest" data-field="x_uom" name="x_uom" id="x_uom" size="30" maxlength="10" placeholder="@s_dodetltest.uom.PlaceHolder" value="@s_dodetltest.uom.EditValue" @Html.Raw(s_dodetltest.uom.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.uom.CustomMessage)</div></div>
+	</div>
+} @* uom.Visible (end) *@
+@if (s_dodetltest.qty.Visible) { // qty.Visible (begin)
+	<div id="r_qty" class="form-group row">
+		<label id="elh_s_dodetltest_qty" for="x_qty" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.qty.Caption)@Html.Raw(s_dodetltest.qty.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.qty.CellAttributes)>
+<span id="el_s_dodetltest_qty">
+<input type="text" data-table="s_dodetltest" data-field="x_qty" name="x_qty" id="x_qty" size="30" placeholder="@s_dodetltest.qty.PlaceHolder" value="@s_dodetltest.qty.EditValue" @Html.Raw(s_dodetltest.qty.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.qty.CustomMessage)</div></div>
+	</div>
+} @* qty.Visible (end) *@
+@if (s_dodetltest.unit_price.Visible) { // unit_price.Visible (begin)
+	<div id="r_unit_price" class="form-group row">
+		<label id="elh_s_dodetltest_unit_price" for="x_unit_price" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.unit_price.Caption)@Html.Raw(s_dodetltest.unit_price.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.unit_price.CellAttributes)>
+<span id="el_s_dodetltest_unit_price">
+<input type="text" data-table="s_dodetltest" data-field="x_unit_price" name="x_unit_price" id="x_unit_price" size="30" placeholder="@s_dodetltest.unit_price.PlaceHolder" value="@s_dodetltest.unit_price.EditValue" @Html.Raw(s_dodetltest.unit_price.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.unit_price.CustomMessage)</div></div>
+	</div>
+} @* unit_price.Visible (end) *@
+@if (s_dodetltest.amount_origin.Visible) { // amount_origin.Visible (begin)
+	<div id="r_amount_origin" class="form-group row">
+		<label id="elh_s_dodetltest_amount_origin" for="x_amount_origin" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.amount_origin.Caption)@Html.Raw(s_dodetltest.amount_origin.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.amount_origin.CellAttributes)>
+<span id="el_s_dodetltest_amount_origin">
+<input type="text" data-table="s_dodetltest" data-field="x_amount_origin" name="x_amount_origin" id="x_amount_origin" size="30" placeholder="@s_dodetltest.amount_origin.PlaceHolder" value="@s_dodetltest.amount_origin.EditValue" @Html.Raw(s_dodetltest.amount_origin.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.amount_origin.CustomMessage)</div></div>
+	</div>
+} @* amount_origin.Visible (end) *@
+@if (s_dodetltest.amount_local.Visible) { // amount_local.Visible (begin)
+	<div id="r_amount_local" class="form-group row">
+		<label id="elh_s_dodetltest_amount_local" for="x_amount_local" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.amount_local.Caption)@Html.Raw(s_dodetltest.amount_local.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.amount_local.CellAttributes)>
+<span id="el_s_dodetltest_amount_local">
+<input type="text" data-table="s_dodetltest" data-field="x_amount_local" name="x_amount_local" id="x_amount_local" size="30" placeholder="@s_dodetltest.amount_local.PlaceHolder" value="@s_dodetltest.amount_local.EditValue" @Html.Raw(s_dodetltest.amount_local.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.amount_local.CustomMessage)</div></div>
+	</div>
+} @* amount_local.Visible (end) *@
+@if (s_dodetltest.tax_code.Visible) { // tax_code.Visible (begin)
+	<div id="r_tax_code" class="form-group row">
+		<label id="elh_s_dodetltest_tax_code" for="x_tax_code" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.tax_code.Caption)@Html.Raw(s_dodetltest.tax_code.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.tax_code.CellAttributes)>
+<span id="el_s_dodetltest_tax_code">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_code" name="x_tax_code" id="x_tax_code" size="30" maxlength="10" placeholder="@s_dodetltest.tax_code.PlaceHolder" value="@s_dodetltest.tax_code.EditValue" @Html.Raw(s_dodetltest.tax_code.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.tax_code.CustomMessage)</div></div>
+	</div>
+} @* tax_code.Visible (end) *@
+@if (s_dodetltest.tax_rate.Visible) { // tax_rate.Visible (begin)
+	<div id="r_tax_rate" class="form-group row">
+		<label id="elh_s_dodetltest_tax_rate" for="x_tax_rate" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.tax_rate.Caption)@Html.Raw(s_dodetltest.tax_rate.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.tax_rate.CellAttributes)>
+<span id="el_s_dodetltest_tax_rate">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_rate" name="x_tax_rate" id="x_tax_rate" size="30" placeholder="@s_dodetltest.tax_rate.PlaceHolder" value="@s_dodetltest.tax_rate.EditValue" @Html.Raw(s_dodetltest.tax_rate.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.tax_rate.CustomMessage)</div></div>
+	</div>
+} @* tax_rate.Visible (end) *@
+@if (s_dodetltest.tax_amount_origin.Visible) { // tax_amount_origin.Visible (begin)
+	<div id="r_tax_amount_origin" class="form-group row">
+		<label id="elh_s_dodetltest_tax_amount_origin" for="x_tax_amount_origin" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.tax_amount_origin.Caption)@Html.Raw(s_dodetltest.tax_amount_origin.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.tax_amount_origin.CellAttributes)>
+<span id="el_s_dodetltest_tax_amount_origin">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_amount_origin" name="x_tax_amount_origin" id="x_tax_amount_origin" size="30" placeholder="@s_dodetltest.tax_amount_origin.PlaceHolder" value="@s_dodetltest.tax_amount_origin.EditValue" @Html.Raw(s_dodetltest.tax_amount_origin.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.tax_amount_origin.CustomMessage)</div></div>
+	</div>
+} @* tax_amount_origin.Visible (end) *@
+@if (s_dodetltest.tax_amount_local.Visible) { // tax_amount_local.Visible (begin)
+	<div id="r_tax_amount_local" class="form-group row">
+		<label id="elh_s_dodetltest_tax_amount_local" for="x_tax_amount_local" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.tax_amount_local.Caption)@Html.Raw(s_dodetltest.tax_amount_local.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.tax_amount_local.CellAttributes)>
+<span id="el_s_dodetltest_tax_amount_local">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_amount_local" name="x_tax_amount_local" id="x_tax_amount_local" size="30" placeholder="@s_dodetltest.tax_amount_local.PlaceHolder" value="@s_dodetltest.tax_amount_local.EditValue" @Html.Raw(s_dodetltest.tax_amount_local.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.tax_amount_local.CustomMessage)</div></div>
+	</div>
+} @* tax_amount_local.Visible (end) *@
+@if (s_dodetltest.TrxUserId.Visible) { // TrxUserId.Visible (begin)
+	<div id="r_TrxUserId" class="form-group row">
+		<label id="elh_s_dodetltest_TrxUserId" for="x_TrxUserId" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.TrxUserId.Caption)@Html.Raw(s_dodetltest.TrxUserId.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.TrxUserId.CellAttributes)>
+<span id="el_s_dodetltest_TrxUserId">
+<input type="text" data-table="s_dodetltest" data-field="x_TrxUserId" name="x_TrxUserId" id="x_TrxUserId" size="30" placeholder="@s_dodetltest.TrxUserId.PlaceHolder" value="@s_dodetltest.TrxUserId.EditValue" @Html.Raw(s_dodetltest.TrxUserId.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.TrxUserId.CustomMessage)</div></div>
+	</div>
+} @* TrxUserId.Visible (end) *@
+@if (s_dodetltest.to_gl_acct.Visible) { // to_gl_acct.Visible (begin)
+	<div id="r_to_gl_acct" class="form-group row">
+		<label id="elh_s_dodetltest_to_gl_acct" for="x_to_gl_acct" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.to_gl_acct.Caption)@Html.Raw(s_dodetltest.to_gl_acct.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.to_gl_acct.CellAttributes)>
+<span id="el_s_dodetltest_to_gl_acct">
+<input type="text" data-table="s_dodetltest" data-field="x_to_gl_acct" name="x_to_gl_acct" id="x_to_gl_acct" size="30" maxlength="10" placeholder="@s_dodetltest.to_gl_acct.PlaceHolder" value="@s_dodetltest.to_gl_acct.EditValue" @Html.Raw(s_dodetltest.to_gl_acct.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.to_gl_acct.CustomMessage)</div></div>
+	</div>
+} @* to_gl_acct.Visible (end) *@
+@if (s_dodetltest.tax_acct.Visible) { // tax_acct.Visible (begin)
+	<div id="r_tax_acct" class="form-group row">
+		<label id="elh_s_dodetltest_tax_acct" for="x_tax_acct" class="@s_dodetltest_Add.LeftColumnClass">@Html.Raw(s_dodetltest.tax_acct.Caption)@Html.Raw(s_dodetltest.tax_acct.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dodetltest_Add.RightColumnClass"><div @Html.Raw(s_dodetltest.tax_acct.CellAttributes)>
+<span id="el_s_dodetltest_tax_acct">
+<input type="text" data-table="s_dodetltest" data-field="x_tax_acct" name="x_tax_acct" id="x_tax_acct" size="30" maxlength="10" placeholder="@s_dodetltest.tax_acct.PlaceHolder" value="@s_dodetltest.tax_acct.EditValue" @Html.Raw(s_dodetltest.tax_acct.EditAttributes)>
+</span>
+@Html.Raw(s_dodetltest.tax_acct.CustomMessage)</div></div>
+	</div>
+} @* tax_acct.Visible (end) *@
+</div><!-- /page* -->
+@{ s_dodetltest_Add.CloseRecordset(); }
+@if (!s_dodetltest_Add.IsModal) {
+<div class="form-group row"><!-- buttons .form-group -->
+	<div class="@s_dodetltest_Add.OffsetColumnClass"><!-- buttons offset -->
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("AddBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_dodetltest_Add.ReturnUrl)"> @Html.Raw(Language.Phrase("CancelBtn"))</button>
+	</div><!-- /buttons offset -->
+</div><!-- /buttons .form-group -->
+}
+</form>
+@s_dodetltest_Add.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

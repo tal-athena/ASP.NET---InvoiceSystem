@@ -1,0 +1,267 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_dohdrtest_Delete.Page_Render();
+
+	// Check action result
+	if (s_dohdrtest_Delete.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "delete";
+var fs_dohdrtestdelete = currentForm = new ew.Form("fs_dohdrtestdelete", "delete");
+
+// Form_CustomValidate event
+fs_dohdrtestdelete.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_dohdrtestdelete.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_dohdrtestdelete.lists["x_dbcode"] = @Html.Raw(s_dohdrtest_Delete.dbcode.Lookup.ToClientList());
+fs_dohdrtestdelete.lists["x_dbcode"].options = @Html.Raw(ConvertToJson(s_dohdrtest_Delete.dbcode.LookupOptions));
+fs_dohdrtestdelete.autoSuggests["x_dbcode"] = @Html.Raw(ConvertToJson(new Dictionary<string, string> { {"data", "ajax=autosuggest"} }));
+fs_dohdrtestdelete.lists["x_CurrencyCode"] = @Html.Raw(s_dohdrtest_Delete.CurrencyCode.Lookup.ToClientList());
+fs_dohdrtestdelete.lists["x_CurrencyCode"].options = @Html.Raw(ConvertToJson(s_dohdrtest_Delete.CurrencyCode.LookupOptions));
+fs_dohdrtestdelete.autoSuggests["x_CurrencyCode"] = @Html.Raw(ConvertToJson(new Dictionary<string, string> { {"data", "ajax=autosuggest"} }));
+
+// Form object for search
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_dohdrtest_Delete.ShowPageHeader()
+@s_dohdrtest_Delete.ShowMessages()
+<form name="fs_dohdrtestdelete" id="fs_dohdrtestdelete" class="form-inline ew-form ew-delete-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_dohdrtest_Delete.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="delete">
+@foreach (string key in s_dohdrtest_Delete.RecordKeys) {
+<input type="hidden" name="key_m" value="@key">
+}
+<div class="card ew-card ew-grid">
+<div class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+<table class="table ew-table">
+	<thead>
+	<tr class="ew-table-header">
+@if (s_dohdrtest.TrxId.Visible) { // TrxId (begin)
+		<th class="@Html.Raw(s_dohdrtest.TrxId.HeaderCellClass)"><span id="elh_s_dohdrtest_TrxId" class="s_dohdrtest_TrxId">@Html.Raw(s_dohdrtest.TrxId.Caption)</span></th>
+} @* TrxId.Visible (end) *@
+@if (s_dohdrtest.dt_rec.Visible) { // dt_rec (begin)
+		<th class="@Html.Raw(s_dohdrtest.dt_rec.HeaderCellClass)"><span id="elh_s_dohdrtest_dt_rec" class="s_dohdrtest_dt_rec">@Html.Raw(s_dohdrtest.dt_rec.Caption)</span></th>
+} @* dt_rec.Visible (end) *@
+@if (s_dohdrtest.do_no.Visible) { // do_no (begin)
+		<th class="@Html.Raw(s_dohdrtest.do_no.HeaderCellClass)"><span id="elh_s_dohdrtest_do_no" class="s_dohdrtest_do_no">@Html.Raw(s_dohdrtest.do_no.Caption)</span></th>
+} @* do_no.Visible (end) *@
+@if (s_dohdrtest.dbcode.Visible) { // dbcode (begin)
+		<th class="@Html.Raw(s_dohdrtest.dbcode.HeaderCellClass)"><span id="elh_s_dohdrtest_dbcode" class="s_dohdrtest_dbcode">@Html.Raw(s_dohdrtest.dbcode.Caption)</span></th>
+} @* dbcode.Visible (end) *@
+@if (s_dohdrtest.slsman.Visible) { // slsman (begin)
+		<th class="@Html.Raw(s_dohdrtest.slsman.HeaderCellClass)"><span id="elh_s_dohdrtest_slsman" class="s_dohdrtest_slsman">@Html.Raw(s_dohdrtest.slsman.Caption)</span></th>
+} @* slsman.Visible (end) *@
+@if (s_dohdrtest.fileno.Visible) { // fileno (begin)
+		<th class="@Html.Raw(s_dohdrtest.fileno.HeaderCellClass)"><span id="elh_s_dohdrtest_fileno" class="s_dohdrtest_fileno">@Html.Raw(s_dohdrtest.fileno.Caption)</span></th>
+} @* fileno.Visible (end) *@
+@if (s_dohdrtest.TrxUserId.Visible) { // TrxUserId (begin)
+		<th class="@Html.Raw(s_dohdrtest.TrxUserId.HeaderCellClass)"><span id="elh_s_dohdrtest_TrxUserId" class="s_dohdrtest_TrxUserId">@Html.Raw(s_dohdrtest.TrxUserId.Caption)</span></th>
+} @* TrxUserId.Visible (end) *@
+@if (s_dohdrtest.CurrencyCode.Visible) { // CurrencyCode (begin)
+		<th class="@Html.Raw(s_dohdrtest.CurrencyCode.HeaderCellClass)"><span id="elh_s_dohdrtest_CurrencyCode" class="s_dohdrtest_CurrencyCode">@Html.Raw(s_dohdrtest.CurrencyCode.Caption)</span></th>
+} @* CurrencyCode.Visible (end) *@
+@if (s_dohdrtest.ex_rate.Visible) { // ex_rate (begin)
+		<th class="@Html.Raw(s_dohdrtest.ex_rate.HeaderCellClass)"><span id="elh_s_dohdrtest_ex_rate" class="s_dohdrtest_ex_rate">@Html.Raw(s_dohdrtest.ex_rate.Caption)</span></th>
+} @* ex_rate.Visible (end) *@
+@if (s_dohdrtest.do_amount_original.Visible) { // do_amount_original (begin)
+		<th class="@Html.Raw(s_dohdrtest.do_amount_original.HeaderCellClass)"><span id="elh_s_dohdrtest_do_amount_original" class="s_dohdrtest_do_amount_original">@Html.Raw(s_dohdrtest.do_amount_original.Caption)</span></th>
+} @* do_amount_original.Visible (end) *@
+@if (s_dohdrtest.do_amount_loca.Visible) { // do_amount_loca (begin)
+		<th class="@Html.Raw(s_dohdrtest.do_amount_loca.HeaderCellClass)"><span id="elh_s_dohdrtest_do_amount_loca" class="s_dohdrtest_do_amount_loca">@Html.Raw(s_dohdrtest.do_amount_loca.Caption)</span></th>
+} @* do_amount_loca.Visible (end) *@
+@if (s_dohdrtest.rounding_adj.Visible) { // rounding_adj (begin)
+		<th class="@Html.Raw(s_dohdrtest.rounding_adj.HeaderCellClass)"><span id="elh_s_dohdrtest_rounding_adj" class="s_dohdrtest_rounding_adj">@Html.Raw(s_dohdrtest.rounding_adj.Caption)</span></th>
+} @* rounding_adj.Visible (end) *@
+@if (s_dohdrtest.ar_gl_acct.Visible) { // ar_gl_acct (begin)
+		<th class="@Html.Raw(s_dohdrtest.ar_gl_acct.HeaderCellClass)"><span id="elh_s_dohdrtest_ar_gl_acct" class="s_dohdrtest_ar_gl_acct">@Html.Raw(s_dohdrtest.ar_gl_acct.Caption)</span></th>
+} @* ar_gl_acct.Visible (end) *@
+	</tr>
+	</thead>
+	<tbody>
+@{ s_dohdrtest_Delete.RecordCount = 0; }
+@while (s_dohdrtest_Delete.Recordset != null && await s_dohdrtest_Delete.Recordset.ReadAsync()) { // DN
+	s_dohdrtest_Delete.RecordCount++;
+	s_dohdrtest_Delete.RowCnt++;
+
+	// Set row properties
+	s_dohdrtest_Delete.ResetAttributes();
+	s_dohdrtest_Delete.RowType = Config.RowTypeView; // View
+
+	// Get the field contents
+	await s_dohdrtest_Delete.LoadRowValues(s_dohdrtest_Delete.Recordset);
+
+	// Render row
+	await s_dohdrtest_Delete.RenderRow();
+	<tr @Html.Raw(s_dohdrtest_Delete.RowAttributes)>
+@if (s_dohdrtest.TrxId.Visible) { // TrxId (begin)
+		<td @Html.Raw(s_dohdrtest.TrxId.CellAttributes)>
+<span id="el@(s_dohdrtest_Delete.RowCnt)_s_dohdrtest_TrxId" class="s_dohdrtest_TrxId">
+<span @Html.Raw(s_dohdrtest.TrxId.ViewAttributes)>
+@Html.Raw(s_dohdrtest.TrxId.GetViewValue())</span>
+</span>
+</td>
+} @* TrxId.Visible (end) *@
+@if (s_dohdrtest.dt_rec.Visible) { // dt_rec (begin)
+		<td @Html.Raw(s_dohdrtest.dt_rec.CellAttributes)>
+<span id="el@(s_dohdrtest_Delete.RowCnt)_s_dohdrtest_dt_rec" class="s_dohdrtest_dt_rec">
+<span @Html.Raw(s_dohdrtest.dt_rec.ViewAttributes)>
+@Html.Raw(s_dohdrtest.dt_rec.GetViewValue())</span>
+</span>
+</td>
+} @* dt_rec.Visible (end) *@
+@if (s_dohdrtest.do_no.Visible) { // do_no (begin)
+		<td @Html.Raw(s_dohdrtest.do_no.CellAttributes)>
+<span id="el@(s_dohdrtest_Delete.RowCnt)_s_dohdrtest_do_no" class="s_dohdrtest_do_no">
+<span @Html.Raw(s_dohdrtest.do_no.ViewAttributes)>
+@Html.Raw(s_dohdrtest.do_no.GetViewValue())</span>
+</span>
+</td>
+} @* do_no.Visible (end) *@
+@if (s_dohdrtest.dbcode.Visible) { // dbcode (begin)
+		<td @Html.Raw(s_dohdrtest.dbcode.CellAttributes)>
+<span id="el@(s_dohdrtest_Delete.RowCnt)_s_dohdrtest_dbcode" class="s_dohdrtest_dbcode">
+<span @Html.Raw(s_dohdrtest.dbcode.ViewAttributes)>
+@Html.Raw(s_dohdrtest.dbcode.GetViewValue())</span>
+</span>
+</td>
+} @* dbcode.Visible (end) *@
+@if (s_dohdrtest.slsman.Visible) { // slsman (begin)
+		<td @Html.Raw(s_dohdrtest.slsman.CellAttributes)>
+<span id="el@(s_dohdrtest_Delete.RowCnt)_s_dohdrtest_slsman" class="s_dohdrtest_slsman">
+<span @Html.Raw(s_dohdrtest.slsman.ViewAttributes)>
+@Html.Raw(s_dohdrtest.slsman.GetViewValue())</span>
+</span>
+</td>
+} @* slsman.Visible (end) *@
+@if (s_dohdrtest.fileno.Visible) { // fileno (begin)
+		<td @Html.Raw(s_dohdrtest.fileno.CellAttributes)>
+<span id="el@(s_dohdrtest_Delete.RowCnt)_s_dohdrtest_fileno" class="s_dohdrtest_fileno">
+<span @Html.Raw(s_dohdrtest.fileno.ViewAttributes)>
+@Html.Raw(s_dohdrtest.fileno.GetViewValue())</span>
+</span>
+</td>
+} @* fileno.Visible (end) *@
+@if (s_dohdrtest.TrxUserId.Visible) { // TrxUserId (begin)
+		<td @Html.Raw(s_dohdrtest.TrxUserId.CellAttributes)>
+<span id="el@(s_dohdrtest_Delete.RowCnt)_s_dohdrtest_TrxUserId" class="s_dohdrtest_TrxUserId">
+<span @Html.Raw(s_dohdrtest.TrxUserId.ViewAttributes)>
+@Html.Raw(s_dohdrtest.TrxUserId.GetViewValue())</span>
+</span>
+</td>
+} @* TrxUserId.Visible (end) *@
+@if (s_dohdrtest.CurrencyCode.Visible) { // CurrencyCode (begin)
+		<td @Html.Raw(s_dohdrtest.CurrencyCode.CellAttributes)>
+<span id="el@(s_dohdrtest_Delete.RowCnt)_s_dohdrtest_CurrencyCode" class="s_dohdrtest_CurrencyCode">
+<span @Html.Raw(s_dohdrtest.CurrencyCode.ViewAttributes)>
+@Html.Raw(s_dohdrtest.CurrencyCode.GetViewValue())</span>
+</span>
+</td>
+} @* CurrencyCode.Visible (end) *@
+@if (s_dohdrtest.ex_rate.Visible) { // ex_rate (begin)
+		<td @Html.Raw(s_dohdrtest.ex_rate.CellAttributes)>
+<span id="el@(s_dohdrtest_Delete.RowCnt)_s_dohdrtest_ex_rate" class="s_dohdrtest_ex_rate">
+<span @Html.Raw(s_dohdrtest.ex_rate.ViewAttributes)>
+@Html.Raw(s_dohdrtest.ex_rate.GetViewValue())</span>
+</span>
+</td>
+} @* ex_rate.Visible (end) *@
+@if (s_dohdrtest.do_amount_original.Visible) { // do_amount_original (begin)
+		<td @Html.Raw(s_dohdrtest.do_amount_original.CellAttributes)>
+<span id="el@(s_dohdrtest_Delete.RowCnt)_s_dohdrtest_do_amount_original" class="s_dohdrtest_do_amount_original">
+<span @Html.Raw(s_dohdrtest.do_amount_original.ViewAttributes)>
+@Html.Raw(s_dohdrtest.do_amount_original.GetViewValue())</span>
+</span>
+</td>
+} @* do_amount_original.Visible (end) *@
+@if (s_dohdrtest.do_amount_loca.Visible) { // do_amount_loca (begin)
+		<td @Html.Raw(s_dohdrtest.do_amount_loca.CellAttributes)>
+<span id="el@(s_dohdrtest_Delete.RowCnt)_s_dohdrtest_do_amount_loca" class="s_dohdrtest_do_amount_loca">
+<span @Html.Raw(s_dohdrtest.do_amount_loca.ViewAttributes)>
+@Html.Raw(s_dohdrtest.do_amount_loca.GetViewValue())</span>
+</span>
+</td>
+} @* do_amount_loca.Visible (end) *@
+@if (s_dohdrtest.rounding_adj.Visible) { // rounding_adj (begin)
+		<td @Html.Raw(s_dohdrtest.rounding_adj.CellAttributes)>
+<span id="el@(s_dohdrtest_Delete.RowCnt)_s_dohdrtest_rounding_adj" class="s_dohdrtest_rounding_adj">
+<span @Html.Raw(s_dohdrtest.rounding_adj.ViewAttributes)>
+@Html.Raw(s_dohdrtest.rounding_adj.GetViewValue())</span>
+</span>
+</td>
+} @* rounding_adj.Visible (end) *@
+@if (s_dohdrtest.ar_gl_acct.Visible) { // ar_gl_acct (begin)
+		<td @Html.Raw(s_dohdrtest.ar_gl_acct.CellAttributes)>
+<span id="el@(s_dohdrtest_Delete.RowCnt)_s_dohdrtest_ar_gl_acct" class="s_dohdrtest_ar_gl_acct">
+<span @Html.Raw(s_dohdrtest.ar_gl_acct.ViewAttributes)>
+@Html.Raw(s_dohdrtest.ar_gl_acct.GetViewValue())</span>
+</span>
+</td>
+} @* ar_gl_acct.Visible (end) *@
+	</tr>
+}
+@{ s_dohdrtest_Delete.CloseRecordset(); }
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<div class="divconfirmdelete">
+  <div>
+	<label>
+		@Html.Raw(Language.Phrase("askconfirmdelete"))
+	</label>
+  </div>
+</div>
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("DeleteBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_dohdrtest_Delete.ReturnUrl)">@Language.Phrase("CancelBtn")</button>
+</div>
+</form>
+@s_dohdrtest_Delete.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

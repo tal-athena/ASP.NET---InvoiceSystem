@@ -1,0 +1,153 @@
+@{
+}
+@if (s_dohdrtest.Visible) { // s_dohdrtest_Master.Visible (begin)
+<div class="ew-master-div">
+<table id="tbl_s_dohdrtestmaster" class="table ew-view-table ew-master-table ew-vertical">
+	<tbody>
+		@if (s_dohdrtest.TrxId.Visible) { // TrxId.Visible (begin)
+		<tr id="r_TrxId">
+			<td class="@s_dohdrtest.TableLeftColumnClass">@Html.Raw(s_dohdrtest.TrxId.Caption)</td>
+			<td @Html.Raw(s_dohdrtest.TrxId.CellAttributes)>
+<span id="el_s_dohdrtest_TrxId">
+<span @Html.Raw(s_dohdrtest.TrxId.ViewAttributes)>
+@Html.Raw(s_dohdrtest.TrxId.GetViewValue())</span>
+</span>
+</td>
+		</tr>
+		} @* TrxId.Visible (end) *@
+		@if (s_dohdrtest.dt_rec.Visible) { // dt_rec.Visible (begin)
+		<tr id="r_dt_rec">
+			<td class="@s_dohdrtest.TableLeftColumnClass">@Html.Raw(s_dohdrtest.dt_rec.Caption)</td>
+			<td @Html.Raw(s_dohdrtest.dt_rec.CellAttributes)>
+<span id="el_s_dohdrtest_dt_rec">
+<span @Html.Raw(s_dohdrtest.dt_rec.ViewAttributes)>
+@Html.Raw(s_dohdrtest.dt_rec.GetViewValue())</span>
+</span>
+</td>
+		</tr>
+		} @* dt_rec.Visible (end) *@
+		@if (s_dohdrtest.do_no.Visible) { // do_no.Visible (begin)
+		<tr id="r_do_no">
+			<td class="@s_dohdrtest.TableLeftColumnClass">@Html.Raw(s_dohdrtest.do_no.Caption)</td>
+			<td @Html.Raw(s_dohdrtest.do_no.CellAttributes)>
+<span id="el_s_dohdrtest_do_no">
+<span @Html.Raw(s_dohdrtest.do_no.ViewAttributes)>
+@Html.Raw(s_dohdrtest.do_no.GetViewValue())</span>
+</span>
+</td>
+		</tr>
+		} @* do_no.Visible (end) *@
+		@if (s_dohdrtest.dbcode.Visible) { // dbcode.Visible (begin)
+		<tr id="r_dbcode">
+			<td class="@s_dohdrtest.TableLeftColumnClass">@Html.Raw(s_dohdrtest.dbcode.Caption)</td>
+			<td @Html.Raw(s_dohdrtest.dbcode.CellAttributes)>
+<span id="el_s_dohdrtest_dbcode">
+<span @Html.Raw(s_dohdrtest.dbcode.ViewAttributes)>
+@Html.Raw(s_dohdrtest.dbcode.GetViewValue())</span>
+</span>
+</td>
+		</tr>
+		} @* dbcode.Visible (end) *@
+		@if (s_dohdrtest.slsman.Visible) { // slsman.Visible (begin)
+		<tr id="r_slsman">
+			<td class="@s_dohdrtest.TableLeftColumnClass">@Html.Raw(s_dohdrtest.slsman.Caption)</td>
+			<td @Html.Raw(s_dohdrtest.slsman.CellAttributes)>
+<span id="el_s_dohdrtest_slsman">
+<span @Html.Raw(s_dohdrtest.slsman.ViewAttributes)>
+@Html.Raw(s_dohdrtest.slsman.GetViewValue())</span>
+</span>
+</td>
+		</tr>
+		} @* slsman.Visible (end) *@
+		@if (s_dohdrtest.fileno.Visible) { // fileno.Visible (begin)
+		<tr id="r_fileno">
+			<td class="@s_dohdrtest.TableLeftColumnClass">@Html.Raw(s_dohdrtest.fileno.Caption)</td>
+			<td @Html.Raw(s_dohdrtest.fileno.CellAttributes)>
+<span id="el_s_dohdrtest_fileno">
+<span @Html.Raw(s_dohdrtest.fileno.ViewAttributes)>
+@Html.Raw(s_dohdrtest.fileno.GetViewValue())</span>
+</span>
+</td>
+		</tr>
+		} @* fileno.Visible (end) *@
+		@if (s_dohdrtest.TrxUserId.Visible) { // TrxUserId.Visible (begin)
+		<tr id="r_TrxUserId">
+			<td class="@s_dohdrtest.TableLeftColumnClass">@Html.Raw(s_dohdrtest.TrxUserId.Caption)</td>
+			<td @Html.Raw(s_dohdrtest.TrxUserId.CellAttributes)>
+<span id="el_s_dohdrtest_TrxUserId">
+<span @Html.Raw(s_dohdrtest.TrxUserId.ViewAttributes)>
+@Html.Raw(s_dohdrtest.TrxUserId.GetViewValue())</span>
+</span>
+</td>
+		</tr>
+		} @* TrxUserId.Visible (end) *@
+		@if (s_dohdrtest.CurrencyCode.Visible) { // CurrencyCode.Visible (begin)
+		<tr id="r_CurrencyCode">
+			<td class="@s_dohdrtest.TableLeftColumnClass">@Html.Raw(s_dohdrtest.CurrencyCode.Caption)</td>
+			<td @Html.Raw(s_dohdrtest.CurrencyCode.CellAttributes)>
+<span id="el_s_dohdrtest_CurrencyCode">
+<span @Html.Raw(s_dohdrtest.CurrencyCode.ViewAttributes)>
+@Html.Raw(s_dohdrtest.CurrencyCode.GetViewValue())</span>
+</span>
+</td>
+		</tr>
+		} @* CurrencyCode.Visible (end) *@
+		@if (s_dohdrtest.ex_rate.Visible) { // ex_rate.Visible (begin)
+		<tr id="r_ex_rate">
+			<td class="@s_dohdrtest.TableLeftColumnClass">@Html.Raw(s_dohdrtest.ex_rate.Caption)</td>
+			<td @Html.Raw(s_dohdrtest.ex_rate.CellAttributes)>
+<span id="el_s_dohdrtest_ex_rate">
+<span @Html.Raw(s_dohdrtest.ex_rate.ViewAttributes)>
+@Html.Raw(s_dohdrtest.ex_rate.GetViewValue())</span>
+</span>
+</td>
+		</tr>
+		} @* ex_rate.Visible (end) *@
+		@if (s_dohdrtest.do_amount_original.Visible) { // do_amount_original.Visible (begin)
+		<tr id="r_do_amount_original">
+			<td class="@s_dohdrtest.TableLeftColumnClass">@Html.Raw(s_dohdrtest.do_amount_original.Caption)</td>
+			<td @Html.Raw(s_dohdrtest.do_amount_original.CellAttributes)>
+<span id="el_s_dohdrtest_do_amount_original">
+<span @Html.Raw(s_dohdrtest.do_amount_original.ViewAttributes)>
+@Html.Raw(s_dohdrtest.do_amount_original.GetViewValue())</span>
+</span>
+</td>
+		</tr>
+		} @* do_amount_original.Visible (end) *@
+		@if (s_dohdrtest.do_amount_loca.Visible) { // do_amount_loca.Visible (begin)
+		<tr id="r_do_amount_loca">
+			<td class="@s_dohdrtest.TableLeftColumnClass">@Html.Raw(s_dohdrtest.do_amount_loca.Caption)</td>
+			<td @Html.Raw(s_dohdrtest.do_amount_loca.CellAttributes)>
+<span id="el_s_dohdrtest_do_amount_loca">
+<span @Html.Raw(s_dohdrtest.do_amount_loca.ViewAttributes)>
+@Html.Raw(s_dohdrtest.do_amount_loca.GetViewValue())</span>
+</span>
+</td>
+		</tr>
+		} @* do_amount_loca.Visible (end) *@
+		@if (s_dohdrtest.rounding_adj.Visible) { // rounding_adj.Visible (begin)
+		<tr id="r_rounding_adj">
+			<td class="@s_dohdrtest.TableLeftColumnClass">@Html.Raw(s_dohdrtest.rounding_adj.Caption)</td>
+			<td @Html.Raw(s_dohdrtest.rounding_adj.CellAttributes)>
+<span id="el_s_dohdrtest_rounding_adj">
+<span @Html.Raw(s_dohdrtest.rounding_adj.ViewAttributes)>
+@Html.Raw(s_dohdrtest.rounding_adj.GetViewValue())</span>
+</span>
+</td>
+		</tr>
+		} @* rounding_adj.Visible (end) *@
+		@if (s_dohdrtest.ar_gl_acct.Visible) { // ar_gl_acct.Visible (begin)
+		<tr id="r_ar_gl_acct">
+			<td class="@s_dohdrtest.TableLeftColumnClass">@Html.Raw(s_dohdrtest.ar_gl_acct.Caption)</td>
+			<td @Html.Raw(s_dohdrtest.ar_gl_acct.CellAttributes)>
+<span id="el_s_dohdrtest_ar_gl_acct">
+<span @Html.Raw(s_dohdrtest.ar_gl_acct.ViewAttributes)>
+@Html.Raw(s_dohdrtest.ar_gl_acct.GetViewValue())</span>
+</span>
+</td>
+		</tr>
+		} @* ar_gl_acct.Visible (end) *@
+	</tbody>
+</table>
+</div>
+} @* s_dohdrtest_Master.Visible (end) *@

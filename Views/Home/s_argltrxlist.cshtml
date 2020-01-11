@@ -1,0 +1,670 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_argltrx_List.Page_Render();
+
+	// Check action result
+	if (s_argltrx_List.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_argltrx.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "list";
+var fs_argltrxlist = currentForm = new ew.Form("fs_argltrxlist", "list");
+fs_argltrxlist.formKeyCountName = "@s_argltrx_List.FormKeyCountName";
+
+// Form_CustomValidate event
+fs_argltrxlist.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_argltrxlist.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_argltrxlist.lists["x_markdelete"] = @Html.Raw(s_argltrx_List.markdelete.Lookup.ToClientList());
+fs_argltrxlist.lists["x_markdelete"].options = @Html.Raw(ConvertToJson(s_argltrx_List.markdelete.Options(false))); // DN
+
+// Form object for search
+var fs_argltrxlistsrch = currentSearchForm = new ew.Form("fs_argltrxlistsrch");
+
+// Filters
+fs_argltrxlistsrch.filterList = @Html.Raw(await s_argltrx_List.GetFilterList());
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_argltrx.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+@if (s_argltrx_List.TotalRecords > 0 && s_argltrx_List.ExportOptions.Visible) {
+	s_argltrx_List.ExportOptions.Render("body");
+}
+@if (s_argltrx_List.ImportOptions.Visible) {
+	s_argltrx_List.ImportOptions.Render("body");
+}
+@if (s_argltrx_List.SearchOptions.Visible) {
+	s_argltrx_List.SearchOptions.Render("body");
+}
+@if (s_argltrx_List.FilterOptions.Visible) {
+	s_argltrx_List.FilterOptions.Render("body");
+}
+<div class="clearfix"></div>
+</div>
+}
+@{ s_argltrx_List.RenderOtherOptions(); }
+@if (Security.CanSearch) {
+if (!s_argltrx_List.IsExport() && Empty(s_argltrx_List.CurrentAction)) { // Begin search form
+<form name="fs_argltrxlistsrch" id="fs_argltrxlistsrch" class="form-inline ew-form ew-ext-search-form" action="@AppPath(CurrentPageName())">
+<div id="fs_argltrxlistsrch-search-panel" class="ew-search-panel collapse@(!Empty(s_argltrx_List.SearchWhere) ? " show" : " show")">
+<input type="hidden" name="cmd" value="search">
+<div class="ew-basic-search">
+<div id="xsr_1" class="ew-row d-sm-flex">
+	<div class="ew-quick-search input-group">
+	<input type="text" name="@Config.TableBasicSearch" id="@Config.TableBasicSearch" class="form-control" value="@s_argltrx_List.BasicSearch.SessionKeyword" placeholder="@Language.Phrase("Search")">
+	<input type="hidden" name="@Config.TableBasicSearchType" id="@Config.TableBasicSearchType" value="@s_argltrx_List.BasicSearch.SessionType">
+	<div class="input-group-append">
+		<button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit">@Html.Raw(Language.Phrase("SearchBtn"))</button>
+		<button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype">@Html.Raw(s_argltrx_List.BasicSearch.TypeNameShort)</span></button>
+		<div class="dropdown-menu dropdown-menu-right">
+			<a class="dropdown-item @((s_argltrx_List.BasicSearch.SessionType == "") ? " active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this)">@Html.Raw(Language.Phrase("QuickSearchAuto"))</a>
+			<a class="dropdown-item @((s_argltrx_List.BasicSearch.SessionType == "=") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'=')">@Html.Raw(Language.Phrase("QuickSearchExact"))</a>
+			<a class="dropdown-item @((s_argltrx_List.BasicSearch.SessionType == "AND") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'AND')">@Html.Raw(Language.Phrase("QuickSearchAll"))</a>
+			<a class="dropdown-item @((s_argltrx_List.BasicSearch.SessionType == "OR") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'OR')">@Html.Raw(Language.Phrase("QuickSearchAny"))</a>
+		</div>
+	</div>
+	</div>
+</div>
+</div>
+</div>
+</form>
+} @* End search form *@
+}
+@s_argltrx_List.ShowPageHeader()
+@s_argltrx_List.ShowMessages()
+@if (s_argltrx_List.TotalRecords > 0 || s_argltrx_List.CurrentAction != "") {
+<div class="card ew-card ew-grid@(s_argltrx_List.IsAddOrEdit ? " ew-grid-add-edit" : "") s_argltrx">
+<form name="fs_argltrxlist" id="fs_argltrxlist" class="form-inline ew-form ew-list-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_argltrx_List.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<div id="gmp_s_argltrx" class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+@if (s_argltrx_List.TotalRecords > 0 || s_argltrx.IsGridEdit) { // Begin If TotalRecords > 0
+<table id="tbl_s_argltrxlist" class="table ew-table"><!-- .ew-table -->
+<thead>
+	<tr class="ew-table-header">
+@{
+
+	// Header row
+	s_argltrx_List.RowType = Config.RowTypeHeader;
+
+	// Render list options
+	await s_argltrx_List.RenderListOptions();
+
+	// Render list options (header, left)
+	s_argltrx_List.ListOptions.Render("header", "left");
+}
+@if (s_argltrx.dt_rec.Visible) { // dt_rec.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.dt_rec) == "") {
+		<th data-name="dt_rec" class="@s_argltrx.dt_rec.HeaderCellClass"><div id="elh_s_argltrx_dt_rec" class="s_argltrx_dt_rec"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.dt_rec.Caption)</div></div></th>
+	} else {
+		<th data-name="dt_rec" class="@s_argltrx.dt_rec.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.dt_rec))',1);"><div id="elh_s_argltrx_dt_rec" class="s_argltrx_dt_rec">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.dt_rec.Caption)</span><span class="ew-table-header-sort">@if (s_argltrx.dt_rec.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.dt_rec.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* dt_rec.Visible (end) *@
+@if (s_argltrx.doc_date.Visible) { // doc_date.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.doc_date) == "") {
+		<th data-name="doc_date" class="@s_argltrx.doc_date.HeaderCellClass"><div id="elh_s_argltrx_doc_date" class="s_argltrx_doc_date"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.doc_date.Caption)</div></div></th>
+	} else {
+		<th data-name="doc_date" class="@s_argltrx.doc_date.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.doc_date))',1);"><div id="elh_s_argltrx_doc_date" class="s_argltrx_doc_date">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.doc_date.Caption)</span><span class="ew-table-header-sort">@if (s_argltrx.doc_date.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.doc_date.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* doc_date.Visible (end) *@
+@if (s_argltrx.dbcode.Visible) { // dbcode.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.dbcode) == "") {
+		<th data-name="dbcode" class="@s_argltrx.dbcode.HeaderCellClass"><div id="elh_s_argltrx_dbcode" class="s_argltrx_dbcode"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.dbcode.Caption)</div></div></th>
+	} else {
+		<th data-name="dbcode" class="@s_argltrx.dbcode.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.dbcode))',1);"><div id="elh_s_argltrx_dbcode" class="s_argltrx_dbcode">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.dbcode.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_argltrx.dbcode.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.dbcode.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* dbcode.Visible (end) *@
+@if (s_argltrx.ref_no.Visible) { // ref_no.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.ref_no) == "") {
+		<th data-name="ref_no" class="@s_argltrx.ref_no.HeaderCellClass"><div id="elh_s_argltrx_ref_no" class="s_argltrx_ref_no"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.ref_no.Caption)</div></div></th>
+	} else {
+		<th data-name="ref_no" class="@s_argltrx.ref_no.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.ref_no))',1);"><div id="elh_s_argltrx_ref_no" class="s_argltrx_ref_no">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.ref_no.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_argltrx.ref_no.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.ref_no.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* ref_no.Visible (end) *@
+@if (s_argltrx.db_cr.Visible) { // db_cr.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.db_cr) == "") {
+		<th data-name="db_cr" class="@s_argltrx.db_cr.HeaderCellClass"><div id="elh_s_argltrx_db_cr" class="s_argltrx_db_cr"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.db_cr.Caption)</div></div></th>
+	} else {
+		<th data-name="db_cr" class="@s_argltrx.db_cr.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.db_cr))',1);"><div id="elh_s_argltrx_db_cr" class="s_argltrx_db_cr">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.db_cr.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_argltrx.db_cr.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.db_cr.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* db_cr.Visible (end) *@
+@if (s_argltrx.to_gl_acct.Visible) { // to_gl_acct.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.to_gl_acct) == "") {
+		<th data-name="to_gl_acct" class="@s_argltrx.to_gl_acct.HeaderCellClass"><div id="elh_s_argltrx_to_gl_acct" class="s_argltrx_to_gl_acct"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.to_gl_acct.Caption)</div></div></th>
+	} else {
+		<th data-name="to_gl_acct" class="@s_argltrx.to_gl_acct.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.to_gl_acct))',1);"><div id="elh_s_argltrx_to_gl_acct" class="s_argltrx_to_gl_acct">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.to_gl_acct.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_argltrx.to_gl_acct.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.to_gl_acct.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* to_gl_acct.Visible (end) *@
+@if (s_argltrx.to_gl_dept.Visible) { // to_gl_dept.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.to_gl_dept) == "") {
+		<th data-name="to_gl_dept" class="@s_argltrx.to_gl_dept.HeaderCellClass"><div id="elh_s_argltrx_to_gl_dept" class="s_argltrx_to_gl_dept"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.to_gl_dept.Caption)</div></div></th>
+	} else {
+		<th data-name="to_gl_dept" class="@s_argltrx.to_gl_dept.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.to_gl_dept))',1);"><div id="elh_s_argltrx_to_gl_dept" class="s_argltrx_to_gl_dept">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.to_gl_dept.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_argltrx.to_gl_dept.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.to_gl_dept.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* to_gl_dept.Visible (end) *@
+@if (s_argltrx.amt_gl.Visible) { // amt_gl.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.amt_gl) == "") {
+		<th data-name="amt_gl" class="@s_argltrx.amt_gl.HeaderCellClass"><div id="elh_s_argltrx_amt_gl" class="s_argltrx_amt_gl"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.amt_gl.Caption)</div></div></th>
+	} else {
+		<th data-name="amt_gl" class="@s_argltrx.amt_gl.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.amt_gl))',1);"><div id="elh_s_argltrx_amt_gl" class="s_argltrx_amt_gl">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.amt_gl.Caption)</span><span class="ew-table-header-sort">@if (s_argltrx.amt_gl.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.amt_gl.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* amt_gl.Visible (end) *@
+@if (s_argltrx.month.Visible) { // month.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.month) == "") {
+		<th data-name="month" class="@s_argltrx.month.HeaderCellClass"><div id="elh_s_argltrx_month" class="s_argltrx_month"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.month.Caption)</div></div></th>
+	} else {
+		<th data-name="month" class="@s_argltrx.month.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.month))',1);"><div id="elh_s_argltrx_month" class="s_argltrx_month">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.month.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_argltrx.month.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.month.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* month.Visible (end) *@
+@if (s_argltrx.source.Visible) { // source.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.source) == "") {
+		<th data-name="source" class="@s_argltrx.source.HeaderCellClass"><div id="elh_s_argltrx_source" class="s_argltrx_source"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.source.Caption)</div></div></th>
+	} else {
+		<th data-name="source" class="@s_argltrx.source.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.source))',1);"><div id="elh_s_argltrx_source" class="s_argltrx_source">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.source.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_argltrx.source.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.source.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* source.Visible (end) *@
+@if (s_argltrx.forx_amt.Visible) { // forx_amt.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.forx_amt) == "") {
+		<th data-name="forx_amt" class="@s_argltrx.forx_amt.HeaderCellClass"><div id="elh_s_argltrx_forx_amt" class="s_argltrx_forx_amt"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.forx_amt.Caption)</div></div></th>
+	} else {
+		<th data-name="forx_amt" class="@s_argltrx.forx_amt.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.forx_amt))',1);"><div id="elh_s_argltrx_forx_amt" class="s_argltrx_forx_amt">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.forx_amt.Caption)</span><span class="ew-table-header-sort">@if (s_argltrx.forx_amt.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.forx_amt.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* forx_amt.Visible (end) *@
+@if (s_argltrx.markdelete.Visible) { // markdelete.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.markdelete) == "") {
+		<th data-name="markdelete" class="@s_argltrx.markdelete.HeaderCellClass"><div id="elh_s_argltrx_markdelete" class="s_argltrx_markdelete"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.markdelete.Caption)</div></div></th>
+	} else {
+		<th data-name="markdelete" class="@s_argltrx.markdelete.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.markdelete))',1);"><div id="elh_s_argltrx_markdelete" class="s_argltrx_markdelete">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.markdelete.Caption)</span><span class="ew-table-header-sort">@if (s_argltrx.markdelete.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.markdelete.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* markdelete.Visible (end) *@
+@if (s_argltrx.trn_no.Visible) { // trn_no.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.trn_no) == "") {
+		<th data-name="trn_no" class="@s_argltrx.trn_no.HeaderCellClass"><div id="elh_s_argltrx_trn_no" class="s_argltrx_trn_no"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.trn_no.Caption)</div></div></th>
+	} else {
+		<th data-name="trn_no" class="@s_argltrx.trn_no.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.trn_no))',1);"><div id="elh_s_argltrx_trn_no" class="s_argltrx_trn_no">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.trn_no.Caption)</span><span class="ew-table-header-sort">@if (s_argltrx.trn_no.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.trn_no.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* trn_no.Visible (end) *@
+@if (s_argltrx.prefix.Visible) { // prefix.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.prefix) == "") {
+		<th data-name="prefix" class="@s_argltrx.prefix.HeaderCellClass"><div id="elh_s_argltrx_prefix" class="s_argltrx_prefix"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.prefix.Caption)</div></div></th>
+	} else {
+		<th data-name="prefix" class="@s_argltrx.prefix.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.prefix))',1);"><div id="elh_s_argltrx_prefix" class="s_argltrx_prefix">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.prefix.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_argltrx.prefix.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.prefix.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* prefix.Visible (end) *@
+@if (s_argltrx.exrate.Visible) { // exrate.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.exrate) == "") {
+		<th data-name="exrate" class="@s_argltrx.exrate.HeaderCellClass"><div id="elh_s_argltrx_exrate" class="s_argltrx_exrate"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.exrate.Caption)</div></div></th>
+	} else {
+		<th data-name="exrate" class="@s_argltrx.exrate.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.exrate))',1);"><div id="elh_s_argltrx_exrate" class="s_argltrx_exrate">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.exrate.Caption)</span><span class="ew-table-header-sort">@if (s_argltrx.exrate.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.exrate.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* exrate.Visible (end) *@
+@if (s_argltrx.clear_fp.Visible) { // clear_fp.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.clear_fp) == "") {
+		<th data-name="clear_fp" class="@s_argltrx.clear_fp.HeaderCellClass"><div id="elh_s_argltrx_clear_fp" class="s_argltrx_clear_fp"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.clear_fp.Caption)</div></div></th>
+	} else {
+		<th data-name="clear_fp" class="@s_argltrx.clear_fp.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.clear_fp))',1);"><div id="elh_s_argltrx_clear_fp" class="s_argltrx_clear_fp">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.clear_fp.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_argltrx.clear_fp.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.clear_fp.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* clear_fp.Visible (end) *@
+@if (s_argltrx.note.Visible) { // note.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.note) == "") {
+		<th data-name="note" class="@s_argltrx.note.HeaderCellClass"><div id="elh_s_argltrx_note" class="s_argltrx_note"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.note.Caption)</div></div></th>
+	} else {
+		<th data-name="note" class="@s_argltrx.note.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.note))',1);"><div id="elh_s_argltrx_note" class="s_argltrx_note">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.note.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_argltrx.note.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.note.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* note.Visible (end) *@
+@if (s_argltrx.dt_upd.Visible) { // dt_upd.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.dt_upd) == "") {
+		<th data-name="dt_upd" class="@s_argltrx.dt_upd.HeaderCellClass"><div id="elh_s_argltrx_dt_upd" class="s_argltrx_dt_upd"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.dt_upd.Caption)</div></div></th>
+	} else {
+		<th data-name="dt_upd" class="@s_argltrx.dt_upd.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.dt_upd))',1);"><div id="elh_s_argltrx_dt_upd" class="s_argltrx_dt_upd">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.dt_upd.Caption)</span><span class="ew-table-header-sort">@if (s_argltrx.dt_upd.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.dt_upd.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* dt_upd.Visible (end) *@
+@if (s_argltrx.id_upd.Visible) { // id_upd.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.id_upd) == "") {
+		<th data-name="id_upd" class="@s_argltrx.id_upd.HeaderCellClass"><div id="elh_s_argltrx_id_upd" class="s_argltrx_id_upd"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.id_upd.Caption)</div></div></th>
+	} else {
+		<th data-name="id_upd" class="@s_argltrx.id_upd.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.id_upd))',1);"><div id="elh_s_argltrx_id_upd" class="s_argltrx_id_upd">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.id_upd.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_argltrx.id_upd.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.id_upd.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* id_upd.Visible (end) *@
+@if (s_argltrx.rowid.Visible) { // rowid.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.rowid) == "") {
+		<th data-name="rowid" class="@s_argltrx.rowid.HeaderCellClass"><div id="elh_s_argltrx_rowid" class="s_argltrx_rowid"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.rowid.Caption)</div></div></th>
+	} else {
+		<th data-name="rowid" class="@s_argltrx.rowid.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.rowid))',1);"><div id="elh_s_argltrx_rowid" class="s_argltrx_rowid">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.rowid.Caption)</span><span class="ew-table-header-sort">@if (s_argltrx.rowid.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.rowid.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* rowid.Visible (end) *@
+@if (s_argltrx.tax_code.Visible) { // tax_code.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.tax_code) == "") {
+		<th data-name="tax_code" class="@s_argltrx.tax_code.HeaderCellClass"><div id="elh_s_argltrx_tax_code" class="s_argltrx_tax_code"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.tax_code.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_code" class="@s_argltrx.tax_code.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.tax_code))',1);"><div id="elh_s_argltrx_tax_code" class="s_argltrx_tax_code">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.tax_code.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_argltrx.tax_code.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.tax_code.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_code.Visible (end) *@
+@if (s_argltrx.tax_rate.Visible) { // tax_rate.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.tax_rate) == "") {
+		<th data-name="tax_rate" class="@s_argltrx.tax_rate.HeaderCellClass"><div id="elh_s_argltrx_tax_rate" class="s_argltrx_tax_rate"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.tax_rate.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_rate" class="@s_argltrx.tax_rate.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.tax_rate))',1);"><div id="elh_s_argltrx_tax_rate" class="s_argltrx_tax_rate">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.tax_rate.Caption)</span><span class="ew-table-header-sort">@if (s_argltrx.tax_rate.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.tax_rate.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_rate.Visible (end) *@
+@if (s_argltrx.gst_date.Visible) { // gst_date.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.gst_date) == "") {
+		<th data-name="gst_date" class="@s_argltrx.gst_date.HeaderCellClass"><div id="elh_s_argltrx_gst_date" class="s_argltrx_gst_date"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.gst_date.Caption)</div></div></th>
+	} else {
+		<th data-name="gst_date" class="@s_argltrx.gst_date.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.gst_date))',1);"><div id="elh_s_argltrx_gst_date" class="s_argltrx_gst_date">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.gst_date.Caption)</span><span class="ew-table-header-sort">@if (s_argltrx.gst_date.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.gst_date.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* gst_date.Visible (end) *@
+@if (s_argltrx.tax_value.Visible) { // tax_value.Visible (begin)
+	if (s_argltrx_List.SortUrl(s_argltrx.tax_value) == "") {
+		<th data-name="tax_value" class="@s_argltrx.tax_value.HeaderCellClass"><div id="elh_s_argltrx_tax_value" class="s_argltrx_tax_value"><div class="ew-table-header-caption">@Html.Raw(s_argltrx.tax_value.Caption)</div></div></th>
+	} else {
+		<th data-name="tax_value" class="@s_argltrx.tax_value.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_argltrx.SortUrl(s_argltrx.tax_value))',1);"><div id="elh_s_argltrx_tax_value" class="s_argltrx_tax_value">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_argltrx.tax_value.Caption)</span><span class="ew-table-header-sort">@if (s_argltrx.tax_value.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_argltrx.tax_value.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* tax_value.Visible (end) *@
+@{
+
+	// Render list options (header, right)
+	s_argltrx_List.ListOptions.Render("header", "right");
+}
+	</tr>
+</thead>
+<tbody>
+@{ // Begin Code
+if (s_argltrx_List.ExportAll && s_argltrx_List.IsExport()) {
+	s_argltrx_List.StopRecord = s_argltrx_List.TotalRecords;
+} else {
+
+	// Set the last record to display
+	if (s_argltrx_List.TotalRecords > s_argltrx_List.StartRecord + s_argltrx_List.DisplayRecords - 1) {
+		s_argltrx_List.StopRecord = s_argltrx_List.StartRecord + s_argltrx_List.DisplayRecords - 1;
+	} else {
+		s_argltrx_List.StopRecord = s_argltrx_List.TotalRecords;
+	}
+}
+if (s_argltrx_List.Recordset != null && s_argltrx_List.Recordset.HasRows) {
+	if (!s_argltrx_List.Connection.SelectOffset) { // DN
+		for (var i = 1; i <= s_argltrx_List.StartRecord - 1; i++) { // Move to first record
+			if (await s_argltrx_List.Recordset.ReadAsync()) {
+				s_argltrx_List.RecordCount++;
+			}
+		}
+	} else {
+		s_argltrx_List.RecordCount = s_argltrx_List.StartRecord - 1;
+	}
+} else if (!s_argltrx_List.AllowAddDeleteRow && s_argltrx_List.StopRecord == 0) {
+	s_argltrx_List.StopRecord = s_argltrx_List.GridAddRowCount;
+}
+
+// Initialize aggregate
+s_argltrx_List.RowType = Config.RowTypeAggregateInit;
+s_argltrx_List.ResetAttributes();
+await s_argltrx_List.RenderRow();
+
+// Output data rows
+bool eof = (s_argltrx_List.Recordset == null); // DN
+while (s_argltrx_List.RecordCount < s_argltrx_List.StopRecord) { // Begin While
+	if (!s_argltrx_List.IsGridAdd && !eof) { // DN
+		eof = !await s_argltrx_List.Recordset.ReadAsync();
+	}
+	s_argltrx_List.RecordCount++;
+	if (s_argltrx_List.RecordCount >= s_argltrx_List.StartRecord) {
+		s_argltrx_List.RowCnt++;
+
+		// Set up key count
+		s_argltrx_List.KeyCount = ConvertToInt(s_argltrx_List.RowIndex);
+
+		// Init row class and style
+		s_argltrx_List.ResetAttributes();
+		s_argltrx_List.CssClass = "";
+		if (s_argltrx_List.IsGridAdd) {
+		} else {
+			await s_argltrx_List.LoadRowValues(s_argltrx_List.Recordset); // Load row values
+		}
+		s_argltrx_List.RowType = Config.RowTypeView; // Render view
+
+		// Set up row id / data-rowindex
+		s_argltrx_List.RowAttrs.Add("data-rowindex", Convert.ToString(s_argltrx_List.RowCnt));
+		s_argltrx_List.RowAttrs.Add("id", "r" + Convert.ToString(s_argltrx_List.RowCnt) + "_s_argltrx");
+		s_argltrx_List.RowAttrs.Add("data-rowtype", Convert.ToString(s_argltrx_List.RowType));
+
+		// Render row
+		await s_argltrx_List.RenderRow();
+
+		// Render list options
+		await s_argltrx_List.RenderListOptions();
+	<tr @Html.Raw(s_argltrx_List.RowAttributes)>
+	@{
+
+		// Render list options (body, left)
+		s_argltrx_List.ListOptions.Render("body", "left", s_argltrx_List.RowCnt);
+	}
+	@if (s_argltrx.dt_rec.Visible) { // dt_rec.Visible (begin)
+		<td data-name="dt_rec"@Html.Raw(s_argltrx.dt_rec.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_dt_rec" class="s_argltrx_dt_rec">
+<span @Html.Raw(s_argltrx.dt_rec.ViewAttributes)>
+@Html.Raw(s_argltrx.dt_rec.GetViewValue())</span>
+</span>
+</td>
+	} @* dt_rec.Visible (end) *@
+	@if (s_argltrx.doc_date.Visible) { // doc_date.Visible (begin)
+		<td data-name="doc_date"@Html.Raw(s_argltrx.doc_date.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_doc_date" class="s_argltrx_doc_date">
+<span @Html.Raw(s_argltrx.doc_date.ViewAttributes)>
+@Html.Raw(s_argltrx.doc_date.GetViewValue())</span>
+</span>
+</td>
+	} @* doc_date.Visible (end) *@
+	@if (s_argltrx.dbcode.Visible) { // dbcode.Visible (begin)
+		<td data-name="dbcode"@Html.Raw(s_argltrx.dbcode.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_dbcode" class="s_argltrx_dbcode">
+<span @Html.Raw(s_argltrx.dbcode.ViewAttributes)>
+@Html.Raw(s_argltrx.dbcode.GetViewValue())</span>
+</span>
+</td>
+	} @* dbcode.Visible (end) *@
+	@if (s_argltrx.ref_no.Visible) { // ref_no.Visible (begin)
+		<td data-name="ref_no"@Html.Raw(s_argltrx.ref_no.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_ref_no" class="s_argltrx_ref_no">
+<span @Html.Raw(s_argltrx.ref_no.ViewAttributes)>
+@Html.Raw(s_argltrx.ref_no.GetViewValue())</span>
+</span>
+</td>
+	} @* ref_no.Visible (end) *@
+	@if (s_argltrx.db_cr.Visible) { // db_cr.Visible (begin)
+		<td data-name="db_cr"@Html.Raw(s_argltrx.db_cr.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_db_cr" class="s_argltrx_db_cr">
+<span @Html.Raw(s_argltrx.db_cr.ViewAttributes)>
+@Html.Raw(s_argltrx.db_cr.GetViewValue())</span>
+</span>
+</td>
+	} @* db_cr.Visible (end) *@
+	@if (s_argltrx.to_gl_acct.Visible) { // to_gl_acct.Visible (begin)
+		<td data-name="to_gl_acct"@Html.Raw(s_argltrx.to_gl_acct.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_to_gl_acct" class="s_argltrx_to_gl_acct">
+<span @Html.Raw(s_argltrx.to_gl_acct.ViewAttributes)>
+@Html.Raw(s_argltrx.to_gl_acct.GetViewValue())</span>
+</span>
+</td>
+	} @* to_gl_acct.Visible (end) *@
+	@if (s_argltrx.to_gl_dept.Visible) { // to_gl_dept.Visible (begin)
+		<td data-name="to_gl_dept"@Html.Raw(s_argltrx.to_gl_dept.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_to_gl_dept" class="s_argltrx_to_gl_dept">
+<span @Html.Raw(s_argltrx.to_gl_dept.ViewAttributes)>
+@Html.Raw(s_argltrx.to_gl_dept.GetViewValue())</span>
+</span>
+</td>
+	} @* to_gl_dept.Visible (end) *@
+	@if (s_argltrx.amt_gl.Visible) { // amt_gl.Visible (begin)
+		<td data-name="amt_gl"@Html.Raw(s_argltrx.amt_gl.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_amt_gl" class="s_argltrx_amt_gl">
+<span @Html.Raw(s_argltrx.amt_gl.ViewAttributes)>
+@Html.Raw(s_argltrx.amt_gl.GetViewValue())</span>
+</span>
+</td>
+	} @* amt_gl.Visible (end) *@
+	@if (s_argltrx.month.Visible) { // month.Visible (begin)
+		<td data-name="month"@Html.Raw(s_argltrx.month.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_month" class="s_argltrx_month">
+<span @Html.Raw(s_argltrx.month.ViewAttributes)>
+@Html.Raw(s_argltrx.month.GetViewValue())</span>
+</span>
+</td>
+	} @* month.Visible (end) *@
+	@if (s_argltrx.source.Visible) { // source.Visible (begin)
+		<td data-name="source"@Html.Raw(s_argltrx.source.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_source" class="s_argltrx_source">
+<span @Html.Raw(s_argltrx.source.ViewAttributes)>
+@Html.Raw(s_argltrx.source.GetViewValue())</span>
+</span>
+</td>
+	} @* source.Visible (end) *@
+	@if (s_argltrx.forx_amt.Visible) { // forx_amt.Visible (begin)
+		<td data-name="forx_amt"@Html.Raw(s_argltrx.forx_amt.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_forx_amt" class="s_argltrx_forx_amt">
+<span @Html.Raw(s_argltrx.forx_amt.ViewAttributes)>
+@Html.Raw(s_argltrx.forx_amt.GetViewValue())</span>
+</span>
+</td>
+	} @* forx_amt.Visible (end) *@
+	@if (s_argltrx.markdelete.Visible) { // markdelete.Visible (begin)
+		<td data-name="markdelete"@Html.Raw(s_argltrx.markdelete.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_markdelete" class="s_argltrx_markdelete">
+<span @Html.Raw(s_argltrx.markdelete.ViewAttributes)>
+<input type="checkbox" value="@s_argltrx.markdelete.GetViewValue()" disabled checked="@ConvertToBool(s_argltrx.markdelete.CurrentValue)"></span>
+</span>
+</td>
+	} @* markdelete.Visible (end) *@
+	@if (s_argltrx.trn_no.Visible) { // trn_no.Visible (begin)
+		<td data-name="trn_no"@Html.Raw(s_argltrx.trn_no.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_trn_no" class="s_argltrx_trn_no">
+<span @Html.Raw(s_argltrx.trn_no.ViewAttributes)>
+@Html.Raw(s_argltrx.trn_no.GetViewValue())</span>
+</span>
+</td>
+	} @* trn_no.Visible (end) *@
+	@if (s_argltrx.prefix.Visible) { // prefix.Visible (begin)
+		<td data-name="prefix"@Html.Raw(s_argltrx.prefix.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_prefix" class="s_argltrx_prefix">
+<span @Html.Raw(s_argltrx.prefix.ViewAttributes)>
+@Html.Raw(s_argltrx.prefix.GetViewValue())</span>
+</span>
+</td>
+	} @* prefix.Visible (end) *@
+	@if (s_argltrx.exrate.Visible) { // exrate.Visible (begin)
+		<td data-name="exrate"@Html.Raw(s_argltrx.exrate.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_exrate" class="s_argltrx_exrate">
+<span @Html.Raw(s_argltrx.exrate.ViewAttributes)>
+@Html.Raw(s_argltrx.exrate.GetViewValue())</span>
+</span>
+</td>
+	} @* exrate.Visible (end) *@
+	@if (s_argltrx.clear_fp.Visible) { // clear_fp.Visible (begin)
+		<td data-name="clear_fp"@Html.Raw(s_argltrx.clear_fp.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_clear_fp" class="s_argltrx_clear_fp">
+<span @Html.Raw(s_argltrx.clear_fp.ViewAttributes)>
+@Html.Raw(s_argltrx.clear_fp.GetViewValue())</span>
+</span>
+</td>
+	} @* clear_fp.Visible (end) *@
+	@if (s_argltrx.note.Visible) { // note.Visible (begin)
+		<td data-name="note"@Html.Raw(s_argltrx.note.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_note" class="s_argltrx_note">
+<span @Html.Raw(s_argltrx.note.ViewAttributes)>
+@Html.Raw(s_argltrx.note.GetViewValue())</span>
+</span>
+</td>
+	} @* note.Visible (end) *@
+	@if (s_argltrx.dt_upd.Visible) { // dt_upd.Visible (begin)
+		<td data-name="dt_upd"@Html.Raw(s_argltrx.dt_upd.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_dt_upd" class="s_argltrx_dt_upd">
+<span @Html.Raw(s_argltrx.dt_upd.ViewAttributes)>
+@Html.Raw(s_argltrx.dt_upd.GetViewValue())</span>
+</span>
+</td>
+	} @* dt_upd.Visible (end) *@
+	@if (s_argltrx.id_upd.Visible) { // id_upd.Visible (begin)
+		<td data-name="id_upd"@Html.Raw(s_argltrx.id_upd.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_id_upd" class="s_argltrx_id_upd">
+<span @Html.Raw(s_argltrx.id_upd.ViewAttributes)>
+@Html.Raw(s_argltrx.id_upd.GetViewValue())</span>
+</span>
+</td>
+	} @* id_upd.Visible (end) *@
+	@if (s_argltrx.rowid.Visible) { // rowid.Visible (begin)
+		<td data-name="rowid"@Html.Raw(s_argltrx.rowid.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_rowid" class="s_argltrx_rowid">
+<span @Html.Raw(s_argltrx.rowid.ViewAttributes)>
+@Html.Raw(s_argltrx.rowid.GetViewValue())</span>
+</span>
+</td>
+	} @* rowid.Visible (end) *@
+	@if (s_argltrx.tax_code.Visible) { // tax_code.Visible (begin)
+		<td data-name="tax_code"@Html.Raw(s_argltrx.tax_code.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_tax_code" class="s_argltrx_tax_code">
+<span @Html.Raw(s_argltrx.tax_code.ViewAttributes)>
+@Html.Raw(s_argltrx.tax_code.GetViewValue())</span>
+</span>
+</td>
+	} @* tax_code.Visible (end) *@
+	@if (s_argltrx.tax_rate.Visible) { // tax_rate.Visible (begin)
+		<td data-name="tax_rate"@Html.Raw(s_argltrx.tax_rate.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_tax_rate" class="s_argltrx_tax_rate">
+<span @Html.Raw(s_argltrx.tax_rate.ViewAttributes)>
+@Html.Raw(s_argltrx.tax_rate.GetViewValue())</span>
+</span>
+</td>
+	} @* tax_rate.Visible (end) *@
+	@if (s_argltrx.gst_date.Visible) { // gst_date.Visible (begin)
+		<td data-name="gst_date"@Html.Raw(s_argltrx.gst_date.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_gst_date" class="s_argltrx_gst_date">
+<span @Html.Raw(s_argltrx.gst_date.ViewAttributes)>
+@Html.Raw(s_argltrx.gst_date.GetViewValue())</span>
+</span>
+</td>
+	} @* gst_date.Visible (end) *@
+	@if (s_argltrx.tax_value.Visible) { // tax_value.Visible (begin)
+		<td data-name="tax_value"@Html.Raw(s_argltrx.tax_value.CellAttributes)>
+<span id="el@(s_argltrx_List.RowCnt)_s_argltrx_tax_value" class="s_argltrx_tax_value">
+<span @Html.Raw(s_argltrx.tax_value.ViewAttributes)>
+@Html.Raw(s_argltrx.tax_value.GetViewValue())</span>
+</span>
+</td>
+	} @* tax_value.Visible (end) *@
+	@{
+
+		// Render list options (body, right)
+		s_argltrx_List.ListOptions.Render("body", "right", s_argltrx_List.RowCnt);
+	}
+	</tr>
+	} @* End if *@
+} @* End While *@
+} @* End Code *@
+</tbody>
+</table><!-- /.ew-table -->
+} @* End If TotalRecords > 0 *@
+@if (Empty(s_argltrx_List.CurrentAction)) {
+<input type="hidden" name="action" id="action" value="">
+}
+</div><!-- /.ew-grid-middle-panel -->
+</form><!-- /.ew-list-form -->
+@{ s_argltrx_List.CloseRecordset(); }
+		@if (!s_argltrx.IsExport()) {
+		<div class="card-footer ew-grid-lower-panel">
+		<div class="ew-list-other-options">
+		@s_argltrx_List.OtherOptions.RenderBody("bottom")
+		</div>
+		@if (!s_argltrx_List.IsGridAdd) {
+			<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="@AppPath(CurrentPageName())">
+			@s_argltrx_List.Pager.Render()
+			</form>
+		}
+		<div class="clearfix"></div>
+		</div>
+		}
+</div><!-- /.ew-grid -->
+}
+@if (s_argltrx_List.TotalRecords <= 0 && s_argltrx_List.CurrentAction == "") { // Show other options
+<div class="ew-list-other-options">
+@s_argltrx_List.OtherOptions.ForEach(opt => opt.ButtonClass = "").RenderBody()
+</div>
+<div class="clearfix"></div>
+}
+@s_argltrx_List.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_argltrx.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

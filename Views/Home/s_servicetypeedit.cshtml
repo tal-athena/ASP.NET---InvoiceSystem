@@ -1,0 +1,210 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_servicetype_Edit.Page_Render();
+
+	// Check action result
+	if (s_servicetype_Edit.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "edit";
+var fs_servicetypeedit = currentForm = new ew.Form("fs_servicetypeedit", "edit");
+
+// Validate form
+fs_servicetypeedit.validate = function() {
+	if (!this.validateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.getForm(), $fobj = $(fobj);
+	if ($fobj.find("#confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.formKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = ["insert", "gridinsert"].includes($fobj.find("#action").val()) && $k[0];
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+	@if (s_servicetype_Edit.Id.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Id");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_servicetype.Id.RequiredErrorMessage.Replace("%s", s_servicetype.Id.Caption)))");
+		</text>
+	}
+	@if (s_servicetype_Edit.service_type.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_service_type");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_servicetype.service_type.RequiredErrorMessage.Replace("%s", s_servicetype.service_type.Caption)))");
+		</text>
+	}
+	@if (s_servicetype_Edit.description.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_description");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_servicetype.description.RequiredErrorMessage.Replace("%s", s_servicetype.description.Caption)))");
+		</text>
+	}
+	@if (s_servicetype_Edit.dt_upd.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_dt_upd");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_servicetype.dt_upd.RequiredErrorMessage.Replace("%s", s_servicetype.dt_upd.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_dt_upd");
+		if (elm && !ew.checkDateDef(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_servicetype.dt_upd.ErrorMessage))");
+	@if (s_servicetype_Edit.id_upd.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_id_upd");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_servicetype.id_upd.RequiredErrorMessage.Replace("%s", s_servicetype.id_upd.Caption)))");
+		</text>
+	}
+
+		// Fire Form_CustomValidate event
+		if (!this.Form_CustomValidate(fobj))
+			return false;
+	}
+
+	// Process detail forms
+	var dfs = $fobj.find("input[name='detailpage']").get();
+	for (var i = 0; i < dfs.length; i++) {
+		var df = dfs[i], val = df.value;
+		if (val && ew.forms[val])
+			if (!ew.forms[val].validate())
+				return false;
+	}
+	return true;
+}
+
+// Form_CustomValidate event
+fs_servicetypeedit.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_servicetypeedit.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_servicetype_Edit.ShowPageHeader()
+@s_servicetype_Edit.ShowMessages()
+<form name="fs_servicetypeedit" id="fs_servicetypeedit" class="@s_servicetype_Edit.FormClassName" action="@AppPath(CurrentPageName())" method="post">
+@if (s_servicetype_Edit.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="update">
+@if (s_servicetype_Edit.IsModal) {
+<input type="hidden" name="modal" value="@ConvertToInt(s_servicetype_Edit.IsModal)">
+}
+<div class="ew-edit-div"><!-- page* -->
+@if (s_servicetype.Id.Visible) { // Id.Visible (begin)
+	<div id="r_Id" class="form-group row">
+		<label id="elh_s_servicetype_Id" class="@s_servicetype_Edit.LeftColumnClass">@Html.Raw(s_servicetype.Id.Caption)@Html.Raw(s_servicetype.Id.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_servicetype_Edit.RightColumnClass"><div @Html.Raw(s_servicetype.Id.CellAttributes)>
+<span id="el_s_servicetype_Id">
+<span @Html.Raw(s_servicetype.Id.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_servicetype.Id.EditValue))"></span>
+</span>
+<input type="hidden" data-table="s_servicetype" data-field="x_Id" name="x_Id" id="x_Id" value="@s_servicetype.Id.CurrentValue">
+@Html.Raw(s_servicetype.Id.CustomMessage)</div></div>
+	</div>
+} @* Id.Visible (end) *@
+@if (s_servicetype.service_type.Visible) { // service_type.Visible (begin)
+	<div id="r_service_type" class="form-group row">
+		<label id="elh_s_servicetype_service_type" for="x_service_type" class="@s_servicetype_Edit.LeftColumnClass">@Html.Raw(s_servicetype.service_type.Caption)@Html.Raw(s_servicetype.service_type.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_servicetype_Edit.RightColumnClass"><div @Html.Raw(s_servicetype.service_type.CellAttributes)>
+<span id="el_s_servicetype_service_type">
+<input type="text" data-table="s_servicetype" data-field="x_service_type" name="x_service_type" id="x_service_type" size="30" maxlength="20" placeholder="@s_servicetype.service_type.PlaceHolder" value="@s_servicetype.service_type.EditValue" @Html.Raw(s_servicetype.service_type.EditAttributes)>
+</span>
+@Html.Raw(s_servicetype.service_type.CustomMessage)</div></div>
+	</div>
+} @* service_type.Visible (end) *@
+@if (s_servicetype.description.Visible) { // description.Visible (begin)
+	<div id="r_description" class="form-group row">
+		<label id="elh_s_servicetype_description" for="x_description" class="@s_servicetype_Edit.LeftColumnClass">@Html.Raw(s_servicetype.description.Caption)@Html.Raw(s_servicetype.description.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_servicetype_Edit.RightColumnClass"><div @Html.Raw(s_servicetype.description.CellAttributes)>
+<span id="el_s_servicetype_description">
+<input type="text" data-table="s_servicetype" data-field="x_description" name="x_description" id="x_description" size="30" maxlength="100" placeholder="@s_servicetype.description.PlaceHolder" value="@s_servicetype.description.EditValue" @Html.Raw(s_servicetype.description.EditAttributes)>
+</span>
+@Html.Raw(s_servicetype.description.CustomMessage)</div></div>
+	</div>
+} @* description.Visible (end) *@
+@if (s_servicetype.dt_upd.Visible) { // dt_upd.Visible (begin)
+	<div id="r_dt_upd" class="form-group row">
+		<label id="elh_s_servicetype_dt_upd" for="x_dt_upd" class="@s_servicetype_Edit.LeftColumnClass">@Html.Raw(s_servicetype.dt_upd.Caption)@Html.Raw(s_servicetype.dt_upd.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_servicetype_Edit.RightColumnClass"><div @Html.Raw(s_servicetype.dt_upd.CellAttributes)>
+<span id="el_s_servicetype_dt_upd">
+<input type="text" data-table="s_servicetype" data-field="x_dt_upd" name="x_dt_upd" id="x_dt_upd" placeholder="@s_servicetype.dt_upd.PlaceHolder" value="@s_servicetype.dt_upd.EditValue" @Html.Raw(s_servicetype.dt_upd.EditAttributes)>
+</span>
+@Html.Raw(s_servicetype.dt_upd.CustomMessage)</div></div>
+	</div>
+} @* dt_upd.Visible (end) *@
+@if (s_servicetype.id_upd.Visible) { // id_upd.Visible (begin)
+	<div id="r_id_upd" class="form-group row">
+		<label id="elh_s_servicetype_id_upd" for="x_id_upd" class="@s_servicetype_Edit.LeftColumnClass">@Html.Raw(s_servicetype.id_upd.Caption)@Html.Raw(s_servicetype.id_upd.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_servicetype_Edit.RightColumnClass"><div @Html.Raw(s_servicetype.id_upd.CellAttributes)>
+<span id="el_s_servicetype_id_upd">
+<input type="text" data-table="s_servicetype" data-field="x_id_upd" name="x_id_upd" id="x_id_upd" size="30" maxlength="20" placeholder="@s_servicetype.id_upd.PlaceHolder" value="@s_servicetype.id_upd.EditValue" @Html.Raw(s_servicetype.id_upd.EditAttributes)>
+</span>
+@Html.Raw(s_servicetype.id_upd.CustomMessage)</div></div>
+	</div>
+} @* id_upd.Visible (end) *@
+</div><!-- /page* -->
+@{ s_servicetype_Edit.CloseRecordset(); }
+@if (!s_servicetype_Edit.IsModal) {
+@:<div class="form-group row"><!-- buttons .form-group -->
+	@:<div class="@s_servicetype_Edit.OffsetColumnClass"><!-- buttons offset -->
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("SaveBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_servicetype_Edit.ReturnUrl)">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+	@:</div><!-- /buttons offset -->
+@:</div><!-- /buttons .form-group -->
+}
+</form>
+@s_servicetype_Edit.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

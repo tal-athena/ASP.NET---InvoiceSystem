@@ -1,0 +1,451 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_currency_List.Page_Render();
+
+	// Check action result
+	if (s_currency_List.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_currency.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "list";
+var fs_currencylist = currentForm = new ew.Form("fs_currencylist", "list");
+fs_currencylist.formKeyCountName = "@s_currency_List.FormKeyCountName";
+
+// Form_CustomValidate event
+fs_currencylist.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_currencylist.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_currencylist.lists["x_PrimaryCurrency"] = @Html.Raw(s_currency_List.PrimaryCurrency.Lookup.ToClientList());
+fs_currencylist.lists["x_PrimaryCurrency"].options = @Html.Raw(ConvertToJson(s_currency_List.PrimaryCurrency.Options(false))); // DN
+fs_currencylist.lists["x_Published"] = @Html.Raw(s_currency_List.Published.Lookup.ToClientList());
+fs_currencylist.lists["x_Published"].options = @Html.Raw(ConvertToJson(s_currency_List.Published.Options(false))); // DN
+
+// Form object for search
+var fs_currencylistsrch = currentSearchForm = new ew.Form("fs_currencylistsrch");
+
+// Filters
+fs_currencylistsrch.filterList = @Html.Raw(await s_currency_List.GetFilterList());
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_currency.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+@if (s_currency_List.TotalRecords > 0 && s_currency_List.ExportOptions.Visible) {
+	s_currency_List.ExportOptions.Render("body");
+}
+@if (s_currency_List.ImportOptions.Visible) {
+	s_currency_List.ImportOptions.Render("body");
+}
+@if (s_currency_List.SearchOptions.Visible) {
+	s_currency_List.SearchOptions.Render("body");
+}
+@if (s_currency_List.FilterOptions.Visible) {
+	s_currency_List.FilterOptions.Render("body");
+}
+<div class="clearfix"></div>
+</div>
+}
+@{ s_currency_List.RenderOtherOptions(); }
+@if (Security.CanSearch) {
+if (!s_currency_List.IsExport() && Empty(s_currency_List.CurrentAction)) { // Begin search form
+<form name="fs_currencylistsrch" id="fs_currencylistsrch" class="form-inline ew-form ew-ext-search-form" action="@AppPath(CurrentPageName())">
+<div id="fs_currencylistsrch-search-panel" class="ew-search-panel collapse@(!Empty(s_currency_List.SearchWhere) ? " show" : " show")">
+<input type="hidden" name="cmd" value="search">
+<div class="ew-basic-search">
+<div id="xsr_1" class="ew-row d-sm-flex">
+	<div class="ew-quick-search input-group">
+	<input type="text" name="@Config.TableBasicSearch" id="@Config.TableBasicSearch" class="form-control" value="@s_currency_List.BasicSearch.SessionKeyword" placeholder="@Language.Phrase("Search")">
+	<input type="hidden" name="@Config.TableBasicSearchType" id="@Config.TableBasicSearchType" value="@s_currency_List.BasicSearch.SessionType">
+	<div class="input-group-append">
+		<button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit">@Html.Raw(Language.Phrase("SearchBtn"))</button>
+		<button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype">@Html.Raw(s_currency_List.BasicSearch.TypeNameShort)</span></button>
+		<div class="dropdown-menu dropdown-menu-right">
+			<a class="dropdown-item @((s_currency_List.BasicSearch.SessionType == "") ? " active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this)">@Html.Raw(Language.Phrase("QuickSearchAuto"))</a>
+			<a class="dropdown-item @((s_currency_List.BasicSearch.SessionType == "=") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'=')">@Html.Raw(Language.Phrase("QuickSearchExact"))</a>
+			<a class="dropdown-item @((s_currency_List.BasicSearch.SessionType == "AND") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'AND')">@Html.Raw(Language.Phrase("QuickSearchAll"))</a>
+			<a class="dropdown-item @((s_currency_List.BasicSearch.SessionType == "OR") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'OR')">@Html.Raw(Language.Phrase("QuickSearchAny"))</a>
+		</div>
+	</div>
+	</div>
+</div>
+</div>
+</div>
+</form>
+} @* End search form *@
+}
+@s_currency_List.ShowPageHeader()
+@s_currency_List.ShowMessages()
+@if (s_currency_List.TotalRecords > 0 || s_currency_List.CurrentAction != "") {
+<div class="card ew-card ew-grid@(s_currency_List.IsAddOrEdit ? " ew-grid-add-edit" : "") s_currency">
+<form name="fs_currencylist" id="fs_currencylist" class="form-inline ew-form ew-list-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_currency_List.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<div id="gmp_s_currency" class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+@if (s_currency_List.TotalRecords > 0 || s_currency.IsGridEdit) { // Begin If TotalRecords > 0
+<table id="tbl_s_currencylist" class="table ew-table"><!-- .ew-table -->
+<thead>
+	<tr class="ew-table-header">
+@{
+
+	// Header row
+	s_currency_List.RowType = Config.RowTypeHeader;
+
+	// Render list options
+	await s_currency_List.RenderListOptions();
+
+	// Render list options (header, left)
+	s_currency_List.ListOptions.Render("header", "left");
+}
+@if (s_currency.Id.Visible) { // Id.Visible (begin)
+	if (s_currency_List.SortUrl(s_currency.Id) == "") {
+		<th data-name="Id" class="@s_currency.Id.HeaderCellClass"><div id="elh_s_currency_Id" class="s_currency_Id"><div class="ew-table-header-caption">@Html.Raw(s_currency.Id.Caption)</div></div></th>
+	} else {
+		<th data-name="Id" class="@s_currency.Id.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_currency.SortUrl(s_currency.Id))',1);"><div id="elh_s_currency_Id" class="s_currency_Id">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_currency.Id.Caption)</span><span class="ew-table-header-sort">@if (s_currency.Id.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_currency.Id.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* Id.Visible (end) *@
+@if (s_currency.CurrencyCode.Visible) { // CurrencyCode.Visible (begin)
+	if (s_currency_List.SortUrl(s_currency.CurrencyCode) == "") {
+		<th data-name="CurrencyCode" class="@s_currency.CurrencyCode.HeaderCellClass"><div id="elh_s_currency_CurrencyCode" class="s_currency_CurrencyCode"><div class="ew-table-header-caption">@Html.Raw(s_currency.CurrencyCode.Caption)</div></div></th>
+	} else {
+		<th data-name="CurrencyCode" class="@s_currency.CurrencyCode.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_currency.SortUrl(s_currency.CurrencyCode))',1);"><div id="elh_s_currency_CurrencyCode" class="s_currency_CurrencyCode">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_currency.CurrencyCode.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_currency.CurrencyCode.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_currency.CurrencyCode.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* CurrencyCode.Visible (end) *@
+@if (s_currency.CurrencyName.Visible) { // CurrencyName.Visible (begin)
+	if (s_currency_List.SortUrl(s_currency.CurrencyName) == "") {
+		<th data-name="CurrencyName" class="@s_currency.CurrencyName.HeaderCellClass"><div id="elh_s_currency_CurrencyName" class="s_currency_CurrencyName"><div class="ew-table-header-caption">@Html.Raw(s_currency.CurrencyName.Caption)</div></div></th>
+	} else {
+		<th data-name="CurrencyName" class="@s_currency.CurrencyName.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_currency.SortUrl(s_currency.CurrencyName))',1);"><div id="elh_s_currency_CurrencyName" class="s_currency_CurrencyName">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_currency.CurrencyName.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_currency.CurrencyName.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_currency.CurrencyName.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* CurrencyName.Visible (end) *@
+@if (s_currency.PrimaryCurrency.Visible) { // PrimaryCurrency.Visible (begin)
+	if (s_currency_List.SortUrl(s_currency.PrimaryCurrency) == "") {
+		<th data-name="PrimaryCurrency" class="@s_currency.PrimaryCurrency.HeaderCellClass"><div id="elh_s_currency_PrimaryCurrency" class="s_currency_PrimaryCurrency"><div class="ew-table-header-caption">@Html.Raw(s_currency.PrimaryCurrency.Caption)</div></div></th>
+	} else {
+		<th data-name="PrimaryCurrency" class="@s_currency.PrimaryCurrency.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_currency.SortUrl(s_currency.PrimaryCurrency))',1);"><div id="elh_s_currency_PrimaryCurrency" class="s_currency_PrimaryCurrency">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_currency.PrimaryCurrency.Caption)</span><span class="ew-table-header-sort">@if (s_currency.PrimaryCurrency.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_currency.PrimaryCurrency.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* PrimaryCurrency.Visible (end) *@
+@if (s_currency.Rate.Visible) { // Rate.Visible (begin)
+	if (s_currency_List.SortUrl(s_currency.Rate) == "") {
+		<th data-name="Rate" class="@s_currency.Rate.HeaderCellClass"><div id="elh_s_currency_Rate" class="s_currency_Rate"><div class="ew-table-header-caption">@Html.Raw(s_currency.Rate.Caption)</div></div></th>
+	} else {
+		<th data-name="Rate" class="@s_currency.Rate.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_currency.SortUrl(s_currency.Rate))',1);"><div id="elh_s_currency_Rate" class="s_currency_Rate">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_currency.Rate.Caption)</span><span class="ew-table-header-sort">@if (s_currency.Rate.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_currency.Rate.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* Rate.Visible (end) *@
+@if (s_currency.DisplayLocale.Visible) { // DisplayLocale.Visible (begin)
+	if (s_currency_List.SortUrl(s_currency.DisplayLocale) == "") {
+		<th data-name="DisplayLocale" class="@s_currency.DisplayLocale.HeaderCellClass"><div id="elh_s_currency_DisplayLocale" class="s_currency_DisplayLocale"><div class="ew-table-header-caption">@Html.Raw(s_currency.DisplayLocale.Caption)</div></div></th>
+	} else {
+		<th data-name="DisplayLocale" class="@s_currency.DisplayLocale.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_currency.SortUrl(s_currency.DisplayLocale))',1);"><div id="elh_s_currency_DisplayLocale" class="s_currency_DisplayLocale">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_currency.DisplayLocale.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_currency.DisplayLocale.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_currency.DisplayLocale.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* DisplayLocale.Visible (end) *@
+@if (s_currency.CustomFormatting.Visible) { // CustomFormatting.Visible (begin)
+	if (s_currency_List.SortUrl(s_currency.CustomFormatting) == "") {
+		<th data-name="CustomFormatting" class="@s_currency.CustomFormatting.HeaderCellClass"><div id="elh_s_currency_CustomFormatting" class="s_currency_CustomFormatting"><div class="ew-table-header-caption">@Html.Raw(s_currency.CustomFormatting.Caption)</div></div></th>
+	} else {
+		<th data-name="CustomFormatting" class="@s_currency.CustomFormatting.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_currency.SortUrl(s_currency.CustomFormatting))',1);"><div id="elh_s_currency_CustomFormatting" class="s_currency_CustomFormatting">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_currency.CustomFormatting.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_currency.CustomFormatting.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_currency.CustomFormatting.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* CustomFormatting.Visible (end) *@
+@if (s_currency.Published.Visible) { // Published.Visible (begin)
+	if (s_currency_List.SortUrl(s_currency.Published) == "") {
+		<th data-name="Published" class="@s_currency.Published.HeaderCellClass"><div id="elh_s_currency_Published" class="s_currency_Published"><div class="ew-table-header-caption">@Html.Raw(s_currency.Published.Caption)</div></div></th>
+	} else {
+		<th data-name="Published" class="@s_currency.Published.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_currency.SortUrl(s_currency.Published))',1);"><div id="elh_s_currency_Published" class="s_currency_Published">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_currency.Published.Caption)</span><span class="ew-table-header-sort">@if (s_currency.Published.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_currency.Published.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* Published.Visible (end) *@
+@if (s_currency.UpdatedOnUtc.Visible) { // UpdatedOnUtc.Visible (begin)
+	if (s_currency_List.SortUrl(s_currency.UpdatedOnUtc) == "") {
+		<th data-name="UpdatedOnUtc" class="@s_currency.UpdatedOnUtc.HeaderCellClass"><div id="elh_s_currency_UpdatedOnUtc" class="s_currency_UpdatedOnUtc"><div class="ew-table-header-caption">@Html.Raw(s_currency.UpdatedOnUtc.Caption)</div></div></th>
+	} else {
+		<th data-name="UpdatedOnUtc" class="@s_currency.UpdatedOnUtc.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_currency.SortUrl(s_currency.UpdatedOnUtc))',1);"><div id="elh_s_currency_UpdatedOnUtc" class="s_currency_UpdatedOnUtc">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_currency.UpdatedOnUtc.Caption)</span><span class="ew-table-header-sort">@if (s_currency.UpdatedOnUtc.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_currency.UpdatedOnUtc.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* UpdatedOnUtc.Visible (end) *@
+@if (s_currency.RoundingTypeId.Visible) { // RoundingTypeId.Visible (begin)
+	if (s_currency_List.SortUrl(s_currency.RoundingTypeId) == "") {
+		<th data-name="RoundingTypeId" class="@s_currency.RoundingTypeId.HeaderCellClass"><div id="elh_s_currency_RoundingTypeId" class="s_currency_RoundingTypeId"><div class="ew-table-header-caption">@Html.Raw(s_currency.RoundingTypeId.Caption)</div></div></th>
+	} else {
+		<th data-name="RoundingTypeId" class="@s_currency.RoundingTypeId.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_currency.SortUrl(s_currency.RoundingTypeId))',1);"><div id="elh_s_currency_RoundingTypeId" class="s_currency_RoundingTypeId">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_currency.RoundingTypeId.Caption)</span><span class="ew-table-header-sort">@if (s_currency.RoundingTypeId.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_currency.RoundingTypeId.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* RoundingTypeId.Visible (end) *@
+@if (s_currency.DisplayOrder.Visible) { // DisplayOrder.Visible (begin)
+	if (s_currency_List.SortUrl(s_currency.DisplayOrder) == "") {
+		<th data-name="DisplayOrder" class="@s_currency.DisplayOrder.HeaderCellClass"><div id="elh_s_currency_DisplayOrder" class="s_currency_DisplayOrder"><div class="ew-table-header-caption">@Html.Raw(s_currency.DisplayOrder.Caption)</div></div></th>
+	} else {
+		<th data-name="DisplayOrder" class="@s_currency.DisplayOrder.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_currency.SortUrl(s_currency.DisplayOrder))',1);"><div id="elh_s_currency_DisplayOrder" class="s_currency_DisplayOrder">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_currency.DisplayOrder.Caption)</span><span class="ew-table-header-sort">@if (s_currency.DisplayOrder.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_currency.DisplayOrder.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* DisplayOrder.Visible (end) *@
+@{
+
+	// Render list options (header, right)
+	s_currency_List.ListOptions.Render("header", "right");
+}
+	</tr>
+</thead>
+<tbody>
+@{ // Begin Code
+if (s_currency_List.ExportAll && s_currency_List.IsExport()) {
+	s_currency_List.StopRecord = s_currency_List.TotalRecords;
+} else {
+
+	// Set the last record to display
+	if (s_currency_List.TotalRecords > s_currency_List.StartRecord + s_currency_List.DisplayRecords - 1) {
+		s_currency_List.StopRecord = s_currency_List.StartRecord + s_currency_List.DisplayRecords - 1;
+	} else {
+		s_currency_List.StopRecord = s_currency_List.TotalRecords;
+	}
+}
+if (s_currency_List.Recordset != null && s_currency_List.Recordset.HasRows) {
+	if (!s_currency_List.Connection.SelectOffset) { // DN
+		for (var i = 1; i <= s_currency_List.StartRecord - 1; i++) { // Move to first record
+			if (await s_currency_List.Recordset.ReadAsync()) {
+				s_currency_List.RecordCount++;
+			}
+		}
+	} else {
+		s_currency_List.RecordCount = s_currency_List.StartRecord - 1;
+	}
+} else if (!s_currency_List.AllowAddDeleteRow && s_currency_List.StopRecord == 0) {
+	s_currency_List.StopRecord = s_currency_List.GridAddRowCount;
+}
+
+// Initialize aggregate
+s_currency_List.RowType = Config.RowTypeAggregateInit;
+s_currency_List.ResetAttributes();
+await s_currency_List.RenderRow();
+
+// Output data rows
+bool eof = (s_currency_List.Recordset == null); // DN
+while (s_currency_List.RecordCount < s_currency_List.StopRecord) { // Begin While
+	if (!s_currency_List.IsGridAdd && !eof) { // DN
+		eof = !await s_currency_List.Recordset.ReadAsync();
+	}
+	s_currency_List.RecordCount++;
+	if (s_currency_List.RecordCount >= s_currency_List.StartRecord) {
+		s_currency_List.RowCnt++;
+
+		// Set up key count
+		s_currency_List.KeyCount = ConvertToInt(s_currency_List.RowIndex);
+
+		// Init row class and style
+		s_currency_List.ResetAttributes();
+		s_currency_List.CssClass = "";
+		if (s_currency_List.IsGridAdd) {
+		} else {
+			await s_currency_List.LoadRowValues(s_currency_List.Recordset); // Load row values
+		}
+		s_currency_List.RowType = Config.RowTypeView; // Render view
+
+		// Set up row id / data-rowindex
+		s_currency_List.RowAttrs.Add("data-rowindex", Convert.ToString(s_currency_List.RowCnt));
+		s_currency_List.RowAttrs.Add("id", "r" + Convert.ToString(s_currency_List.RowCnt) + "_s_currency");
+		s_currency_List.RowAttrs.Add("data-rowtype", Convert.ToString(s_currency_List.RowType));
+
+		// Render row
+		await s_currency_List.RenderRow();
+
+		// Render list options
+		await s_currency_List.RenderListOptions();
+	<tr @Html.Raw(s_currency_List.RowAttributes)>
+	@{
+
+		// Render list options (body, left)
+		s_currency_List.ListOptions.Render("body", "left", s_currency_List.RowCnt);
+	}
+	@if (s_currency.Id.Visible) { // Id.Visible (begin)
+		<td data-name="Id"@Html.Raw(s_currency.Id.CellAttributes)>
+<span id="el@(s_currency_List.RowCnt)_s_currency_Id" class="s_currency_Id">
+<span @Html.Raw(s_currency.Id.ViewAttributes)>
+@Html.Raw(s_currency.Id.GetViewValue())</span>
+</span>
+</td>
+	} @* Id.Visible (end) *@
+	@if (s_currency.CurrencyCode.Visible) { // CurrencyCode.Visible (begin)
+		<td data-name="CurrencyCode"@Html.Raw(s_currency.CurrencyCode.CellAttributes)>
+<span id="el@(s_currency_List.RowCnt)_s_currency_CurrencyCode" class="s_currency_CurrencyCode">
+<span @Html.Raw(s_currency.CurrencyCode.ViewAttributes)>
+@Html.Raw(s_currency.CurrencyCode.GetViewValue())</span>
+</span>
+</td>
+	} @* CurrencyCode.Visible (end) *@
+	@if (s_currency.CurrencyName.Visible) { // CurrencyName.Visible (begin)
+		<td data-name="CurrencyName"@Html.Raw(s_currency.CurrencyName.CellAttributes)>
+<span id="el@(s_currency_List.RowCnt)_s_currency_CurrencyName" class="s_currency_CurrencyName">
+<span @Html.Raw(s_currency.CurrencyName.ViewAttributes)>
+@Html.Raw(s_currency.CurrencyName.GetViewValue())</span>
+</span>
+</td>
+	} @* CurrencyName.Visible (end) *@
+	@if (s_currency.PrimaryCurrency.Visible) { // PrimaryCurrency.Visible (begin)
+		<td data-name="PrimaryCurrency"@Html.Raw(s_currency.PrimaryCurrency.CellAttributes)>
+<span id="el@(s_currency_List.RowCnt)_s_currency_PrimaryCurrency" class="s_currency_PrimaryCurrency">
+<span @Html.Raw(s_currency.PrimaryCurrency.ViewAttributes)>
+<input type="checkbox" value="@s_currency.PrimaryCurrency.GetViewValue()" disabled checked="@ConvertToBool(s_currency.PrimaryCurrency.CurrentValue)"></span>
+</span>
+</td>
+	} @* PrimaryCurrency.Visible (end) *@
+	@if (s_currency.Rate.Visible) { // Rate.Visible (begin)
+		<td data-name="Rate"@Html.Raw(s_currency.Rate.CellAttributes)>
+<span id="el@(s_currency_List.RowCnt)_s_currency_Rate" class="s_currency_Rate">
+<span @Html.Raw(s_currency.Rate.ViewAttributes)>
+@Html.Raw(s_currency.Rate.GetViewValue())</span>
+</span>
+</td>
+	} @* Rate.Visible (end) *@
+	@if (s_currency.DisplayLocale.Visible) { // DisplayLocale.Visible (begin)
+		<td data-name="DisplayLocale"@Html.Raw(s_currency.DisplayLocale.CellAttributes)>
+<span id="el@(s_currency_List.RowCnt)_s_currency_DisplayLocale" class="s_currency_DisplayLocale">
+<span @Html.Raw(s_currency.DisplayLocale.ViewAttributes)>
+@Html.Raw(s_currency.DisplayLocale.GetViewValue())</span>
+</span>
+</td>
+	} @* DisplayLocale.Visible (end) *@
+	@if (s_currency.CustomFormatting.Visible) { // CustomFormatting.Visible (begin)
+		<td data-name="CustomFormatting"@Html.Raw(s_currency.CustomFormatting.CellAttributes)>
+<span id="el@(s_currency_List.RowCnt)_s_currency_CustomFormatting" class="s_currency_CustomFormatting">
+<span @Html.Raw(s_currency.CustomFormatting.ViewAttributes)>
+@Html.Raw(s_currency.CustomFormatting.GetViewValue())</span>
+</span>
+</td>
+	} @* CustomFormatting.Visible (end) *@
+	@if (s_currency.Published.Visible) { // Published.Visible (begin)
+		<td data-name="Published"@Html.Raw(s_currency.Published.CellAttributes)>
+<span id="el@(s_currency_List.RowCnt)_s_currency_Published" class="s_currency_Published">
+<span @Html.Raw(s_currency.Published.ViewAttributes)>
+<input type="checkbox" value="@s_currency.Published.GetViewValue()" disabled checked="@ConvertToBool(s_currency.Published.CurrentValue)"></span>
+</span>
+</td>
+	} @* Published.Visible (end) *@
+	@if (s_currency.UpdatedOnUtc.Visible) { // UpdatedOnUtc.Visible (begin)
+		<td data-name="UpdatedOnUtc"@Html.Raw(s_currency.UpdatedOnUtc.CellAttributes)>
+<span id="el@(s_currency_List.RowCnt)_s_currency_UpdatedOnUtc" class="s_currency_UpdatedOnUtc">
+<span @Html.Raw(s_currency.UpdatedOnUtc.ViewAttributes)>
+@Html.Raw(s_currency.UpdatedOnUtc.GetViewValue())</span>
+</span>
+</td>
+	} @* UpdatedOnUtc.Visible (end) *@
+	@if (s_currency.RoundingTypeId.Visible) { // RoundingTypeId.Visible (begin)
+		<td data-name="RoundingTypeId"@Html.Raw(s_currency.RoundingTypeId.CellAttributes)>
+<span id="el@(s_currency_List.RowCnt)_s_currency_RoundingTypeId" class="s_currency_RoundingTypeId">
+<span @Html.Raw(s_currency.RoundingTypeId.ViewAttributes)>
+@Html.Raw(s_currency.RoundingTypeId.GetViewValue())</span>
+</span>
+</td>
+	} @* RoundingTypeId.Visible (end) *@
+	@if (s_currency.DisplayOrder.Visible) { // DisplayOrder.Visible (begin)
+		<td data-name="DisplayOrder"@Html.Raw(s_currency.DisplayOrder.CellAttributes)>
+<span id="el@(s_currency_List.RowCnt)_s_currency_DisplayOrder" class="s_currency_DisplayOrder">
+<span @Html.Raw(s_currency.DisplayOrder.ViewAttributes)>
+@Html.Raw(s_currency.DisplayOrder.GetViewValue())</span>
+</span>
+</td>
+	} @* DisplayOrder.Visible (end) *@
+	@{
+
+		// Render list options (body, right)
+		s_currency_List.ListOptions.Render("body", "right", s_currency_List.RowCnt);
+	}
+	</tr>
+	} @* End if *@
+} @* End While *@
+} @* End Code *@
+</tbody>
+</table><!-- /.ew-table -->
+} @* End If TotalRecords > 0 *@
+@if (Empty(s_currency_List.CurrentAction)) {
+<input type="hidden" name="action" id="action" value="">
+}
+</div><!-- /.ew-grid-middle-panel -->
+</form><!-- /.ew-list-form -->
+@{ s_currency_List.CloseRecordset(); }
+		@if (!s_currency.IsExport()) {
+		<div class="card-footer ew-grid-lower-panel">
+		<div class="ew-list-other-options">
+		@s_currency_List.OtherOptions.RenderBody("bottom")
+		</div>
+		@if (!s_currency_List.IsGridAdd) {
+			<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="@AppPath(CurrentPageName())">
+			@s_currency_List.Pager.Render()
+			</form>
+		}
+		<div class="clearfix"></div>
+		</div>
+		}
+</div><!-- /.ew-grid -->
+}
+@if (s_currency_List.TotalRecords <= 0 && s_currency_List.CurrentAction == "") { // Show other options
+<div class="ew-list-other-options">
+@s_currency_List.OtherOptions.ForEach(opt => opt.ButtonClass = "").RenderBody()
+</div>
+<div class="clearfix"></div>
+}
+@s_currency_List.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_currency.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

@@ -1,0 +1,264 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_dodetltest_Delete.Page_Render();
+
+	// Check action result
+	if (s_dodetltest_Delete.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "delete";
+var fs_dodetltestdelete = currentForm = new ew.Form("fs_dodetltestdelete", "delete");
+
+// Form_CustomValidate event
+fs_dodetltestdelete.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_dodetltestdelete.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_dodetltestdelete.lists["x_part_code"] = @Html.Raw(s_dodetltest_Delete.part_code.Lookup.ToClientList());
+fs_dodetltestdelete.lists["x_part_code"].options = @Html.Raw(ConvertToJson(s_dodetltest_Delete.part_code.LookupOptions));
+fs_dodetltestdelete.autoSuggests["x_part_code"] = @Html.Raw(ConvertToJson(new Dictionary<string, string> { {"data", "ajax=autosuggest"} }));
+
+// Form object for search
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_dodetltest_Delete.ShowPageHeader()
+@s_dodetltest_Delete.ShowMessages()
+<form name="fs_dodetltestdelete" id="fs_dodetltestdelete" class="form-inline ew-form ew-delete-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_dodetltest_Delete.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="delete">
+@foreach (string key in s_dodetltest_Delete.RecordKeys) {
+<input type="hidden" name="key_m" value="@key">
+}
+<div class="card ew-card ew-grid">
+<div class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+<table class="table ew-table">
+	<thead>
+	<tr class="ew-table-header">
+@if (s_dodetltest.item_no.Visible) { // item_no (begin)
+		<th class="@Html.Raw(s_dodetltest.item_no.HeaderCellClass)"><span id="elh_s_dodetltest_item_no" class="s_dodetltest_item_no">@Html.Raw(s_dodetltest.item_no.Caption)</span></th>
+} @* item_no.Visible (end) *@
+@if (s_dodetltest.item_type.Visible) { // item_type (begin)
+		<th class="@Html.Raw(s_dodetltest.item_type.HeaderCellClass)"><span id="elh_s_dodetltest_item_type" class="s_dodetltest_item_type">@Html.Raw(s_dodetltest.item_type.Caption)</span></th>
+} @* item_type.Visible (end) *@
+@if (s_dodetltest.part_code.Visible) { // part_code (begin)
+		<th class="@Html.Raw(s_dodetltest.part_code.HeaderCellClass)"><span id="elh_s_dodetltest_part_code" class="s_dodetltest_part_code">@Html.Raw(s_dodetltest.part_code.Caption)</span></th>
+} @* part_code.Visible (end) *@
+@if (s_dodetltest.part_desc.Visible) { // part_desc (begin)
+		<th class="@Html.Raw(s_dodetltest.part_desc.HeaderCellClass)"><span id="elh_s_dodetltest_part_desc" class="s_dodetltest_part_desc">@Html.Raw(s_dodetltest.part_desc.Caption)</span></th>
+} @* part_desc.Visible (end) *@
+@if (s_dodetltest.uom.Visible) { // uom (begin)
+		<th class="@Html.Raw(s_dodetltest.uom.HeaderCellClass)"><span id="elh_s_dodetltest_uom" class="s_dodetltest_uom">@Html.Raw(s_dodetltest.uom.Caption)</span></th>
+} @* uom.Visible (end) *@
+@if (s_dodetltest.qty.Visible) { // qty (begin)
+		<th class="@Html.Raw(s_dodetltest.qty.HeaderCellClass)"><span id="elh_s_dodetltest_qty" class="s_dodetltest_qty">@Html.Raw(s_dodetltest.qty.Caption)</span></th>
+} @* qty.Visible (end) *@
+@if (s_dodetltest.unit_price.Visible) { // unit_price (begin)
+		<th class="@Html.Raw(s_dodetltest.unit_price.HeaderCellClass)"><span id="elh_s_dodetltest_unit_price" class="s_dodetltest_unit_price">@Html.Raw(s_dodetltest.unit_price.Caption)</span></th>
+} @* unit_price.Visible (end) *@
+@if (s_dodetltest.amount_origin.Visible) { // amount_origin (begin)
+		<th class="@Html.Raw(s_dodetltest.amount_origin.HeaderCellClass)"><span id="elh_s_dodetltest_amount_origin" class="s_dodetltest_amount_origin">@Html.Raw(s_dodetltest.amount_origin.Caption)</span></th>
+} @* amount_origin.Visible (end) *@
+@if (s_dodetltest.tax_code.Visible) { // tax_code (begin)
+		<th class="@Html.Raw(s_dodetltest.tax_code.HeaderCellClass)"><span id="elh_s_dodetltest_tax_code" class="s_dodetltest_tax_code">@Html.Raw(s_dodetltest.tax_code.Caption)</span></th>
+} @* tax_code.Visible (end) *@
+@if (s_dodetltest.tax_rate.Visible) { // tax_rate (begin)
+		<th class="@Html.Raw(s_dodetltest.tax_rate.HeaderCellClass)"><span id="elh_s_dodetltest_tax_rate" class="s_dodetltest_tax_rate">@Html.Raw(s_dodetltest.tax_rate.Caption)</span></th>
+} @* tax_rate.Visible (end) *@
+@if (s_dodetltest.tax_amount_origin.Visible) { // tax_amount_origin (begin)
+		<th class="@Html.Raw(s_dodetltest.tax_amount_origin.HeaderCellClass)"><span id="elh_s_dodetltest_tax_amount_origin" class="s_dodetltest_tax_amount_origin">@Html.Raw(s_dodetltest.tax_amount_origin.Caption)</span></th>
+} @* tax_amount_origin.Visible (end) *@
+@if (s_dodetltest.to_gl_acct.Visible) { // to_gl_acct (begin)
+		<th class="@Html.Raw(s_dodetltest.to_gl_acct.HeaderCellClass)"><span id="elh_s_dodetltest_to_gl_acct" class="s_dodetltest_to_gl_acct">@Html.Raw(s_dodetltest.to_gl_acct.Caption)</span></th>
+} @* to_gl_acct.Visible (end) *@
+@if (s_dodetltest.tax_acct.Visible) { // tax_acct (begin)
+		<th class="@Html.Raw(s_dodetltest.tax_acct.HeaderCellClass)"><span id="elh_s_dodetltest_tax_acct" class="s_dodetltest_tax_acct">@Html.Raw(s_dodetltest.tax_acct.Caption)</span></th>
+} @* tax_acct.Visible (end) *@
+	</tr>
+	</thead>
+	<tbody>
+@{ s_dodetltest_Delete.RecordCount = 0; }
+@while (s_dodetltest_Delete.Recordset != null && await s_dodetltest_Delete.Recordset.ReadAsync()) { // DN
+	s_dodetltest_Delete.RecordCount++;
+	s_dodetltest_Delete.RowCnt++;
+
+	// Set row properties
+	s_dodetltest_Delete.ResetAttributes();
+	s_dodetltest_Delete.RowType = Config.RowTypeView; // View
+
+	// Get the field contents
+	await s_dodetltest_Delete.LoadRowValues(s_dodetltest_Delete.Recordset);
+
+	// Render row
+	await s_dodetltest_Delete.RenderRow();
+	<tr @Html.Raw(s_dodetltest_Delete.RowAttributes)>
+@if (s_dodetltest.item_no.Visible) { // item_no (begin)
+		<td @Html.Raw(s_dodetltest.item_no.CellAttributes)>
+<span id="el@(s_dodetltest_Delete.RowCnt)_s_dodetltest_item_no" class="s_dodetltest_item_no">
+<span @Html.Raw(s_dodetltest.item_no.ViewAttributes)>
+@Html.Raw(s_dodetltest.item_no.GetViewValue())</span>
+</span>
+</td>
+} @* item_no.Visible (end) *@
+@if (s_dodetltest.item_type.Visible) { // item_type (begin)
+		<td @Html.Raw(s_dodetltest.item_type.CellAttributes)>
+<span id="el@(s_dodetltest_Delete.RowCnt)_s_dodetltest_item_type" class="s_dodetltest_item_type">
+<span @Html.Raw(s_dodetltest.item_type.ViewAttributes)>
+@Html.Raw(s_dodetltest.item_type.GetViewValue())</span>
+</span>
+</td>
+} @* item_type.Visible (end) *@
+@if (s_dodetltest.part_code.Visible) { // part_code (begin)
+		<td @Html.Raw(s_dodetltest.part_code.CellAttributes)>
+<span id="el@(s_dodetltest_Delete.RowCnt)_s_dodetltest_part_code" class="s_dodetltest_part_code">
+<span @Html.Raw(s_dodetltest.part_code.ViewAttributes)>
+@Html.Raw(s_dodetltest.part_code.GetViewValue())</span>
+</span>
+</td>
+} @* part_code.Visible (end) *@
+@if (s_dodetltest.part_desc.Visible) { // part_desc (begin)
+		<td @Html.Raw(s_dodetltest.part_desc.CellAttributes)>
+<span id="el@(s_dodetltest_Delete.RowCnt)_s_dodetltest_part_desc" class="s_dodetltest_part_desc">
+<span @Html.Raw(s_dodetltest.part_desc.ViewAttributes)>
+@Html.Raw(s_dodetltest.part_desc.GetViewValue())</span>
+</span>
+</td>
+} @* part_desc.Visible (end) *@
+@if (s_dodetltest.uom.Visible) { // uom (begin)
+		<td @Html.Raw(s_dodetltest.uom.CellAttributes)>
+<span id="el@(s_dodetltest_Delete.RowCnt)_s_dodetltest_uom" class="s_dodetltest_uom">
+<span @Html.Raw(s_dodetltest.uom.ViewAttributes)>
+@Html.Raw(s_dodetltest.uom.GetViewValue())</span>
+</span>
+</td>
+} @* uom.Visible (end) *@
+@if (s_dodetltest.qty.Visible) { // qty (begin)
+		<td @Html.Raw(s_dodetltest.qty.CellAttributes)>
+<span id="el@(s_dodetltest_Delete.RowCnt)_s_dodetltest_qty" class="s_dodetltest_qty">
+<span @Html.Raw(s_dodetltest.qty.ViewAttributes)>
+@Html.Raw(s_dodetltest.qty.GetViewValue())</span>
+</span>
+</td>
+} @* qty.Visible (end) *@
+@if (s_dodetltest.unit_price.Visible) { // unit_price (begin)
+		<td @Html.Raw(s_dodetltest.unit_price.CellAttributes)>
+<span id="el@(s_dodetltest_Delete.RowCnt)_s_dodetltest_unit_price" class="s_dodetltest_unit_price">
+<span @Html.Raw(s_dodetltest.unit_price.ViewAttributes)>
+@Html.Raw(s_dodetltest.unit_price.GetViewValue())</span>
+</span>
+</td>
+} @* unit_price.Visible (end) *@
+@if (s_dodetltest.amount_origin.Visible) { // amount_origin (begin)
+		<td @Html.Raw(s_dodetltest.amount_origin.CellAttributes)>
+<span id="el@(s_dodetltest_Delete.RowCnt)_s_dodetltest_amount_origin" class="s_dodetltest_amount_origin">
+<span @Html.Raw(s_dodetltest.amount_origin.ViewAttributes)>
+@Html.Raw(s_dodetltest.amount_origin.GetViewValue())</span>
+</span>
+</td>
+} @* amount_origin.Visible (end) *@
+@if (s_dodetltest.tax_code.Visible) { // tax_code (begin)
+		<td @Html.Raw(s_dodetltest.tax_code.CellAttributes)>
+<span id="el@(s_dodetltest_Delete.RowCnt)_s_dodetltest_tax_code" class="s_dodetltest_tax_code">
+<span @Html.Raw(s_dodetltest.tax_code.ViewAttributes)>
+@Html.Raw(s_dodetltest.tax_code.GetViewValue())</span>
+</span>
+</td>
+} @* tax_code.Visible (end) *@
+@if (s_dodetltest.tax_rate.Visible) { // tax_rate (begin)
+		<td @Html.Raw(s_dodetltest.tax_rate.CellAttributes)>
+<span id="el@(s_dodetltest_Delete.RowCnt)_s_dodetltest_tax_rate" class="s_dodetltest_tax_rate">
+<span @Html.Raw(s_dodetltest.tax_rate.ViewAttributes)>
+@Html.Raw(s_dodetltest.tax_rate.GetViewValue())</span>
+</span>
+</td>
+} @* tax_rate.Visible (end) *@
+@if (s_dodetltest.tax_amount_origin.Visible) { // tax_amount_origin (begin)
+		<td @Html.Raw(s_dodetltest.tax_amount_origin.CellAttributes)>
+<span id="el@(s_dodetltest_Delete.RowCnt)_s_dodetltest_tax_amount_origin" class="s_dodetltest_tax_amount_origin">
+<span @Html.Raw(s_dodetltest.tax_amount_origin.ViewAttributes)>
+@Html.Raw(s_dodetltest.tax_amount_origin.GetViewValue())</span>
+</span>
+</td>
+} @* tax_amount_origin.Visible (end) *@
+@if (s_dodetltest.to_gl_acct.Visible) { // to_gl_acct (begin)
+		<td @Html.Raw(s_dodetltest.to_gl_acct.CellAttributes)>
+<span id="el@(s_dodetltest_Delete.RowCnt)_s_dodetltest_to_gl_acct" class="s_dodetltest_to_gl_acct">
+<span @Html.Raw(s_dodetltest.to_gl_acct.ViewAttributes)>
+@Html.Raw(s_dodetltest.to_gl_acct.GetViewValue())</span>
+</span>
+</td>
+} @* to_gl_acct.Visible (end) *@
+@if (s_dodetltest.tax_acct.Visible) { // tax_acct (begin)
+		<td @Html.Raw(s_dodetltest.tax_acct.CellAttributes)>
+<span id="el@(s_dodetltest_Delete.RowCnt)_s_dodetltest_tax_acct" class="s_dodetltest_tax_acct">
+<span @Html.Raw(s_dodetltest.tax_acct.ViewAttributes)>
+@Html.Raw(s_dodetltest.tax_acct.GetViewValue())</span>
+</span>
+</td>
+} @* tax_acct.Visible (end) *@
+	</tr>
+}
+@{ s_dodetltest_Delete.CloseRecordset(); }
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<div class="divconfirmdelete">
+  <div>
+	<label>
+		@Html.Raw(Language.Phrase("askconfirmdelete"))
+	</label>
+  </div>
+</div>
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("DeleteBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_dodetltest_Delete.ReturnUrl)">@Language.Phrase("CancelBtn")</button>
+</div>
+</form>
+@s_dodetltest_Delete.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

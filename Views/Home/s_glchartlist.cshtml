@@ -1,0 +1,464 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_glchart_List.Page_Render();
+
+	// Check action result
+	if (s_glchart_List.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_glchart.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "list";
+var fs_glchartlist = currentForm = new ew.Form("fs_glchartlist", "list");
+fs_glchartlist.formKeyCountName = "@s_glchart_List.FormKeyCountName";
+
+// Form_CustomValidate event
+fs_glchartlist.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_glchartlist.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+var fs_glchartlistsrch = currentSearchForm = new ew.Form("fs_glchartlistsrch");
+
+// Filters
+fs_glchartlistsrch.filterList = @Html.Raw(await s_glchart_List.GetFilterList());
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_glchart.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+@if (s_glchart_List.TotalRecords > 0 && s_glchart_List.ExportOptions.Visible) {
+	s_glchart_List.ExportOptions.Render("body");
+}
+@if (s_glchart_List.ImportOptions.Visible) {
+	s_glchart_List.ImportOptions.Render("body");
+}
+@if (s_glchart_List.SearchOptions.Visible) {
+	s_glchart_List.SearchOptions.Render("body");
+}
+@if (s_glchart_List.FilterOptions.Visible) {
+	s_glchart_List.FilterOptions.Render("body");
+}
+<div class="clearfix"></div>
+</div>
+}
+@{ s_glchart_List.RenderOtherOptions(); }
+@if (Security.CanSearch) {
+if (!s_glchart_List.IsExport() && Empty(s_glchart_List.CurrentAction)) { // Begin search form
+<form name="fs_glchartlistsrch" id="fs_glchartlistsrch" class="form-inline ew-form ew-ext-search-form" action="@AppPath(CurrentPageName())">
+<div id="fs_glchartlistsrch-search-panel" class="ew-search-panel collapse@(!Empty(s_glchart_List.SearchWhere) ? " show" : " show")">
+<input type="hidden" name="cmd" value="search">
+<div class="ew-basic-search">
+<div id="xsr_1" class="ew-row d-sm-flex">
+	<div class="ew-quick-search input-group">
+	<input type="text" name="@Config.TableBasicSearch" id="@Config.TableBasicSearch" class="form-control" value="@s_glchart_List.BasicSearch.SessionKeyword" placeholder="@Language.Phrase("Search")">
+	<input type="hidden" name="@Config.TableBasicSearchType" id="@Config.TableBasicSearchType" value="@s_glchart_List.BasicSearch.SessionType">
+	<div class="input-group-append">
+		<button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit">@Html.Raw(Language.Phrase("SearchBtn"))</button>
+		<button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype">@Html.Raw(s_glchart_List.BasicSearch.TypeNameShort)</span></button>
+		<div class="dropdown-menu dropdown-menu-right">
+			<a class="dropdown-item @((s_glchart_List.BasicSearch.SessionType == "") ? " active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this)">@Html.Raw(Language.Phrase("QuickSearchAuto"))</a>
+			<a class="dropdown-item @((s_glchart_List.BasicSearch.SessionType == "=") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'=')">@Html.Raw(Language.Phrase("QuickSearchExact"))</a>
+			<a class="dropdown-item @((s_glchart_List.BasicSearch.SessionType == "AND") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'AND')">@Html.Raw(Language.Phrase("QuickSearchAll"))</a>
+			<a class="dropdown-item @((s_glchart_List.BasicSearch.SessionType == "OR") ? "active" : "")" href="javascript:void(0);" onclick="ew.setSearchType(this,'OR')">@Html.Raw(Language.Phrase("QuickSearchAny"))</a>
+		</div>
+	</div>
+	</div>
+</div>
+</div>
+</div>
+</form>
+} @* End search form *@
+}
+@s_glchart_List.ShowPageHeader()
+@s_glchart_List.ShowMessages()
+@if (s_glchart_List.TotalRecords > 0 || s_glchart_List.CurrentAction != "") {
+<div class="card ew-card ew-grid@(s_glchart_List.IsAddOrEdit ? " ew-grid-add-edit" : "") s_glchart">
+<form name="fs_glchartlist" id="fs_glchartlist" class="form-inline ew-form ew-list-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_glchart_List.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<div id="gmp_s_glchart" class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+@if (s_glchart_List.TotalRecords > 0 || s_glchart.IsGridEdit) { // Begin If TotalRecords > 0
+<table id="tbl_s_glchartlist" class="table ew-table"><!-- .ew-table -->
+<thead>
+	<tr class="ew-table-header">
+@{
+
+	// Header row
+	s_glchart_List.RowType = Config.RowTypeHeader;
+
+	// Render list options
+	await s_glchart_List.RenderListOptions();
+
+	// Render list options (header, left)
+	s_glchart_List.ListOptions.Render("header", "left");
+}
+@if (s_glchart.Id.Visible) { // Id.Visible (begin)
+	if (s_glchart_List.SortUrl(s_glchart.Id) == "") {
+		<th data-name="Id" class="@s_glchart.Id.HeaderCellClass"><div id="elh_s_glchart_Id" class="s_glchart_Id"><div class="ew-table-header-caption">@Html.Raw(s_glchart.Id.Caption)</div></div></th>
+	} else {
+		<th data-name="Id" class="@s_glchart.Id.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_glchart.SortUrl(s_glchart.Id))',1);"><div id="elh_s_glchart_Id" class="s_glchart_Id">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_glchart.Id.Caption)</span><span class="ew-table-header-sort">@if (s_glchart.Id.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_glchart.Id.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* Id.Visible (end) *@
+@if (s_glchart.acct_code.Visible) { // acct_code.Visible (begin)
+	if (s_glchart_List.SortUrl(s_glchart.acct_code) == "") {
+		<th data-name="acct_code" class="@s_glchart.acct_code.HeaderCellClass"><div id="elh_s_glchart_acct_code" class="s_glchart_acct_code"><div class="ew-table-header-caption">@Html.Raw(s_glchart.acct_code.Caption)</div></div></th>
+	} else {
+		<th data-name="acct_code" class="@s_glchart.acct_code.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_glchart.SortUrl(s_glchart.acct_code))',1);"><div id="elh_s_glchart_acct_code" class="s_glchart_acct_code">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_glchart.acct_code.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_glchart.acct_code.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_glchart.acct_code.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* acct_code.Visible (end) *@
+@if (s_glchart.description.Visible) { // description.Visible (begin)
+	if (s_glchart_List.SortUrl(s_glchart.description) == "") {
+		<th data-name="description" class="@s_glchart.description.HeaderCellClass"><div id="elh_s_glchart_description" class="s_glchart_description"><div class="ew-table-header-caption">@Html.Raw(s_glchart.description.Caption)</div></div></th>
+	} else {
+		<th data-name="description" class="@s_glchart.description.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_glchart.SortUrl(s_glchart.description))',1);"><div id="elh_s_glchart_description" class="s_glchart_description">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_glchart.description.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_glchart.description.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_glchart.description.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* description.Visible (end) *@
+@if (s_glchart.report_type.Visible) { // report_type.Visible (begin)
+	if (s_glchart_List.SortUrl(s_glchart.report_type) == "") {
+		<th data-name="report_type" class="@s_glchart.report_type.HeaderCellClass"><div id="elh_s_glchart_report_type" class="s_glchart_report_type"><div class="ew-table-header-caption">@Html.Raw(s_glchart.report_type.Caption)</div></div></th>
+	} else {
+		<th data-name="report_type" class="@s_glchart.report_type.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_glchart.SortUrl(s_glchart.report_type))',1);"><div id="elh_s_glchart_report_type" class="s_glchart_report_type">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_glchart.report_type.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_glchart.report_type.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_glchart.report_type.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* report_type.Visible (end) *@
+@if (s_glchart.acct_group.Visible) { // acct_group.Visible (begin)
+	if (s_glchart_List.SortUrl(s_glchart.acct_group) == "") {
+		<th data-name="acct_group" class="@s_glchart.acct_group.HeaderCellClass"><div id="elh_s_glchart_acct_group" class="s_glchart_acct_group"><div class="ew-table-header-caption">@Html.Raw(s_glchart.acct_group.Caption)</div></div></th>
+	} else {
+		<th data-name="acct_group" class="@s_glchart.acct_group.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_glchart.SortUrl(s_glchart.acct_group))',1);"><div id="elh_s_glchart_acct_group" class="s_glchart_acct_group">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_glchart.acct_group.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_glchart.acct_group.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_glchart.acct_group.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* acct_group.Visible (end) *@
+@if (s_glchart.acct_type.Visible) { // acct_type.Visible (begin)
+	if (s_glchart_List.SortUrl(s_glchart.acct_type) == "") {
+		<th data-name="acct_type" class="@s_glchart.acct_type.HeaderCellClass"><div id="elh_s_glchart_acct_type" class="s_glchart_acct_type"><div class="ew-table-header-caption">@Html.Raw(s_glchart.acct_type.Caption)</div></div></th>
+	} else {
+		<th data-name="acct_type" class="@s_glchart.acct_type.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_glchart.SortUrl(s_glchart.acct_type))',1);"><div id="elh_s_glchart_acct_type" class="s_glchart_acct_type">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_glchart.acct_type.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_glchart.acct_type.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_glchart.acct_type.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* acct_type.Visible (end) *@
+@if (s_glchart.CurrencyCode.Visible) { // CurrencyCode.Visible (begin)
+	if (s_glchart_List.SortUrl(s_glchart.CurrencyCode) == "") {
+		<th data-name="CurrencyCode" class="@s_glchart.CurrencyCode.HeaderCellClass"><div id="elh_s_glchart_CurrencyCode" class="s_glchart_CurrencyCode"><div class="ew-table-header-caption">@Html.Raw(s_glchart.CurrencyCode.Caption)</div></div></th>
+	} else {
+		<th data-name="CurrencyCode" class="@s_glchart.CurrencyCode.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_glchart.SortUrl(s_glchart.CurrencyCode))',1);"><div id="elh_s_glchart_CurrencyCode" class="s_glchart_CurrencyCode">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_glchart.CurrencyCode.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_glchart.CurrencyCode.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_glchart.CurrencyCode.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* CurrencyCode.Visible (end) *@
+@if (s_glchart.opn_debit.Visible) { // opn_debit.Visible (begin)
+	if (s_glchart_List.SortUrl(s_glchart.opn_debit) == "") {
+		<th data-name="opn_debit" class="@s_glchart.opn_debit.HeaderCellClass"><div id="elh_s_glchart_opn_debit" class="s_glchart_opn_debit"><div class="ew-table-header-caption">@Html.Raw(s_glchart.opn_debit.Caption)</div></div></th>
+	} else {
+		<th data-name="opn_debit" class="@s_glchart.opn_debit.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_glchart.SortUrl(s_glchart.opn_debit))',1);"><div id="elh_s_glchart_opn_debit" class="s_glchart_opn_debit">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_glchart.opn_debit.Caption)</span><span class="ew-table-header-sort">@if (s_glchart.opn_debit.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_glchart.opn_debit.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* opn_debit.Visible (end) *@
+@if (s_glchart.opn_credit.Visible) { // opn_credit.Visible (begin)
+	if (s_glchart_List.SortUrl(s_glchart.opn_credit) == "") {
+		<th data-name="opn_credit" class="@s_glchart.opn_credit.HeaderCellClass"><div id="elh_s_glchart_opn_credit" class="s_glchart_opn_credit"><div class="ew-table-header-caption">@Html.Raw(s_glchart.opn_credit.Caption)</div></div></th>
+	} else {
+		<th data-name="opn_credit" class="@s_glchart.opn_credit.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_glchart.SortUrl(s_glchart.opn_credit))',1);"><div id="elh_s_glchart_opn_credit" class="s_glchart_opn_credit">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_glchart.opn_credit.Caption)</span><span class="ew-table-header-sort">@if (s_glchart.opn_credit.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_glchart.opn_credit.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* opn_credit.Visible (end) *@
+@if (s_glchart.bal_mtd.Visible) { // bal_mtd.Visible (begin)
+	if (s_glchart_List.SortUrl(s_glchart.bal_mtd) == "") {
+		<th data-name="bal_mtd" class="@s_glchart.bal_mtd.HeaderCellClass"><div id="elh_s_glchart_bal_mtd" class="s_glchart_bal_mtd"><div class="ew-table-header-caption">@Html.Raw(s_glchart.bal_mtd.Caption)</div></div></th>
+	} else {
+		<th data-name="bal_mtd" class="@s_glchart.bal_mtd.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_glchart.SortUrl(s_glchart.bal_mtd))',1);"><div id="elh_s_glchart_bal_mtd" class="s_glchart_bal_mtd">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_glchart.bal_mtd.Caption)</span><span class="ew-table-header-sort">@if (s_glchart.bal_mtd.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_glchart.bal_mtd.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* bal_mtd.Visible (end) *@
+@if (s_glchart.bal_ytd.Visible) { // bal_ytd.Visible (begin)
+	if (s_glchart_List.SortUrl(s_glchart.bal_ytd) == "") {
+		<th data-name="bal_ytd" class="@s_glchart.bal_ytd.HeaderCellClass"><div id="elh_s_glchart_bal_ytd" class="s_glchart_bal_ytd"><div class="ew-table-header-caption">@Html.Raw(s_glchart.bal_ytd.Caption)</div></div></th>
+	} else {
+		<th data-name="bal_ytd" class="@s_glchart.bal_ytd.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_glchart.SortUrl(s_glchart.bal_ytd))',1);"><div id="elh_s_glchart_bal_ytd" class="s_glchart_bal_ytd">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_glchart.bal_ytd.Caption)</span><span class="ew-table-header-sort">@if (s_glchart.bal_ytd.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_glchart.bal_ytd.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* bal_ytd.Visible (end) *@
+@if (s_glchart.remark.Visible) { // remark.Visible (begin)
+	if (s_glchart_List.SortUrl(s_glchart.remark) == "") {
+		<th data-name="remark" class="@s_glchart.remark.HeaderCellClass"><div id="elh_s_glchart_remark" class="s_glchart_remark"><div class="ew-table-header-caption">@Html.Raw(s_glchart.remark.Caption)</div></div></th>
+	} else {
+		<th data-name="remark" class="@s_glchart.remark.HeaderCellClass"><div class="ew-pointer" onclick="ew.sort(event,'@Html.Raw(s_glchart.SortUrl(s_glchart.remark))',1);"><div id="elh_s_glchart_remark" class="s_glchart_remark">
+			<div class="ew-table-header-btn"><span class="ew-table-header-caption">@Html.Raw(s_glchart.remark.Caption)@Html.Raw(Language.Phrase("SrchLegend"))</span><span class="ew-table-header-sort">@if (s_glchart.remark.Sort == "ASC") {<i class="fa fa-sort-up"></i>} else if (s_glchart.remark.Sort == "DESC") {<i class="fa fa-sort-down"></i>}</span></div>
+		</div></div></th>
+	}
+} @* remark.Visible (end) *@
+@{
+
+	// Render list options (header, right)
+	s_glchart_List.ListOptions.Render("header", "right");
+}
+	</tr>
+</thead>
+<tbody>
+@{ // Begin Code
+if (s_glchart_List.ExportAll && s_glchart_List.IsExport()) {
+	s_glchart_List.StopRecord = s_glchart_List.TotalRecords;
+} else {
+
+	// Set the last record to display
+	if (s_glchart_List.TotalRecords > s_glchart_List.StartRecord + s_glchart_List.DisplayRecords - 1) {
+		s_glchart_List.StopRecord = s_glchart_List.StartRecord + s_glchart_List.DisplayRecords - 1;
+	} else {
+		s_glchart_List.StopRecord = s_glchart_List.TotalRecords;
+	}
+}
+if (s_glchart_List.Recordset != null && s_glchart_List.Recordset.HasRows) {
+	if (!s_glchart_List.Connection.SelectOffset) { // DN
+		for (var i = 1; i <= s_glchart_List.StartRecord - 1; i++) { // Move to first record
+			if (await s_glchart_List.Recordset.ReadAsync()) {
+				s_glchart_List.RecordCount++;
+			}
+		}
+	} else {
+		s_glchart_List.RecordCount = s_glchart_List.StartRecord - 1;
+	}
+} else if (!s_glchart_List.AllowAddDeleteRow && s_glchart_List.StopRecord == 0) {
+	s_glchart_List.StopRecord = s_glchart_List.GridAddRowCount;
+}
+
+// Initialize aggregate
+s_glchart_List.RowType = Config.RowTypeAggregateInit;
+s_glchart_List.ResetAttributes();
+await s_glchart_List.RenderRow();
+
+// Output data rows
+bool eof = (s_glchart_List.Recordset == null); // DN
+while (s_glchart_List.RecordCount < s_glchart_List.StopRecord) { // Begin While
+	if (!s_glchart_List.IsGridAdd && !eof) { // DN
+		eof = !await s_glchart_List.Recordset.ReadAsync();
+	}
+	s_glchart_List.RecordCount++;
+	if (s_glchart_List.RecordCount >= s_glchart_List.StartRecord) {
+		s_glchart_List.RowCnt++;
+
+		// Set up key count
+		s_glchart_List.KeyCount = ConvertToInt(s_glchart_List.RowIndex);
+
+		// Init row class and style
+		s_glchart_List.ResetAttributes();
+		s_glchart_List.CssClass = "";
+		if (s_glchart_List.IsGridAdd) {
+		} else {
+			await s_glchart_List.LoadRowValues(s_glchart_List.Recordset); // Load row values
+		}
+		s_glchart_List.RowType = Config.RowTypeView; // Render view
+
+		// Set up row id / data-rowindex
+		s_glchart_List.RowAttrs.Add("data-rowindex", Convert.ToString(s_glchart_List.RowCnt));
+		s_glchart_List.RowAttrs.Add("id", "r" + Convert.ToString(s_glchart_List.RowCnt) + "_s_glchart");
+		s_glchart_List.RowAttrs.Add("data-rowtype", Convert.ToString(s_glchart_List.RowType));
+
+		// Render row
+		await s_glchart_List.RenderRow();
+
+		// Render list options
+		await s_glchart_List.RenderListOptions();
+	<tr @Html.Raw(s_glchart_List.RowAttributes)>
+	@{
+
+		// Render list options (body, left)
+		s_glchart_List.ListOptions.Render("body", "left", s_glchart_List.RowCnt);
+	}
+	@if (s_glchart.Id.Visible) { // Id.Visible (begin)
+		<td data-name="Id"@Html.Raw(s_glchart.Id.CellAttributes)>
+<span id="el@(s_glchart_List.RowCnt)_s_glchart_Id" class="s_glchart_Id">
+<span @Html.Raw(s_glchart.Id.ViewAttributes)>
+@Html.Raw(s_glchart.Id.GetViewValue())</span>
+</span>
+</td>
+	} @* Id.Visible (end) *@
+	@if (s_glchart.acct_code.Visible) { // acct_code.Visible (begin)
+		<td data-name="acct_code"@Html.Raw(s_glchart.acct_code.CellAttributes)>
+<span id="el@(s_glchart_List.RowCnt)_s_glchart_acct_code" class="s_glchart_acct_code">
+<span @Html.Raw(s_glchart.acct_code.ViewAttributes)>
+@Html.Raw(s_glchart.acct_code.GetViewValue())</span>
+</span>
+</td>
+	} @* acct_code.Visible (end) *@
+	@if (s_glchart.description.Visible) { // description.Visible (begin)
+		<td data-name="description"@Html.Raw(s_glchart.description.CellAttributes)>
+<span id="el@(s_glchart_List.RowCnt)_s_glchart_description" class="s_glchart_description">
+<span @Html.Raw(s_glchart.description.ViewAttributes)>
+@Html.Raw(s_glchart.description.GetViewValue())</span>
+</span>
+</td>
+	} @* description.Visible (end) *@
+	@if (s_glchart.report_type.Visible) { // report_type.Visible (begin)
+		<td data-name="report_type"@Html.Raw(s_glchart.report_type.CellAttributes)>
+<span id="el@(s_glchart_List.RowCnt)_s_glchart_report_type" class="s_glchart_report_type">
+<span @Html.Raw(s_glchart.report_type.ViewAttributes)>
+@Html.Raw(s_glchart.report_type.GetViewValue())</span>
+</span>
+</td>
+	} @* report_type.Visible (end) *@
+	@if (s_glchart.acct_group.Visible) { // acct_group.Visible (begin)
+		<td data-name="acct_group"@Html.Raw(s_glchart.acct_group.CellAttributes)>
+<span id="el@(s_glchart_List.RowCnt)_s_glchart_acct_group" class="s_glchart_acct_group">
+<span @Html.Raw(s_glchart.acct_group.ViewAttributes)>
+@Html.Raw(s_glchart.acct_group.GetViewValue())</span>
+</span>
+</td>
+	} @* acct_group.Visible (end) *@
+	@if (s_glchart.acct_type.Visible) { // acct_type.Visible (begin)
+		<td data-name="acct_type"@Html.Raw(s_glchart.acct_type.CellAttributes)>
+<span id="el@(s_glchart_List.RowCnt)_s_glchart_acct_type" class="s_glchart_acct_type">
+<span @Html.Raw(s_glchart.acct_type.ViewAttributes)>
+@Html.Raw(s_glchart.acct_type.GetViewValue())</span>
+</span>
+</td>
+	} @* acct_type.Visible (end) *@
+	@if (s_glchart.CurrencyCode.Visible) { // CurrencyCode.Visible (begin)
+		<td data-name="CurrencyCode"@Html.Raw(s_glchart.CurrencyCode.CellAttributes)>
+<span id="el@(s_glchart_List.RowCnt)_s_glchart_CurrencyCode" class="s_glchart_CurrencyCode">
+<span @Html.Raw(s_glchart.CurrencyCode.ViewAttributes)>
+@Html.Raw(s_glchart.CurrencyCode.GetViewValue())</span>
+</span>
+</td>
+	} @* CurrencyCode.Visible (end) *@
+	@if (s_glchart.opn_debit.Visible) { // opn_debit.Visible (begin)
+		<td data-name="opn_debit"@Html.Raw(s_glchart.opn_debit.CellAttributes)>
+<span id="el@(s_glchart_List.RowCnt)_s_glchart_opn_debit" class="s_glchart_opn_debit">
+<span @Html.Raw(s_glchart.opn_debit.ViewAttributes)>
+@Html.Raw(s_glchart.opn_debit.GetViewValue())</span>
+</span>
+</td>
+	} @* opn_debit.Visible (end) *@
+	@if (s_glchart.opn_credit.Visible) { // opn_credit.Visible (begin)
+		<td data-name="opn_credit"@Html.Raw(s_glchart.opn_credit.CellAttributes)>
+<span id="el@(s_glchart_List.RowCnt)_s_glchart_opn_credit" class="s_glchart_opn_credit">
+<span @Html.Raw(s_glchart.opn_credit.ViewAttributes)>
+@Html.Raw(s_glchart.opn_credit.GetViewValue())</span>
+</span>
+</td>
+	} @* opn_credit.Visible (end) *@
+	@if (s_glchart.bal_mtd.Visible) { // bal_mtd.Visible (begin)
+		<td data-name="bal_mtd"@Html.Raw(s_glchart.bal_mtd.CellAttributes)>
+<span id="el@(s_glchart_List.RowCnt)_s_glchart_bal_mtd" class="s_glchart_bal_mtd">
+<span @Html.Raw(s_glchart.bal_mtd.ViewAttributes)>
+@Html.Raw(s_glchart.bal_mtd.GetViewValue())</span>
+</span>
+</td>
+	} @* bal_mtd.Visible (end) *@
+	@if (s_glchart.bal_ytd.Visible) { // bal_ytd.Visible (begin)
+		<td data-name="bal_ytd"@Html.Raw(s_glchart.bal_ytd.CellAttributes)>
+<span id="el@(s_glchart_List.RowCnt)_s_glchart_bal_ytd" class="s_glchart_bal_ytd">
+<span @Html.Raw(s_glchart.bal_ytd.ViewAttributes)>
+@Html.Raw(s_glchart.bal_ytd.GetViewValue())</span>
+</span>
+</td>
+	} @* bal_ytd.Visible (end) *@
+	@if (s_glchart.remark.Visible) { // remark.Visible (begin)
+		<td data-name="remark"@Html.Raw(s_glchart.remark.CellAttributes)>
+<span id="el@(s_glchart_List.RowCnt)_s_glchart_remark" class="s_glchart_remark">
+<span @Html.Raw(s_glchart.remark.ViewAttributes)>
+@Html.Raw(s_glchart.remark.GetViewValue())</span>
+</span>
+</td>
+	} @* remark.Visible (end) *@
+	@{
+
+		// Render list options (body, right)
+		s_glchart_List.ListOptions.Render("body", "right", s_glchart_List.RowCnt);
+	}
+	</tr>
+	} @* End if *@
+} @* End While *@
+} @* End Code *@
+</tbody>
+</table><!-- /.ew-table -->
+} @* End If TotalRecords > 0 *@
+@if (Empty(s_glchart_List.CurrentAction)) {
+<input type="hidden" name="action" id="action" value="">
+}
+</div><!-- /.ew-grid-middle-panel -->
+</form><!-- /.ew-list-form -->
+@{ s_glchart_List.CloseRecordset(); }
+		@if (!s_glchart.IsExport()) {
+		<div class="card-footer ew-grid-lower-panel">
+		<div class="ew-list-other-options">
+		@s_glchart_List.OtherOptions.RenderBody("bottom")
+		</div>
+		@if (!s_glchart_List.IsGridAdd) {
+			<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="@AppPath(CurrentPageName())">
+			@s_glchart_List.Pager.Render()
+			</form>
+		}
+		<div class="clearfix"></div>
+		</div>
+		}
+</div><!-- /.ew-grid -->
+}
+@if (s_glchart_List.TotalRecords <= 0 && s_glchart_List.CurrentAction == "") { // Show other options
+<div class="ew-list-other-options">
+@s_glchart_List.OtherOptions.ForEach(opt => opt.ButtonClass = "").RenderBody()
+</div>
+<div class="clearfix"></div>
+}
+@s_glchart_List.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_glchart.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

@@ -1,0 +1,181 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	UserLevelPermissions_Edit.Page_Render();
+
+	// Check action result
+	if (UserLevelPermissions_Edit.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "edit";
+var fUserLevelPermissionsedit = currentForm = new ew.Form("fUserLevelPermissionsedit", "edit");
+
+// Validate form
+fUserLevelPermissionsedit.validate = function() {
+	if (!this.validateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.getForm(), $fobj = $(fobj);
+	if ($fobj.find("#confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.formKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = ["insert", "gridinsert"].includes($fobj.find("#action").val()) && $k[0];
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+	@if (UserLevelPermissions_Edit.UserLevelID.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_UserLevelID");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(UserLevelPermissions.UserLevelID.RequiredErrorMessage.Replace("%s", UserLevelPermissions.UserLevelID.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_UserLevelID");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(UserLevelPermissions.UserLevelID.ErrorMessage))");
+	@if (UserLevelPermissions_Edit._TableName.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "__TableName");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(UserLevelPermissions._TableName.RequiredErrorMessage.Replace("%s", UserLevelPermissions._TableName.Caption)))");
+		</text>
+	}
+	@if (UserLevelPermissions_Edit.Permission.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Permission");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(UserLevelPermissions.Permission.RequiredErrorMessage.Replace("%s", UserLevelPermissions.Permission.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_Permission");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(UserLevelPermissions.Permission.ErrorMessage))");
+
+		// Fire Form_CustomValidate event
+		if (!this.Form_CustomValidate(fobj))
+			return false;
+	}
+
+	// Process detail forms
+	var dfs = $fobj.find("input[name='detailpage']").get();
+	for (var i = 0; i < dfs.length; i++) {
+		var df = dfs[i], val = df.value;
+		if (val && ew.forms[val])
+			if (!ew.forms[val].validate())
+				return false;
+	}
+	return true;
+}
+
+// Form_CustomValidate event
+fUserLevelPermissionsedit.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fUserLevelPermissionsedit.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@UserLevelPermissions_Edit.ShowPageHeader()
+@UserLevelPermissions_Edit.ShowMessages()
+<form name="fUserLevelPermissionsedit" id="fUserLevelPermissionsedit" class="@UserLevelPermissions_Edit.FormClassName" action="@AppPath(CurrentPageName())" method="post">
+@if (UserLevelPermissions_Edit.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="update">
+@if (UserLevelPermissions_Edit.IsModal) {
+<input type="hidden" name="modal" value="@ConvertToInt(UserLevelPermissions_Edit.IsModal)">
+}
+<div class="ew-edit-div"><!-- page* -->
+@if (UserLevelPermissions.UserLevelID.Visible) { // UserLevelID.Visible (begin)
+	<div id="r_UserLevelID" class="form-group row">
+		<label id="elh_UserLevelPermissions_UserLevelID" for="x_UserLevelID" class="@UserLevelPermissions_Edit.LeftColumnClass">@Html.Raw(UserLevelPermissions.UserLevelID.Caption)@Html.Raw(UserLevelPermissions.UserLevelID.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@UserLevelPermissions_Edit.RightColumnClass"><div @Html.Raw(UserLevelPermissions.UserLevelID.CellAttributes)>
+<span id="el_UserLevelPermissions_UserLevelID">
+<span @Html.Raw(UserLevelPermissions.UserLevelID.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(UserLevelPermissions.UserLevelID.EditValue))"></span>
+</span>
+<input type="hidden" data-table="UserLevelPermissions" data-field="x_UserLevelID" name="x_UserLevelID" id="x_UserLevelID" value="@UserLevelPermissions.UserLevelID.CurrentValue">
+@Html.Raw(UserLevelPermissions.UserLevelID.CustomMessage)</div></div>
+	</div>
+} @* UserLevelID.Visible (end) *@
+@if (UserLevelPermissions._TableName.Visible) { // _TableName.Visible (begin)
+	<div id="r__TableName" class="form-group row">
+		<label id="elh_UserLevelPermissions__TableName" for="x__TableName" class="@UserLevelPermissions_Edit.LeftColumnClass">@Html.Raw(UserLevelPermissions._TableName.Caption)@Html.Raw(UserLevelPermissions._TableName.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@UserLevelPermissions_Edit.RightColumnClass"><div @Html.Raw(UserLevelPermissions._TableName.CellAttributes)>
+<span id="el_UserLevelPermissions__TableName">
+<span @Html.Raw(UserLevelPermissions._TableName.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(UserLevelPermissions._TableName.EditValue))"></span>
+</span>
+<input type="hidden" data-table="UserLevelPermissions" data-field="x__TableName" name="x__TableName" id="x__TableName" value="@UserLevelPermissions._TableName.CurrentValue">
+@Html.Raw(UserLevelPermissions._TableName.CustomMessage)</div></div>
+	</div>
+} @* _TableName.Visible (end) *@
+@if (UserLevelPermissions.Permission.Visible) { // Permission.Visible (begin)
+	<div id="r_Permission" class="form-group row">
+		<label id="elh_UserLevelPermissions_Permission" for="x_Permission" class="@UserLevelPermissions_Edit.LeftColumnClass">@Html.Raw(UserLevelPermissions.Permission.Caption)@Html.Raw(UserLevelPermissions.Permission.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@UserLevelPermissions_Edit.RightColumnClass"><div @Html.Raw(UserLevelPermissions.Permission.CellAttributes)>
+<span id="el_UserLevelPermissions_Permission">
+<input type="text" data-table="UserLevelPermissions" data-field="x_Permission" name="x_Permission" id="x_Permission" size="30" placeholder="@UserLevelPermissions.Permission.PlaceHolder" value="@UserLevelPermissions.Permission.EditValue" @Html.Raw(UserLevelPermissions.Permission.EditAttributes)>
+</span>
+@Html.Raw(UserLevelPermissions.Permission.CustomMessage)</div></div>
+	</div>
+} @* Permission.Visible (end) *@
+</div><!-- /page* -->
+@{ UserLevelPermissions_Edit.CloseRecordset(); }
+@if (!UserLevelPermissions_Edit.IsModal) {
+@:<div class="form-group row"><!-- buttons .form-group -->
+	@:<div class="@UserLevelPermissions_Edit.OffsetColumnClass"><!-- buttons offset -->
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("SaveBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(UserLevelPermissions_Edit.ReturnUrl)">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+	@:</div><!-- /buttons offset -->
+@:</div><!-- /buttons .form-group -->
+}
+</form>
+@UserLevelPermissions_Edit.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

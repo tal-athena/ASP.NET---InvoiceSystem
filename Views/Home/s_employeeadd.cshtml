@@ -1,0 +1,730 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_employee_Add.Page_Render();
+
+	// Check action result
+	if (s_employee_Add.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "add";
+var fs_employeeadd = currentForm = new ew.Form("fs_employeeadd", "add");
+
+// Validate form
+fs_employeeadd.validate = function() {
+	if (!this.validateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.getForm(), $fobj = $(fobj);
+	if ($fobj.find("#confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.formKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = ["insert", "gridinsert"].includes($fobj.find("#action").val()) && $k[0];
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+	@if (s_employee_Add.employeeid.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_employeeid");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.employeeid.RequiredErrorMessage.Replace("%s", s_employee.employeeid.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.fname.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_fname");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.fname.RequiredErrorMessage.Replace("%s", s_employee.fname.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.lname.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_lname");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.lname.RequiredErrorMessage.Replace("%s", s_employee.lname.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.oldic.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_oldic");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.oldic.RequiredErrorMessage.Replace("%s", s_employee.oldic.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.newic.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_newic");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.newic.RequiredErrorMessage.Replace("%s", s_employee.newic.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.passport.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_passport");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.passport.RequiredErrorMessage.Replace("%s", s_employee.passport.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.address1.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_address1");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.address1.RequiredErrorMessage.Replace("%s", s_employee.address1.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.address2.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_address2");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.address2.RequiredErrorMessage.Replace("%s", s_employee.address2.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.Id_city.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Id_city");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.Id_city.RequiredErrorMessage.Replace("%s", s_employee.Id_city.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_Id_city");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.Id_city.ErrorMessage))");
+	@if (s_employee_Add.Id_state.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Id_state");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.Id_state.RequiredErrorMessage.Replace("%s", s_employee.Id_state.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_Id_state");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.Id_state.ErrorMessage))");
+	@if (s_employee_Add.Id_country.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Id_country");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.Id_country.RequiredErrorMessage.Replace("%s", s_employee.Id_country.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_Id_country");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.Id_country.ErrorMessage))");
+	@if (s_employee_Add.postcode.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_postcode");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.postcode.RequiredErrorMessage.Replace("%s", s_employee.postcode.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.gender.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_gender");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.gender.RequiredErrorMessage.Replace("%s", s_employee.gender.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.tel.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tel");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.tel.RequiredErrorMessage.Replace("%s", s_employee.tel.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.handphone.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_handphone");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.handphone.RequiredErrorMessage.Replace("%s", s_employee.handphone.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add._email.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "__email");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee._email.RequiredErrorMessage.Replace("%s", s_employee._email.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.dob.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_dob");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.dob.RequiredErrorMessage.Replace("%s", s_employee.dob.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_dob");
+		if (elm && !ew.checkDateDef(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.dob.ErrorMessage))");
+	@if (s_employee_Add.children.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_children");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.children.RequiredErrorMessage.Replace("%s", s_employee.children.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_children");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.children.ErrorMessage))");
+	@if (s_employee_Add.datejoin.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_datejoin");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.datejoin.RequiredErrorMessage.Replace("%s", s_employee.datejoin.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_datejoin");
+		if (elm && !ew.checkDateDef(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.datejoin.ErrorMessage))");
+	@if (s_employee_Add.dateresign.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_dateresign");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.dateresign.RequiredErrorMessage.Replace("%s", s_employee.dateresign.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_dateresign");
+		if (elm && !ew.checkDateDef(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.dateresign.ErrorMessage))");
+	@if (s_employee_Add.marriedstatus.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_marriedstatus");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.marriedstatus.RequiredErrorMessage.Replace("%s", s_employee.marriedstatus.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.Id_dept.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Id_dept");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.Id_dept.RequiredErrorMessage.Replace("%s", s_employee.Id_dept.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_Id_dept");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.Id_dept.ErrorMessage))");
+	@if (s_employee_Add.Id_position.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Id_position");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.Id_position.RequiredErrorMessage.Replace("%s", s_employee.Id_position.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_Id_position");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.Id_position.ErrorMessage))");
+	@if (s_employee_Add.Id_race.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_Id_race");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.Id_race.RequiredErrorMessage.Replace("%s", s_employee.Id_race.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_Id_race");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.Id_race.ErrorMessage))");
+	@if (s_employee_Add.photopath.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_photopath");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.photopath.RequiredErrorMessage.Replace("%s", s_employee.photopath.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.report_to.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_report_to");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.report_to.RequiredErrorMessage.Replace("%s", s_employee.report_to.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_report_to");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.report_to.ErrorMessage))");
+	@if (s_employee_Add.login_effectivedate.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_login_effectivedate");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.login_effectivedate.RequiredErrorMessage.Replace("%s", s_employee.login_effectivedate.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_login_effectivedate");
+		if (elm && !ew.checkDateDef(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.login_effectivedate.ErrorMessage))");
+	@if (s_employee_Add.login_disableddate.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_login_disableddate");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.login_disableddate.RequiredErrorMessage.Replace("%s", s_employee.login_disableddate.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_login_disableddate");
+		if (elm && !ew.checkDateDef(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.login_disableddate.ErrorMessage))");
+	@if (s_employee_Add.UserLevelId.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_UserLevelId");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.UserLevelId.RequiredErrorMessage.Replace("%s", s_employee.UserLevelId.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add._Username.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "__Username");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee._Username.RequiredErrorMessage.Replace("%s", s_employee._Username.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.password.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_password");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.password.RequiredErrorMessage.Replace("%s", s_employee.password.Caption)))");
+		</text>
+	}
+	@if (s_employee_Add.active.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_active");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_employee.active.RequiredErrorMessage.Replace("%s", s_employee.active.Caption)))");
+		</text>
+	}
+
+		// Fire Form_CustomValidate event
+		if (!this.Form_CustomValidate(fobj))
+			return false;
+	}
+
+	// Process detail forms
+	var dfs = $fobj.find("input[name='detailpage']").get();
+	for (var i = 0; i < dfs.length; i++) {
+		var df = dfs[i], val = df.value;
+		if (val && ew.forms[val])
+			if (!ew.forms[val].validate())
+				return false;
+	}
+	return true;
+}
+
+// Form_CustomValidate event
+fs_employeeadd.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_employeeadd.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_employeeadd.lists["x_UserLevelId"] = @Html.Raw(s_employee_Add.UserLevelId.Lookup.ToClientList());
+fs_employeeadd.lists["x_UserLevelId"].options = @Html.Raw(ConvertToJson(s_employee_Add.UserLevelId.LookupOptions));
+fs_employeeadd.lists["x_active"] = @Html.Raw(s_employee_Add.active.Lookup.ToClientList());
+fs_employeeadd.lists["x_active"].options = @Html.Raw(ConvertToJson(s_employee_Add.active.Options(false))); // DN
+
+// Form object for search
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_employee_Add.ShowPageHeader()
+@s_employee_Add.ShowMessages()
+<form name="fs_employeeadd" id="fs_employeeadd" class="@s_employee_Add.FormClassName" action="@AppPath(CurrentPageName())" method="post">
+@if (s_employee_Add.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="t" value="s_employee">
+<input type="hidden" name="action" id="action" value="insert">
+<input type="hidden" name="modal" value="@ConvertToInt(s_employee_Add.IsModal)">
+<!-- Fields to prevent google autofill -->
+<input class="d-none" type="text" name="@Encrypt(Random())">
+<input class="d-none" type="password" name="@Encrypt(Random())">
+<div class="ew-add-div"><!-- page* -->
+@if (s_employee.employeeid.Visible) { // employeeid.Visible (begin)
+	<div id="r_employeeid" class="form-group row">
+		<label id="elh_s_employee_employeeid" for="x_employeeid" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.employeeid.Caption)@Html.Raw(s_employee.employeeid.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.employeeid.CellAttributes)>
+<span id="el_s_employee_employeeid">
+<input type="text" data-table="s_employee" data-field="x_employeeid" name="x_employeeid" id="x_employeeid" size="30" maxlength="20" placeholder="@s_employee.employeeid.PlaceHolder" value="@s_employee.employeeid.EditValue" @Html.Raw(s_employee.employeeid.EditAttributes)>
+</span>
+@Html.Raw(s_employee.employeeid.CustomMessage)</div></div>
+	</div>
+} @* employeeid.Visible (end) *@
+@if (s_employee.fname.Visible) { // fname.Visible (begin)
+	<div id="r_fname" class="form-group row">
+		<label id="elh_s_employee_fname" for="x_fname" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.fname.Caption)@Html.Raw(s_employee.fname.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.fname.CellAttributes)>
+<span id="el_s_employee_fname">
+<input type="text" data-table="s_employee" data-field="x_fname" name="x_fname" id="x_fname" size="30" maxlength="100" placeholder="@s_employee.fname.PlaceHolder" value="@s_employee.fname.EditValue" @Html.Raw(s_employee.fname.EditAttributes)>
+</span>
+@Html.Raw(s_employee.fname.CustomMessage)</div></div>
+	</div>
+} @* fname.Visible (end) *@
+@if (s_employee.lname.Visible) { // lname.Visible (begin)
+	<div id="r_lname" class="form-group row">
+		<label id="elh_s_employee_lname" for="x_lname" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.lname.Caption)@Html.Raw(s_employee.lname.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.lname.CellAttributes)>
+<span id="el_s_employee_lname">
+<input type="text" data-table="s_employee" data-field="x_lname" name="x_lname" id="x_lname" size="30" maxlength="50" placeholder="@s_employee.lname.PlaceHolder" value="@s_employee.lname.EditValue" @Html.Raw(s_employee.lname.EditAttributes)>
+</span>
+@Html.Raw(s_employee.lname.CustomMessage)</div></div>
+	</div>
+} @* lname.Visible (end) *@
+@if (s_employee.oldic.Visible) { // oldic.Visible (begin)
+	<div id="r_oldic" class="form-group row">
+		<label id="elh_s_employee_oldic" for="x_oldic" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.oldic.Caption)@Html.Raw(s_employee.oldic.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.oldic.CellAttributes)>
+<span id="el_s_employee_oldic">
+<input type="text" data-table="s_employee" data-field="x_oldic" name="x_oldic" id="x_oldic" size="30" maxlength="50" placeholder="@s_employee.oldic.PlaceHolder" value="@s_employee.oldic.EditValue" @Html.Raw(s_employee.oldic.EditAttributes)>
+</span>
+@Html.Raw(s_employee.oldic.CustomMessage)</div></div>
+	</div>
+} @* oldic.Visible (end) *@
+@if (s_employee.newic.Visible) { // newic.Visible (begin)
+	<div id="r_newic" class="form-group row">
+		<label id="elh_s_employee_newic" for="x_newic" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.newic.Caption)@Html.Raw(s_employee.newic.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.newic.CellAttributes)>
+<span id="el_s_employee_newic">
+<input type="text" data-table="s_employee" data-field="x_newic" name="x_newic" id="x_newic" size="30" maxlength="50" placeholder="@s_employee.newic.PlaceHolder" value="@s_employee.newic.EditValue" @Html.Raw(s_employee.newic.EditAttributes)>
+</span>
+@Html.Raw(s_employee.newic.CustomMessage)</div></div>
+	</div>
+} @* newic.Visible (end) *@
+@if (s_employee.passport.Visible) { // passport.Visible (begin)
+	<div id="r_passport" class="form-group row">
+		<label id="elh_s_employee_passport" for="x_passport" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.passport.Caption)@Html.Raw(s_employee.passport.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.passport.CellAttributes)>
+<span id="el_s_employee_passport">
+<input type="text" data-table="s_employee" data-field="x_passport" name="x_passport" id="x_passport" size="30" maxlength="50" placeholder="@s_employee.passport.PlaceHolder" value="@s_employee.passport.EditValue" @Html.Raw(s_employee.passport.EditAttributes)>
+</span>
+@Html.Raw(s_employee.passport.CustomMessage)</div></div>
+	</div>
+} @* passport.Visible (end) *@
+@if (s_employee.address1.Visible) { // address1.Visible (begin)
+	<div id="r_address1" class="form-group row">
+		<label id="elh_s_employee_address1" for="x_address1" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.address1.Caption)@Html.Raw(s_employee.address1.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.address1.CellAttributes)>
+<span id="el_s_employee_address1">
+<input type="text" data-table="s_employee" data-field="x_address1" name="x_address1" id="x_address1" size="30" maxlength="100" placeholder="@s_employee.address1.PlaceHolder" value="@s_employee.address1.EditValue" @Html.Raw(s_employee.address1.EditAttributes)>
+</span>
+@Html.Raw(s_employee.address1.CustomMessage)</div></div>
+	</div>
+} @* address1.Visible (end) *@
+@if (s_employee.address2.Visible) { // address2.Visible (begin)
+	<div id="r_address2" class="form-group row">
+		<label id="elh_s_employee_address2" for="x_address2" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.address2.Caption)@Html.Raw(s_employee.address2.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.address2.CellAttributes)>
+<span id="el_s_employee_address2">
+<input type="text" data-table="s_employee" data-field="x_address2" name="x_address2" id="x_address2" size="30" maxlength="100" placeholder="@s_employee.address2.PlaceHolder" value="@s_employee.address2.EditValue" @Html.Raw(s_employee.address2.EditAttributes)>
+</span>
+@Html.Raw(s_employee.address2.CustomMessage)</div></div>
+	</div>
+} @* address2.Visible (end) *@
+@if (s_employee.Id_city.Visible) { // Id_city.Visible (begin)
+	<div id="r_Id_city" class="form-group row">
+		<label id="elh_s_employee_Id_city" for="x_Id_city" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.Id_city.Caption)@Html.Raw(s_employee.Id_city.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.Id_city.CellAttributes)>
+<span id="el_s_employee_Id_city">
+<input type="text" data-table="s_employee" data-field="x_Id_city" name="x_Id_city" id="x_Id_city" size="30" placeholder="@s_employee.Id_city.PlaceHolder" value="@s_employee.Id_city.EditValue" @Html.Raw(s_employee.Id_city.EditAttributes)>
+</span>
+@Html.Raw(s_employee.Id_city.CustomMessage)</div></div>
+	</div>
+} @* Id_city.Visible (end) *@
+@if (s_employee.Id_state.Visible) { // Id_state.Visible (begin)
+	<div id="r_Id_state" class="form-group row">
+		<label id="elh_s_employee_Id_state" for="x_Id_state" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.Id_state.Caption)@Html.Raw(s_employee.Id_state.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.Id_state.CellAttributes)>
+<span id="el_s_employee_Id_state">
+<input type="text" data-table="s_employee" data-field="x_Id_state" name="x_Id_state" id="x_Id_state" size="30" placeholder="@s_employee.Id_state.PlaceHolder" value="@s_employee.Id_state.EditValue" @Html.Raw(s_employee.Id_state.EditAttributes)>
+</span>
+@Html.Raw(s_employee.Id_state.CustomMessage)</div></div>
+	</div>
+} @* Id_state.Visible (end) *@
+@if (s_employee.Id_country.Visible) { // Id_country.Visible (begin)
+	<div id="r_Id_country" class="form-group row">
+		<label id="elh_s_employee_Id_country" for="x_Id_country" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.Id_country.Caption)@Html.Raw(s_employee.Id_country.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.Id_country.CellAttributes)>
+<span id="el_s_employee_Id_country">
+<input type="text" data-table="s_employee" data-field="x_Id_country" name="x_Id_country" id="x_Id_country" size="30" placeholder="@s_employee.Id_country.PlaceHolder" value="@s_employee.Id_country.EditValue" @Html.Raw(s_employee.Id_country.EditAttributes)>
+</span>
+@Html.Raw(s_employee.Id_country.CustomMessage)</div></div>
+	</div>
+} @* Id_country.Visible (end) *@
+@if (s_employee.postcode.Visible) { // postcode.Visible (begin)
+	<div id="r_postcode" class="form-group row">
+		<label id="elh_s_employee_postcode" for="x_postcode" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.postcode.Caption)@Html.Raw(s_employee.postcode.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.postcode.CellAttributes)>
+<span id="el_s_employee_postcode">
+<input type="text" data-table="s_employee" data-field="x_postcode" name="x_postcode" id="x_postcode" size="30" maxlength="10" placeholder="@s_employee.postcode.PlaceHolder" value="@s_employee.postcode.EditValue" @Html.Raw(s_employee.postcode.EditAttributes)>
+</span>
+@Html.Raw(s_employee.postcode.CustomMessage)</div></div>
+	</div>
+} @* postcode.Visible (end) *@
+@if (s_employee.gender.Visible) { // gender.Visible (begin)
+	<div id="r_gender" class="form-group row">
+		<label id="elh_s_employee_gender" for="x_gender" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.gender.Caption)@Html.Raw(s_employee.gender.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.gender.CellAttributes)>
+<span id="el_s_employee_gender">
+<input type="text" data-table="s_employee" data-field="x_gender" name="x_gender" id="x_gender" size="30" maxlength="1" placeholder="@s_employee.gender.PlaceHolder" value="@s_employee.gender.EditValue" @Html.Raw(s_employee.gender.EditAttributes)>
+</span>
+@Html.Raw(s_employee.gender.CustomMessage)</div></div>
+	</div>
+} @* gender.Visible (end) *@
+@if (s_employee.tel.Visible) { // tel.Visible (begin)
+	<div id="r_tel" class="form-group row">
+		<label id="elh_s_employee_tel" for="x_tel" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.tel.Caption)@Html.Raw(s_employee.tel.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.tel.CellAttributes)>
+<span id="el_s_employee_tel">
+<input type="text" data-table="s_employee" data-field="x_tel" name="x_tel" id="x_tel" size="30" maxlength="50" placeholder="@s_employee.tel.PlaceHolder" value="@s_employee.tel.EditValue" @Html.Raw(s_employee.tel.EditAttributes)>
+</span>
+@Html.Raw(s_employee.tel.CustomMessage)</div></div>
+	</div>
+} @* tel.Visible (end) *@
+@if (s_employee.handphone.Visible) { // handphone.Visible (begin)
+	<div id="r_handphone" class="form-group row">
+		<label id="elh_s_employee_handphone" for="x_handphone" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.handphone.Caption)@Html.Raw(s_employee.handphone.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.handphone.CellAttributes)>
+<span id="el_s_employee_handphone">
+<input type="text" data-table="s_employee" data-field="x_handphone" name="x_handphone" id="x_handphone" size="30" maxlength="50" placeholder="@s_employee.handphone.PlaceHolder" value="@s_employee.handphone.EditValue" @Html.Raw(s_employee.handphone.EditAttributes)>
+</span>
+@Html.Raw(s_employee.handphone.CustomMessage)</div></div>
+	</div>
+} @* handphone.Visible (end) *@
+@if (s_employee._email.Visible) { // _email.Visible (begin)
+	<div id="r__email" class="form-group row">
+		<label id="elh_s_employee__email" for="x__email" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee._email.Caption)@Html.Raw(s_employee._email.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee._email.CellAttributes)>
+<span id="el_s_employee__email">
+<input type="text" data-table="s_employee" data-field="x__email" name="x__email" id="x__email" size="30" maxlength="50" placeholder="@s_employee._email.PlaceHolder" value="@s_employee._email.EditValue" @Html.Raw(s_employee._email.EditAttributes)>
+</span>
+@Html.Raw(s_employee._email.CustomMessage)</div></div>
+	</div>
+} @* _email.Visible (end) *@
+@if (s_employee.dob.Visible) { // dob.Visible (begin)
+	<div id="r_dob" class="form-group row">
+		<label id="elh_s_employee_dob" for="x_dob" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.dob.Caption)@Html.Raw(s_employee.dob.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.dob.CellAttributes)>
+<span id="el_s_employee_dob">
+<input type="text" data-table="s_employee" data-field="x_dob" name="x_dob" id="x_dob" placeholder="@s_employee.dob.PlaceHolder" value="@s_employee.dob.EditValue" @Html.Raw(s_employee.dob.EditAttributes)>
+</span>
+@Html.Raw(s_employee.dob.CustomMessage)</div></div>
+	</div>
+} @* dob.Visible (end) *@
+@if (s_employee.children.Visible) { // children.Visible (begin)
+	<div id="r_children" class="form-group row">
+		<label id="elh_s_employee_children" for="x_children" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.children.Caption)@Html.Raw(s_employee.children.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.children.CellAttributes)>
+<span id="el_s_employee_children">
+<input type="text" data-table="s_employee" data-field="x_children" name="x_children" id="x_children" size="30" placeholder="@s_employee.children.PlaceHolder" value="@s_employee.children.EditValue" @Html.Raw(s_employee.children.EditAttributes)>
+</span>
+@Html.Raw(s_employee.children.CustomMessage)</div></div>
+	</div>
+} @* children.Visible (end) *@
+@if (s_employee.datejoin.Visible) { // datejoin.Visible (begin)
+	<div id="r_datejoin" class="form-group row">
+		<label id="elh_s_employee_datejoin" for="x_datejoin" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.datejoin.Caption)@Html.Raw(s_employee.datejoin.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.datejoin.CellAttributes)>
+<span id="el_s_employee_datejoin">
+<input type="text" data-table="s_employee" data-field="x_datejoin" name="x_datejoin" id="x_datejoin" placeholder="@s_employee.datejoin.PlaceHolder" value="@s_employee.datejoin.EditValue" @Html.Raw(s_employee.datejoin.EditAttributes)>
+</span>
+@Html.Raw(s_employee.datejoin.CustomMessage)</div></div>
+	</div>
+} @* datejoin.Visible (end) *@
+@if (s_employee.dateresign.Visible) { // dateresign.Visible (begin)
+	<div id="r_dateresign" class="form-group row">
+		<label id="elh_s_employee_dateresign" for="x_dateresign" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.dateresign.Caption)@Html.Raw(s_employee.dateresign.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.dateresign.CellAttributes)>
+<span id="el_s_employee_dateresign">
+<input type="text" data-table="s_employee" data-field="x_dateresign" name="x_dateresign" id="x_dateresign" placeholder="@s_employee.dateresign.PlaceHolder" value="@s_employee.dateresign.EditValue" @Html.Raw(s_employee.dateresign.EditAttributes)>
+</span>
+@Html.Raw(s_employee.dateresign.CustomMessage)</div></div>
+	</div>
+} @* dateresign.Visible (end) *@
+@if (s_employee.marriedstatus.Visible) { // marriedstatus.Visible (begin)
+	<div id="r_marriedstatus" class="form-group row">
+		<label id="elh_s_employee_marriedstatus" for="x_marriedstatus" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.marriedstatus.Caption)@Html.Raw(s_employee.marriedstatus.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.marriedstatus.CellAttributes)>
+<span id="el_s_employee_marriedstatus">
+<input type="text" data-table="s_employee" data-field="x_marriedstatus" name="x_marriedstatus" id="x_marriedstatus" size="30" maxlength="1" placeholder="@s_employee.marriedstatus.PlaceHolder" value="@s_employee.marriedstatus.EditValue" @Html.Raw(s_employee.marriedstatus.EditAttributes)>
+</span>
+@Html.Raw(s_employee.marriedstatus.CustomMessage)</div></div>
+	</div>
+} @* marriedstatus.Visible (end) *@
+@if (s_employee.Id_dept.Visible) { // Id_dept.Visible (begin)
+	<div id="r_Id_dept" class="form-group row">
+		<label id="elh_s_employee_Id_dept" for="x_Id_dept" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.Id_dept.Caption)@Html.Raw(s_employee.Id_dept.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.Id_dept.CellAttributes)>
+<span id="el_s_employee_Id_dept">
+<input type="text" data-table="s_employee" data-field="x_Id_dept" name="x_Id_dept" id="x_Id_dept" size="30" placeholder="@s_employee.Id_dept.PlaceHolder" value="@s_employee.Id_dept.EditValue" @Html.Raw(s_employee.Id_dept.EditAttributes)>
+</span>
+@Html.Raw(s_employee.Id_dept.CustomMessage)</div></div>
+	</div>
+} @* Id_dept.Visible (end) *@
+@if (s_employee.Id_position.Visible) { // Id_position.Visible (begin)
+	<div id="r_Id_position" class="form-group row">
+		<label id="elh_s_employee_Id_position" for="x_Id_position" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.Id_position.Caption)@Html.Raw(s_employee.Id_position.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.Id_position.CellAttributes)>
+<span id="el_s_employee_Id_position">
+<input type="text" data-table="s_employee" data-field="x_Id_position" name="x_Id_position" id="x_Id_position" size="30" placeholder="@s_employee.Id_position.PlaceHolder" value="@s_employee.Id_position.EditValue" @Html.Raw(s_employee.Id_position.EditAttributes)>
+</span>
+@Html.Raw(s_employee.Id_position.CustomMessage)</div></div>
+	</div>
+} @* Id_position.Visible (end) *@
+@if (s_employee.Id_race.Visible) { // Id_race.Visible (begin)
+	<div id="r_Id_race" class="form-group row">
+		<label id="elh_s_employee_Id_race" for="x_Id_race" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.Id_race.Caption)@Html.Raw(s_employee.Id_race.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.Id_race.CellAttributes)>
+<span id="el_s_employee_Id_race">
+<input type="text" data-table="s_employee" data-field="x_Id_race" name="x_Id_race" id="x_Id_race" size="30" placeholder="@s_employee.Id_race.PlaceHolder" value="@s_employee.Id_race.EditValue" @Html.Raw(s_employee.Id_race.EditAttributes)>
+</span>
+@Html.Raw(s_employee.Id_race.CustomMessage)</div></div>
+	</div>
+} @* Id_race.Visible (end) *@
+@if (s_employee.photopath.Visible) { // photopath.Visible (begin)
+	<div id="r_photopath" class="form-group row">
+		<label id="elh_s_employee_photopath" for="x_photopath" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.photopath.Caption)@Html.Raw(s_employee.photopath.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.photopath.CellAttributes)>
+<span id="el_s_employee_photopath">
+<textarea data-table="s_employee" data-field="x_photopath" name="x_photopath" id="x_photopath" cols="35" rows="4" placeholder="@s_employee.photopath.PlaceHolder" @Html.Raw(s_employee.photopath.EditAttributes)>@s_employee.photopath.EditValue</textarea>
+</span>
+@Html.Raw(s_employee.photopath.CustomMessage)</div></div>
+	</div>
+} @* photopath.Visible (end) *@
+@if (s_employee.report_to.Visible) { // report_to.Visible (begin)
+	<div id="r_report_to" class="form-group row">
+		<label id="elh_s_employee_report_to" for="x_report_to" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.report_to.Caption)@Html.Raw(s_employee.report_to.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.report_to.CellAttributes)>
+@if (!Security.IsAdmin && Security.IsLoggedIn) { // Non system admin
+<span id="el_s_employee_report_to">
+<div class="input-group">
+	<select class="custom-select ew-custom-select" data-table="s_employee" data-field="x_report_to" data-value-separator="@s_employee.report_to.DisplayValueSeparatorAttribute" id="x_report_to" name="x_report_to"@Html.Raw(s_employee.report_to.EditAttributes)>
+		@s_employee.report_to.SelectOptionListHtml("x_report_to")
+	</select>
+</div>
+</span>
+} else {
+<span id="el_s_employee_report_to">
+<input type="text" data-table="s_employee" data-field="x_report_to" name="x_report_to" id="x_report_to" size="30" placeholder="@s_employee.report_to.PlaceHolder" value="@s_employee.report_to.EditValue" @Html.Raw(s_employee.report_to.EditAttributes)>
+</span>
+}
+@Html.Raw(s_employee.report_to.CustomMessage)</div></div>
+	</div>
+} @* report_to.Visible (end) *@
+@if (s_employee.login_effectivedate.Visible) { // login_effectivedate.Visible (begin)
+	<div id="r_login_effectivedate" class="form-group row">
+		<label id="elh_s_employee_login_effectivedate" for="x_login_effectivedate" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.login_effectivedate.Caption)@Html.Raw(s_employee.login_effectivedate.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.login_effectivedate.CellAttributes)>
+<span id="el_s_employee_login_effectivedate">
+<input type="text" data-table="s_employee" data-field="x_login_effectivedate" name="x_login_effectivedate" id="x_login_effectivedate" placeholder="@s_employee.login_effectivedate.PlaceHolder" value="@s_employee.login_effectivedate.EditValue" @Html.Raw(s_employee.login_effectivedate.EditAttributes)>
+</span>
+@Html.Raw(s_employee.login_effectivedate.CustomMessage)</div></div>
+	</div>
+} @* login_effectivedate.Visible (end) *@
+@if (s_employee.login_disableddate.Visible) { // login_disableddate.Visible (begin)
+	<div id="r_login_disableddate" class="form-group row">
+		<label id="elh_s_employee_login_disableddate" for="x_login_disableddate" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.login_disableddate.Caption)@Html.Raw(s_employee.login_disableddate.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.login_disableddate.CellAttributes)>
+<span id="el_s_employee_login_disableddate">
+<input type="text" data-table="s_employee" data-field="x_login_disableddate" name="x_login_disableddate" id="x_login_disableddate" placeholder="@s_employee.login_disableddate.PlaceHolder" value="@s_employee.login_disableddate.EditValue" @Html.Raw(s_employee.login_disableddate.EditAttributes)>
+</span>
+@Html.Raw(s_employee.login_disableddate.CustomMessage)</div></div>
+	</div>
+} @* login_disableddate.Visible (end) *@
+@if (s_employee.UserLevelId.Visible) { // UserLevelId.Visible (begin)
+	<div id="r_UserLevelId" class="form-group row">
+		<label id="elh_s_employee_UserLevelId" for="x_UserLevelId" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.UserLevelId.Caption)@Html.Raw(s_employee.UserLevelId.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.UserLevelId.CellAttributes)>
+@if (!Security.IsAdmin && Security.IsLoggedIn) { // Non system admin
+<span id="el_s_employee_UserLevelId">
+<input type="text" readonly class="form-control-plaintext" value="@RemoveHtml(Convert.ToString(s_employee.UserLevelId.EditValue))">
+</span>
+} else {
+<span id="el_s_employee_UserLevelId">
+<div class="input-group">
+	<select class="custom-select ew-custom-select" data-table="s_employee" data-field="x_UserLevelId" data-value-separator="@s_employee.UserLevelId.DisplayValueSeparatorAttribute" id="x_UserLevelId" name="x_UserLevelId"@Html.Raw(s_employee.UserLevelId.EditAttributes)>
+		@s_employee.UserLevelId.SelectOptionListHtml("x_UserLevelId")
+	</select>
+</div>
+@Html.Raw(s_employee.UserLevelId.Lookup.GetParamTag("p_x_UserLevelId"))
+</span>
+}
+@Html.Raw(s_employee.UserLevelId.CustomMessage)</div></div>
+	</div>
+} @* UserLevelId.Visible (end) *@
+@if (s_employee._Username.Visible) { // _Username.Visible (begin)
+	<div id="r__Username" class="form-group row">
+		<label id="elh_s_employee__Username" for="x__Username" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee._Username.Caption)@Html.Raw(s_employee._Username.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee._Username.CellAttributes)>
+<span id="el_s_employee__Username">
+<input type="text" data-table="s_employee" data-field="x__Username" name="x__Username" id="x__Username" size="30" maxlength="20" placeholder="@s_employee._Username.PlaceHolder" value="@s_employee._Username.EditValue" @Html.Raw(s_employee._Username.EditAttributes)>
+</span>
+@Html.Raw(s_employee._Username.CustomMessage)</div></div>
+	</div>
+} @* _Username.Visible (end) *@
+@if (s_employee.password.Visible) { // password.Visible (begin)
+	<div id="r_password" class="form-group row">
+		<label id="elh_s_employee_password" for="x_password" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.password.Caption)@Html.Raw(s_employee.password.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.password.CellAttributes)>
+<span id="el_s_employee_password">
+<input type="text" data-table="s_employee" data-field="x_password" name="x_password" id="x_password" size="30" maxlength="20" placeholder="@s_employee.password.PlaceHolder" value="@s_employee.password.EditValue" @Html.Raw(s_employee.password.EditAttributes)>
+</span>
+@Html.Raw(s_employee.password.CustomMessage)</div></div>
+	</div>
+} @* password.Visible (end) *@
+@if (s_employee.active.Visible) { // active.Visible (begin)
+	<div id="r_active" class="form-group row">
+		<label id="elh_s_employee_active" class="@s_employee_Add.LeftColumnClass">@Html.Raw(s_employee.active.Caption)@Html.Raw(s_employee.active.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_employee_Add.RightColumnClass"><div @Html.Raw(s_employee.active.CellAttributes)>
+<span id="el_s_employee_active">
+<input type="checkbox" data-table="s_employee" data-field="x_active" name="x_active" id="x_active" value="1" checked="@ConvertToBool(s_employee.active.CurrentValue)" @Html.Raw(s_employee.active.EditAttributes)>
+</span>
+@Html.Raw(s_employee.active.CustomMessage)</div></div>
+	</div>
+} @* active.Visible (end) *@
+</div><!-- /page* -->
+@{ s_employee_Add.CloseRecordset(); }
+@if (!s_employee_Add.IsModal) {
+<div class="form-group row"><!-- buttons .form-group -->
+	<div class="@s_employee_Add.OffsetColumnClass"><!-- buttons offset -->
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("AddBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_employee_Add.ReturnUrl)"> @Html.Raw(Language.Phrase("CancelBtn"))</button>
+	</div><!-- /buttons offset -->
+</div><!-- /buttons .form-group -->
+}
+</form>
+@s_employee_Add.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

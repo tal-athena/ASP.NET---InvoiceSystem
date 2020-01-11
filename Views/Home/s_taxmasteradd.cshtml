@@ -1,0 +1,312 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_taxmaster_Add.Page_Render();
+
+	// Check action result
+	if (s_taxmaster_Add.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "add";
+var fs_taxmasteradd = currentForm = new ew.Form("fs_taxmasteradd", "add");
+
+// Validate form
+fs_taxmasteradd.validate = function() {
+	if (!this.validateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.getForm(), $fobj = $(fobj);
+	if ($fobj.find("#confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.formKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = ["insert", "gridinsert"].includes($fobj.find("#action").val()) && $k[0];
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+	@if (s_taxmaster_Add.tax_code.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tax_code");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_taxmaster.tax_code.RequiredErrorMessage.Replace("%s", s_taxmaster.tax_code.Caption)))");
+		</text>
+	}
+	@if (s_taxmaster_Add.description.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_description");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_taxmaster.description.RequiredErrorMessage.Replace("%s", s_taxmaster.description.Caption)))");
+		</text>
+	}
+	@if (s_taxmaster_Add.tax_type.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tax_type");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_taxmaster.tax_type.RequiredErrorMessage.Replace("%s", s_taxmaster.tax_type.Caption)))");
+		</text>
+	}
+	@if (s_taxmaster_Add.in_out.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_in_out");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_taxmaster.in_out.RequiredErrorMessage.Replace("%s", s_taxmaster.in_out.Caption)))");
+		</text>
+	}
+	@if (s_taxmaster_Add.gl_acct.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_gl_acct");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_taxmaster.gl_acct.RequiredErrorMessage.Replace("%s", s_taxmaster.gl_acct.Caption)))");
+		</text>
+	}
+	@if (s_taxmaster_Add.tax_rate.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_tax_rate");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_taxmaster.tax_rate.RequiredErrorMessage.Replace("%s", s_taxmaster.tax_rate.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_tax_rate");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_taxmaster.tax_rate.ErrorMessage))");
+	@if (s_taxmaster_Add.short_desc.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_short_desc");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_taxmaster.short_desc.RequiredErrorMessage.Replace("%s", s_taxmaster.short_desc.Caption)))");
+		</text>
+	}
+	@if (s_taxmaster_Add.sls_acct.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_sls_acct");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_taxmaster.sls_acct.RequiredErrorMessage.Replace("%s", s_taxmaster.sls_acct.Caption)))");
+		</text>
+	}
+	@if (s_taxmaster_Add.sls_dept.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_sls_dept");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_taxmaster.sls_dept.RequiredErrorMessage.Replace("%s", s_taxmaster.sls_dept.Caption)))");
+		</text>
+	}
+	@if (s_taxmaster_Add.dt_obsolete.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_dt_obsolete");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_taxmaster.dt_obsolete.RequiredErrorMessage.Replace("%s", s_taxmaster.dt_obsolete.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_dt_obsolete");
+		if (elm && !ew.checkDateDef(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_taxmaster.dt_obsolete.ErrorMessage))");
+	@if (s_taxmaster_Add.id_obsolete.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_id_obsolete");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_taxmaster.id_obsolete.RequiredErrorMessage.Replace("%s", s_taxmaster.id_obsolete.Caption)))");
+		</text>
+	}
+
+		// Fire Form_CustomValidate event
+		if (!this.Form_CustomValidate(fobj))
+			return false;
+	}
+
+	// Process detail forms
+	var dfs = $fobj.find("input[name='detailpage']").get();
+	for (var i = 0; i < dfs.length; i++) {
+		var df = dfs[i], val = df.value;
+		if (val && ew.forms[val])
+			if (!ew.forms[val].validate())
+				return false;
+	}
+	return true;
+}
+
+// Form_CustomValidate event
+fs_taxmasteradd.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_taxmasteradd.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_taxmaster_Add.ShowPageHeader()
+@s_taxmaster_Add.ShowMessages()
+<form name="fs_taxmasteradd" id="fs_taxmasteradd" class="@s_taxmaster_Add.FormClassName" action="@AppPath(CurrentPageName())" method="post">
+@if (s_taxmaster_Add.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="t" value="s_taxmaster">
+<input type="hidden" name="action" id="action" value="insert">
+<input type="hidden" name="modal" value="@ConvertToInt(s_taxmaster_Add.IsModal)">
+<div class="ew-add-div"><!-- page* -->
+@if (s_taxmaster.tax_code.Visible) { // tax_code.Visible (begin)
+	<div id="r_tax_code" class="form-group row">
+		<label id="elh_s_taxmaster_tax_code" for="x_tax_code" class="@s_taxmaster_Add.LeftColumnClass">@Html.Raw(s_taxmaster.tax_code.Caption)@Html.Raw(s_taxmaster.tax_code.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_taxmaster_Add.RightColumnClass"><div @Html.Raw(s_taxmaster.tax_code.CellAttributes)>
+<span id="el_s_taxmaster_tax_code">
+<input type="text" data-table="s_taxmaster" data-field="x_tax_code" name="x_tax_code" id="x_tax_code" size="30" maxlength="10" placeholder="@s_taxmaster.tax_code.PlaceHolder" value="@s_taxmaster.tax_code.EditValue" @Html.Raw(s_taxmaster.tax_code.EditAttributes)>
+</span>
+@Html.Raw(s_taxmaster.tax_code.CustomMessage)</div></div>
+	</div>
+} @* tax_code.Visible (end) *@
+@if (s_taxmaster.description.Visible) { // description.Visible (begin)
+	<div id="r_description" class="form-group row">
+		<label id="elh_s_taxmaster_description" for="x_description" class="@s_taxmaster_Add.LeftColumnClass">@Html.Raw(s_taxmaster.description.Caption)@Html.Raw(s_taxmaster.description.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_taxmaster_Add.RightColumnClass"><div @Html.Raw(s_taxmaster.description.CellAttributes)>
+<span id="el_s_taxmaster_description">
+<input type="text" data-table="s_taxmaster" data-field="x_description" name="x_description" id="x_description" size="30" maxlength="100" placeholder="@s_taxmaster.description.PlaceHolder" value="@s_taxmaster.description.EditValue" @Html.Raw(s_taxmaster.description.EditAttributes)>
+</span>
+@Html.Raw(s_taxmaster.description.CustomMessage)</div></div>
+	</div>
+} @* description.Visible (end) *@
+@if (s_taxmaster.tax_type.Visible) { // tax_type.Visible (begin)
+	<div id="r_tax_type" class="form-group row">
+		<label id="elh_s_taxmaster_tax_type" for="x_tax_type" class="@s_taxmaster_Add.LeftColumnClass">@Html.Raw(s_taxmaster.tax_type.Caption)@Html.Raw(s_taxmaster.tax_type.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_taxmaster_Add.RightColumnClass"><div @Html.Raw(s_taxmaster.tax_type.CellAttributes)>
+<span id="el_s_taxmaster_tax_type">
+<input type="text" data-table="s_taxmaster" data-field="x_tax_type" name="x_tax_type" id="x_tax_type" size="30" maxlength="10" placeholder="@s_taxmaster.tax_type.PlaceHolder" value="@s_taxmaster.tax_type.EditValue" @Html.Raw(s_taxmaster.tax_type.EditAttributes)>
+</span>
+@Html.Raw(s_taxmaster.tax_type.CustomMessage)</div></div>
+	</div>
+} @* tax_type.Visible (end) *@
+@if (s_taxmaster.in_out.Visible) { // in_out.Visible (begin)
+	<div id="r_in_out" class="form-group row">
+		<label id="elh_s_taxmaster_in_out" for="x_in_out" class="@s_taxmaster_Add.LeftColumnClass">@Html.Raw(s_taxmaster.in_out.Caption)@Html.Raw(s_taxmaster.in_out.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_taxmaster_Add.RightColumnClass"><div @Html.Raw(s_taxmaster.in_out.CellAttributes)>
+<span id="el_s_taxmaster_in_out">
+<input type="text" data-table="s_taxmaster" data-field="x_in_out" name="x_in_out" id="x_in_out" size="30" maxlength="10" placeholder="@s_taxmaster.in_out.PlaceHolder" value="@s_taxmaster.in_out.EditValue" @Html.Raw(s_taxmaster.in_out.EditAttributes)>
+</span>
+@Html.Raw(s_taxmaster.in_out.CustomMessage)</div></div>
+	</div>
+} @* in_out.Visible (end) *@
+@if (s_taxmaster.gl_acct.Visible) { // gl_acct.Visible (begin)
+	<div id="r_gl_acct" class="form-group row">
+		<label id="elh_s_taxmaster_gl_acct" for="x_gl_acct" class="@s_taxmaster_Add.LeftColumnClass">@Html.Raw(s_taxmaster.gl_acct.Caption)@Html.Raw(s_taxmaster.gl_acct.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_taxmaster_Add.RightColumnClass"><div @Html.Raw(s_taxmaster.gl_acct.CellAttributes)>
+<span id="el_s_taxmaster_gl_acct">
+<input type="text" data-table="s_taxmaster" data-field="x_gl_acct" name="x_gl_acct" id="x_gl_acct" size="30" maxlength="10" placeholder="@s_taxmaster.gl_acct.PlaceHolder" value="@s_taxmaster.gl_acct.EditValue" @Html.Raw(s_taxmaster.gl_acct.EditAttributes)>
+</span>
+@Html.Raw(s_taxmaster.gl_acct.CustomMessage)</div></div>
+	</div>
+} @* gl_acct.Visible (end) *@
+@if (s_taxmaster.tax_rate.Visible) { // tax_rate.Visible (begin)
+	<div id="r_tax_rate" class="form-group row">
+		<label id="elh_s_taxmaster_tax_rate" for="x_tax_rate" class="@s_taxmaster_Add.LeftColumnClass">@Html.Raw(s_taxmaster.tax_rate.Caption)@Html.Raw(s_taxmaster.tax_rate.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_taxmaster_Add.RightColumnClass"><div @Html.Raw(s_taxmaster.tax_rate.CellAttributes)>
+<span id="el_s_taxmaster_tax_rate">
+<input type="text" data-table="s_taxmaster" data-field="x_tax_rate" name="x_tax_rate" id="x_tax_rate" size="30" placeholder="@s_taxmaster.tax_rate.PlaceHolder" value="@s_taxmaster.tax_rate.EditValue" @Html.Raw(s_taxmaster.tax_rate.EditAttributes)>
+</span>
+@Html.Raw(s_taxmaster.tax_rate.CustomMessage)</div></div>
+	</div>
+} @* tax_rate.Visible (end) *@
+@if (s_taxmaster.short_desc.Visible) { // short_desc.Visible (begin)
+	<div id="r_short_desc" class="form-group row">
+		<label id="elh_s_taxmaster_short_desc" for="x_short_desc" class="@s_taxmaster_Add.LeftColumnClass">@Html.Raw(s_taxmaster.short_desc.Caption)@Html.Raw(s_taxmaster.short_desc.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_taxmaster_Add.RightColumnClass"><div @Html.Raw(s_taxmaster.short_desc.CellAttributes)>
+<span id="el_s_taxmaster_short_desc">
+<input type="text" data-table="s_taxmaster" data-field="x_short_desc" name="x_short_desc" id="x_short_desc" size="30" maxlength="15" placeholder="@s_taxmaster.short_desc.PlaceHolder" value="@s_taxmaster.short_desc.EditValue" @Html.Raw(s_taxmaster.short_desc.EditAttributes)>
+</span>
+@Html.Raw(s_taxmaster.short_desc.CustomMessage)</div></div>
+	</div>
+} @* short_desc.Visible (end) *@
+@if (s_taxmaster.sls_acct.Visible) { // sls_acct.Visible (begin)
+	<div id="r_sls_acct" class="form-group row">
+		<label id="elh_s_taxmaster_sls_acct" for="x_sls_acct" class="@s_taxmaster_Add.LeftColumnClass">@Html.Raw(s_taxmaster.sls_acct.Caption)@Html.Raw(s_taxmaster.sls_acct.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_taxmaster_Add.RightColumnClass"><div @Html.Raw(s_taxmaster.sls_acct.CellAttributes)>
+<span id="el_s_taxmaster_sls_acct">
+<input type="text" data-table="s_taxmaster" data-field="x_sls_acct" name="x_sls_acct" id="x_sls_acct" size="30" maxlength="10" placeholder="@s_taxmaster.sls_acct.PlaceHolder" value="@s_taxmaster.sls_acct.EditValue" @Html.Raw(s_taxmaster.sls_acct.EditAttributes)>
+</span>
+@Html.Raw(s_taxmaster.sls_acct.CustomMessage)</div></div>
+	</div>
+} @* sls_acct.Visible (end) *@
+@if (s_taxmaster.sls_dept.Visible) { // sls_dept.Visible (begin)
+	<div id="r_sls_dept" class="form-group row">
+		<label id="elh_s_taxmaster_sls_dept" for="x_sls_dept" class="@s_taxmaster_Add.LeftColumnClass">@Html.Raw(s_taxmaster.sls_dept.Caption)@Html.Raw(s_taxmaster.sls_dept.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_taxmaster_Add.RightColumnClass"><div @Html.Raw(s_taxmaster.sls_dept.CellAttributes)>
+<span id="el_s_taxmaster_sls_dept">
+<input type="text" data-table="s_taxmaster" data-field="x_sls_dept" name="x_sls_dept" id="x_sls_dept" size="30" maxlength="10" placeholder="@s_taxmaster.sls_dept.PlaceHolder" value="@s_taxmaster.sls_dept.EditValue" @Html.Raw(s_taxmaster.sls_dept.EditAttributes)>
+</span>
+@Html.Raw(s_taxmaster.sls_dept.CustomMessage)</div></div>
+	</div>
+} @* sls_dept.Visible (end) *@
+@if (s_taxmaster.dt_obsolete.Visible) { // dt_obsolete.Visible (begin)
+	<div id="r_dt_obsolete" class="form-group row">
+		<label id="elh_s_taxmaster_dt_obsolete" for="x_dt_obsolete" class="@s_taxmaster_Add.LeftColumnClass">@Html.Raw(s_taxmaster.dt_obsolete.Caption)@Html.Raw(s_taxmaster.dt_obsolete.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_taxmaster_Add.RightColumnClass"><div @Html.Raw(s_taxmaster.dt_obsolete.CellAttributes)>
+<span id="el_s_taxmaster_dt_obsolete">
+<input type="text" data-table="s_taxmaster" data-field="x_dt_obsolete" name="x_dt_obsolete" id="x_dt_obsolete" placeholder="@s_taxmaster.dt_obsolete.PlaceHolder" value="@s_taxmaster.dt_obsolete.EditValue" @Html.Raw(s_taxmaster.dt_obsolete.EditAttributes)>
+</span>
+@Html.Raw(s_taxmaster.dt_obsolete.CustomMessage)</div></div>
+	</div>
+} @* dt_obsolete.Visible (end) *@
+@if (s_taxmaster.id_obsolete.Visible) { // id_obsolete.Visible (begin)
+	<div id="r_id_obsolete" class="form-group row">
+		<label id="elh_s_taxmaster_id_obsolete" for="x_id_obsolete" class="@s_taxmaster_Add.LeftColumnClass">@Html.Raw(s_taxmaster.id_obsolete.Caption)@Html.Raw(s_taxmaster.id_obsolete.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_taxmaster_Add.RightColumnClass"><div @Html.Raw(s_taxmaster.id_obsolete.CellAttributes)>
+<span id="el_s_taxmaster_id_obsolete">
+<input type="text" data-table="s_taxmaster" data-field="x_id_obsolete" name="x_id_obsolete" id="x_id_obsolete" size="30" maxlength="10" placeholder="@s_taxmaster.id_obsolete.PlaceHolder" value="@s_taxmaster.id_obsolete.EditValue" @Html.Raw(s_taxmaster.id_obsolete.EditAttributes)>
+</span>
+@Html.Raw(s_taxmaster.id_obsolete.CustomMessage)</div></div>
+	</div>
+} @* id_obsolete.Visible (end) *@
+</div><!-- /page* -->
+@{ s_taxmaster_Add.CloseRecordset(); }
+@if (!s_taxmaster_Add.IsModal) {
+<div class="form-group row"><!-- buttons .form-group -->
+	<div class="@s_taxmaster_Add.OffsetColumnClass"><!-- buttons offset -->
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("AddBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_taxmaster_Add.ReturnUrl)"> @Html.Raw(Language.Phrase("CancelBtn"))</button>
+	</div><!-- /buttons offset -->
+</div><!-- /buttons .form-group -->
+}
+</form>
+@s_taxmaster_Add.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

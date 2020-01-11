@@ -1,0 +1,64 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Check action result
+	if (_personaldata.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@_personaldata.ShowMessages()
+@if (RouteValues.TryGetValue("cmd", out object command) && SameText("Delete", command))
+{ // DN
+	<div class="alert alert-danger d-inline-block">
+		<i class="icon fa fa-ban"></i>@Html.Raw(Language.Phrase("PersonalDataWarning"))
+	</div>
+	<div>
+		<form id="delete-user" method="post" class="form-group">
+			@if (_personaldata.CheckToken) {
+				@Html.AntiForgeryToken()
+			}
+			<div class="text-danger"></div>
+			<div class="form-group">
+				<label id="label" class="control-label ew-label">@Html.Raw(Language.Phrase("Password"))</label>
+				<input type="password" name="password" id="password" class="form-control ew-control" placeholder="@Html.Raw(Language.Phrase("Password"))">
+			</div>
+			<button class="btn btn-primary" type="submit">@Html.Raw(Language.Phrase("CloseAccountBtn"))</button>
+		</form>
+	</div>
+} else {
+	<div class="row">
+		<div class="col">
+			<p>@Html.Raw(Language.Phrase("PersonalDataContent"))</p>
+			<div class="alert alert-danger d-inline-block">
+				<i class="icon fa fa-ban"></i>@Html.Raw(Language.Phrase("PersonalDataWarning"))
+			</div>
+			<p>
+				<a id="download" href="@HtmlEncode(AppPath("PersonalData/Download"))" class="btn btn-default">@Html.Raw(Language.Phrase("DownloadBtn"))</a>
+				<a id="delete" href="@HtmlEncode(AppPath("PersonalData/Delete"))" class="btn btn-default">@Html.Raw(Language.Phrase("DeleteBtn"))</a>
+			</p>
+		</div>
+	</div>
+}
+@{ _personaldata.ClearFailureMessage(); }

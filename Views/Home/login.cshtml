@@ -1,0 +1,112 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	_login.Page_Render();
+
+	// Check action result
+	if (_login.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+<script>
+var flogin = new ew.Form("flogin");
+
+// Validate function
+flogin.validate = function()
+{
+	var fobj = this._form;
+	if (!this.validateRequired)
+		return true; // ignore validation
+	if (!ew.hasValue(fobj.username))
+		return this.onError(fobj.username, ew.language.phrase("EnterUid"));
+	if (!ew.hasValue(fobj.password))
+		return this.onError(fobj.password, ew.language.phrase("EnterPwd"));
+
+	// Call Form Custom Validate event
+	if (!this.Form_CustomValidate(fobj)) return false;
+	return true;
+}
+
+// Form_CustomValidate function
+flogin.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not
+flogin.validateRequired = @ConvertToJson(Config.ClientValidate);
+</script>
+@_login.ShowPageHeader()
+@_login.ShowMessages()
+<form name="flogin" id="flogin" class="ew-form ew-login-form" action="@AppPath(CurrentPageName())" method="post">
+@if (_login.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<div class="ew-login-box">
+<div class="login-logo"></div>
+<div class="card">
+	<div class="card-body">
+	<p class="login-box-msg">@Html.Raw(Language.Phrase("LoginMsg"))</p>
+	<div class="form-group row">
+		<input type="text" name="username" id="username" class="form-control ew-control" value="@_login.Username" placeholder="@HtmlEncode(Language.Phrase("Username"))">
+	</div>
+	<div class="form-group row">
+		<input type="password" name="password" id="password" class="form-control ew-control" placeholder="@HtmlEncode(Language.Phrase("Password"))">
+	</div>
+	<div class="form-group row">
+		<div class="custom-control custom-checkbox">
+			<input type="checkbox" name="type" id="rememberme" class="custom-control-input" value="a" checked="@(_login.LoginType == "a")">
+			<label class="custom-control-label" for="rememberme">@Html.Raw(Language.Phrase("RememberMe"))</label>
+		</div>
+	</div>
+	<button class="btn btn-primary ew-btn" name="btn-submit" id="btn-submit" type="submit">@Html.Raw(Language.Phrase("Login"))</button>
+@if (Config.Authentications.Count(kvp => kvp.Value.Enabled) > 0) {
+ 	<div class="social-auth-links text-center mb-3">
+ 		<p>@Html.Raw(Language.Phrase("LoginOr"))</p>
+ 		@foreach (var (key, value) in Config.Authentications.Where(kvp => kvp.Value.Enabled)) {
+ 			<a href="ExternalLogin?provider=@key" class="btn btn-block btn-@value.Color.ToLower()"><i class="fa fa-@key.ToLower() mr-2"></i>@Html.Raw(Language.Phrase("Login" + key))</a>
+ 		}
+ 	</div>
+}
+<p>&nbsp;</p>
+</div>
+</div>
+</div>
+</form>
+@_login.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your startup script here
+// document.write("page loaded");
+
+</script>

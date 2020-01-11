@@ -1,0 +1,195 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_glhistory_Delete.Page_Render();
+
+	// Check action result
+	if (s_glhistory_Delete.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "delete";
+var fs_glhistorydelete = currentForm = new ew.Form("fs_glhistorydelete", "delete");
+
+// Form_CustomValidate event
+fs_glhistorydelete.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_glhistorydelete.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+// Form object for search
+
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_glhistory_Delete.ShowPageHeader()
+@s_glhistory_Delete.ShowMessages()
+<form name="fs_glhistorydelete" id="fs_glhistorydelete" class="form-inline ew-form ew-delete-form" action="@AppPath(CurrentPageName())" method="post">
+@if (s_glhistory_Delete.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="delete">
+@foreach (string key in s_glhistory_Delete.RecordKeys) {
+<input type="hidden" name="key_m" value="@key">
+}
+<div class="card ew-card ew-grid">
+<div class="@(IsResponsiveLayout() ? "table-responsive " : "")card-body ew-grid-middle-panel">
+<table class="table ew-table">
+	<thead>
+	<tr class="ew-table-header">
+@if (s_glhistory.Id.Visible) { // Id (begin)
+		<th class="@Html.Raw(s_glhistory.Id.HeaderCellClass)"><span id="elh_s_glhistory_Id" class="s_glhistory_Id">@Html.Raw(s_glhistory.Id.Caption)</span></th>
+} @* Id.Visible (end) *@
+@if (s_glhistory.month.Visible) { // month (begin)
+		<th class="@Html.Raw(s_glhistory.month.HeaderCellClass)"><span id="elh_s_glhistory_month" class="s_glhistory_month">@Html.Raw(s_glhistory.month.Caption)</span></th>
+} @* month.Visible (end) *@
+@if (s_glhistory.acct_code.Visible) { // acct_code (begin)
+		<th class="@Html.Raw(s_glhistory.acct_code.HeaderCellClass)"><span id="elh_s_glhistory_acct_code" class="s_glhistory_acct_code">@Html.Raw(s_glhistory.acct_code.Caption)</span></th>
+} @* acct_code.Visible (end) *@
+@if (s_glhistory.dept_code.Visible) { // dept_code (begin)
+		<th class="@Html.Raw(s_glhistory.dept_code.HeaderCellClass)"><span id="elh_s_glhistory_dept_code" class="s_glhistory_dept_code">@Html.Raw(s_glhistory.dept_code.Caption)</span></th>
+} @* dept_code.Visible (end) *@
+@if (s_glhistory.project_code.Visible) { // project_code (begin)
+		<th class="@Html.Raw(s_glhistory.project_code.HeaderCellClass)"><span id="elh_s_glhistory_project_code" class="s_glhistory_project_code">@Html.Raw(s_glhistory.project_code.Caption)</span></th>
+} @* project_code.Visible (end) *@
+@if (s_glhistory.fileno.Visible) { // fileno (begin)
+		<th class="@Html.Raw(s_glhistory.fileno.HeaderCellClass)"><span id="elh_s_glhistory_fileno" class="s_glhistory_fileno">@Html.Raw(s_glhistory.fileno.Caption)</span></th>
+} @* fileno.Visible (end) *@
+@if (s_glhistory.mth_bal.Visible) { // mth_bal (begin)
+		<th class="@Html.Raw(s_glhistory.mth_bal.HeaderCellClass)"><span id="elh_s_glhistory_mth_bal" class="s_glhistory_mth_bal">@Html.Raw(s_glhistory.mth_bal.Caption)</span></th>
+} @* mth_bal.Visible (end) *@
+	</tr>
+	</thead>
+	<tbody>
+@{ s_glhistory_Delete.RecordCount = 0; }
+@while (s_glhistory_Delete.Recordset != null && await s_glhistory_Delete.Recordset.ReadAsync()) { // DN
+	s_glhistory_Delete.RecordCount++;
+	s_glhistory_Delete.RowCnt++;
+
+	// Set row properties
+	s_glhistory_Delete.ResetAttributes();
+	s_glhistory_Delete.RowType = Config.RowTypeView; // View
+
+	// Get the field contents
+	await s_glhistory_Delete.LoadRowValues(s_glhistory_Delete.Recordset);
+
+	// Render row
+	await s_glhistory_Delete.RenderRow();
+	<tr @Html.Raw(s_glhistory_Delete.RowAttributes)>
+@if (s_glhistory.Id.Visible) { // Id (begin)
+		<td @Html.Raw(s_glhistory.Id.CellAttributes)>
+<span id="el@(s_glhistory_Delete.RowCnt)_s_glhistory_Id" class="s_glhistory_Id">
+<span @Html.Raw(s_glhistory.Id.ViewAttributes)>
+@Html.Raw(s_glhistory.Id.GetViewValue())</span>
+</span>
+</td>
+} @* Id.Visible (end) *@
+@if (s_glhistory.month.Visible) { // month (begin)
+		<td @Html.Raw(s_glhistory.month.CellAttributes)>
+<span id="el@(s_glhistory_Delete.RowCnt)_s_glhistory_month" class="s_glhistory_month">
+<span @Html.Raw(s_glhistory.month.ViewAttributes)>
+@Html.Raw(s_glhistory.month.GetViewValue())</span>
+</span>
+</td>
+} @* month.Visible (end) *@
+@if (s_glhistory.acct_code.Visible) { // acct_code (begin)
+		<td @Html.Raw(s_glhistory.acct_code.CellAttributes)>
+<span id="el@(s_glhistory_Delete.RowCnt)_s_glhistory_acct_code" class="s_glhistory_acct_code">
+<span @Html.Raw(s_glhistory.acct_code.ViewAttributes)>
+@Html.Raw(s_glhistory.acct_code.GetViewValue())</span>
+</span>
+</td>
+} @* acct_code.Visible (end) *@
+@if (s_glhistory.dept_code.Visible) { // dept_code (begin)
+		<td @Html.Raw(s_glhistory.dept_code.CellAttributes)>
+<span id="el@(s_glhistory_Delete.RowCnt)_s_glhistory_dept_code" class="s_glhistory_dept_code">
+<span @Html.Raw(s_glhistory.dept_code.ViewAttributes)>
+@Html.Raw(s_glhistory.dept_code.GetViewValue())</span>
+</span>
+</td>
+} @* dept_code.Visible (end) *@
+@if (s_glhistory.project_code.Visible) { // project_code (begin)
+		<td @Html.Raw(s_glhistory.project_code.CellAttributes)>
+<span id="el@(s_glhistory_Delete.RowCnt)_s_glhistory_project_code" class="s_glhistory_project_code">
+<span @Html.Raw(s_glhistory.project_code.ViewAttributes)>
+@Html.Raw(s_glhistory.project_code.GetViewValue())</span>
+</span>
+</td>
+} @* project_code.Visible (end) *@
+@if (s_glhistory.fileno.Visible) { // fileno (begin)
+		<td @Html.Raw(s_glhistory.fileno.CellAttributes)>
+<span id="el@(s_glhistory_Delete.RowCnt)_s_glhistory_fileno" class="s_glhistory_fileno">
+<span @Html.Raw(s_glhistory.fileno.ViewAttributes)>
+@Html.Raw(s_glhistory.fileno.GetViewValue())</span>
+</span>
+</td>
+} @* fileno.Visible (end) *@
+@if (s_glhistory.mth_bal.Visible) { // mth_bal (begin)
+		<td @Html.Raw(s_glhistory.mth_bal.CellAttributes)>
+<span id="el@(s_glhistory_Delete.RowCnt)_s_glhistory_mth_bal" class="s_glhistory_mth_bal">
+<span @Html.Raw(s_glhistory.mth_bal.ViewAttributes)>
+@Html.Raw(s_glhistory.mth_bal.GetViewValue())</span>
+</span>
+</td>
+} @* mth_bal.Visible (end) *@
+	</tr>
+}
+@{ s_glhistory_Delete.CloseRecordset(); }
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<div class="divconfirmdelete">
+  <div>
+	<label>
+		@Html.Raw(Language.Phrase("askconfirmdelete"))
+	</label>
+  </div>
+</div>
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("DeleteBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_glhistory_Delete.ReturnUrl)">@Language.Phrase("CancelBtn")</button>
+</div>
+</form>
+@s_glhistory_Delete.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>

@@ -1,0 +1,455 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_employee_View.Page_Render();
+
+	// Check action result
+	if (s_employee_View.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_employee.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "view";
+var fs_employeeview = currentForm = new ew.Form("fs_employeeview", "view");
+
+// Form_CustomValidate event
+fs_employeeview.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_employeeview.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_employeeview.lists["x_UserLevelId"] = @Html.Raw(s_employee_View.UserLevelId.Lookup.ToClientList());
+fs_employeeview.lists["x_UserLevelId"].options = @Html.Raw(ConvertToJson(s_employee_View.UserLevelId.LookupOptions));
+fs_employeeview.lists["x_active"] = @Html.Raw(s_employee_View.active.Lookup.ToClientList());
+fs_employeeview.lists["x_active"].options = @Html.Raw(ConvertToJson(s_employee_View.active.Options(false))); // DN
+
+// Form object for search
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_employee.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+	@s_employee_View.ExportOptions.RenderBody()
+	@s_employee_View.OtherOptions.RenderBody()
+	<div class="clearfix"></div>
+</div>
+}
+@s_employee_View.ShowPageHeader()
+@s_employee_View.ShowMessages()
+<form name="fs_employeeview" id="fs_employeeview" class="form-inline ew-form ew-view-form" method="post">
+@if (s_employee_View.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="modal" value="@ConvertToInt(s_employee_View.IsModal)">
+<table class="table table-striped table-sm ew-view-table">
+@if (s_employee.Id.Visible) { @* s_employee.Id.Visible (begin) *@
+	<tr id="r_Id">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_Id">@Html.Raw(s_employee.Id.Caption)</span></td>
+		<td data-name="Id" @Html.Raw(s_employee.Id.CellAttributes)>
+<span id="el_s_employee_Id">
+<span @Html.Raw(s_employee.Id.ViewAttributes)>
+@Html.Raw(s_employee.Id.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.Id.Visible (end) *@
+@if (s_employee.employeeid.Visible) { @* s_employee.employeeid.Visible (begin) *@
+	<tr id="r_employeeid">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_employeeid">@Html.Raw(s_employee.employeeid.Caption)</span></td>
+		<td data-name="employeeid" @Html.Raw(s_employee.employeeid.CellAttributes)>
+<span id="el_s_employee_employeeid">
+<span @Html.Raw(s_employee.employeeid.ViewAttributes)>
+@Html.Raw(s_employee.employeeid.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.employeeid.Visible (end) *@
+@if (s_employee.fname.Visible) { @* s_employee.fname.Visible (begin) *@
+	<tr id="r_fname">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_fname">@Html.Raw(s_employee.fname.Caption)</span></td>
+		<td data-name="fname" @Html.Raw(s_employee.fname.CellAttributes)>
+<span id="el_s_employee_fname">
+<span @Html.Raw(s_employee.fname.ViewAttributes)>
+@Html.Raw(s_employee.fname.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.fname.Visible (end) *@
+@if (s_employee.lname.Visible) { @* s_employee.lname.Visible (begin) *@
+	<tr id="r_lname">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_lname">@Html.Raw(s_employee.lname.Caption)</span></td>
+		<td data-name="lname" @Html.Raw(s_employee.lname.CellAttributes)>
+<span id="el_s_employee_lname">
+<span @Html.Raw(s_employee.lname.ViewAttributes)>
+@Html.Raw(s_employee.lname.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.lname.Visible (end) *@
+@if (s_employee.oldic.Visible) { @* s_employee.oldic.Visible (begin) *@
+	<tr id="r_oldic">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_oldic">@Html.Raw(s_employee.oldic.Caption)</span></td>
+		<td data-name="oldic" @Html.Raw(s_employee.oldic.CellAttributes)>
+<span id="el_s_employee_oldic">
+<span @Html.Raw(s_employee.oldic.ViewAttributes)>
+@Html.Raw(s_employee.oldic.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.oldic.Visible (end) *@
+@if (s_employee.newic.Visible) { @* s_employee.newic.Visible (begin) *@
+	<tr id="r_newic">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_newic">@Html.Raw(s_employee.newic.Caption)</span></td>
+		<td data-name="newic" @Html.Raw(s_employee.newic.CellAttributes)>
+<span id="el_s_employee_newic">
+<span @Html.Raw(s_employee.newic.ViewAttributes)>
+@Html.Raw(s_employee.newic.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.newic.Visible (end) *@
+@if (s_employee.passport.Visible) { @* s_employee.passport.Visible (begin) *@
+	<tr id="r_passport">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_passport">@Html.Raw(s_employee.passport.Caption)</span></td>
+		<td data-name="passport" @Html.Raw(s_employee.passport.CellAttributes)>
+<span id="el_s_employee_passport">
+<span @Html.Raw(s_employee.passport.ViewAttributes)>
+@Html.Raw(s_employee.passport.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.passport.Visible (end) *@
+@if (s_employee.address1.Visible) { @* s_employee.address1.Visible (begin) *@
+	<tr id="r_address1">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_address1">@Html.Raw(s_employee.address1.Caption)</span></td>
+		<td data-name="address1" @Html.Raw(s_employee.address1.CellAttributes)>
+<span id="el_s_employee_address1">
+<span @Html.Raw(s_employee.address1.ViewAttributes)>
+@Html.Raw(s_employee.address1.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.address1.Visible (end) *@
+@if (s_employee.address2.Visible) { @* s_employee.address2.Visible (begin) *@
+	<tr id="r_address2">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_address2">@Html.Raw(s_employee.address2.Caption)</span></td>
+		<td data-name="address2" @Html.Raw(s_employee.address2.CellAttributes)>
+<span id="el_s_employee_address2">
+<span @Html.Raw(s_employee.address2.ViewAttributes)>
+@Html.Raw(s_employee.address2.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.address2.Visible (end) *@
+@if (s_employee.Id_city.Visible) { @* s_employee.Id_city.Visible (begin) *@
+	<tr id="r_Id_city">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_Id_city">@Html.Raw(s_employee.Id_city.Caption)</span></td>
+		<td data-name="Id_city" @Html.Raw(s_employee.Id_city.CellAttributes)>
+<span id="el_s_employee_Id_city">
+<span @Html.Raw(s_employee.Id_city.ViewAttributes)>
+@Html.Raw(s_employee.Id_city.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.Id_city.Visible (end) *@
+@if (s_employee.Id_state.Visible) { @* s_employee.Id_state.Visible (begin) *@
+	<tr id="r_Id_state">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_Id_state">@Html.Raw(s_employee.Id_state.Caption)</span></td>
+		<td data-name="Id_state" @Html.Raw(s_employee.Id_state.CellAttributes)>
+<span id="el_s_employee_Id_state">
+<span @Html.Raw(s_employee.Id_state.ViewAttributes)>
+@Html.Raw(s_employee.Id_state.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.Id_state.Visible (end) *@
+@if (s_employee.Id_country.Visible) { @* s_employee.Id_country.Visible (begin) *@
+	<tr id="r_Id_country">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_Id_country">@Html.Raw(s_employee.Id_country.Caption)</span></td>
+		<td data-name="Id_country" @Html.Raw(s_employee.Id_country.CellAttributes)>
+<span id="el_s_employee_Id_country">
+<span @Html.Raw(s_employee.Id_country.ViewAttributes)>
+@Html.Raw(s_employee.Id_country.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.Id_country.Visible (end) *@
+@if (s_employee.postcode.Visible) { @* s_employee.postcode.Visible (begin) *@
+	<tr id="r_postcode">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_postcode">@Html.Raw(s_employee.postcode.Caption)</span></td>
+		<td data-name="postcode" @Html.Raw(s_employee.postcode.CellAttributes)>
+<span id="el_s_employee_postcode">
+<span @Html.Raw(s_employee.postcode.ViewAttributes)>
+@Html.Raw(s_employee.postcode.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.postcode.Visible (end) *@
+@if (s_employee.gender.Visible) { @* s_employee.gender.Visible (begin) *@
+	<tr id="r_gender">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_gender">@Html.Raw(s_employee.gender.Caption)</span></td>
+		<td data-name="gender" @Html.Raw(s_employee.gender.CellAttributes)>
+<span id="el_s_employee_gender">
+<span @Html.Raw(s_employee.gender.ViewAttributes)>
+@Html.Raw(s_employee.gender.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.gender.Visible (end) *@
+@if (s_employee.tel.Visible) { @* s_employee.tel.Visible (begin) *@
+	<tr id="r_tel">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_tel">@Html.Raw(s_employee.tel.Caption)</span></td>
+		<td data-name="tel" @Html.Raw(s_employee.tel.CellAttributes)>
+<span id="el_s_employee_tel">
+<span @Html.Raw(s_employee.tel.ViewAttributes)>
+@Html.Raw(s_employee.tel.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.tel.Visible (end) *@
+@if (s_employee.handphone.Visible) { @* s_employee.handphone.Visible (begin) *@
+	<tr id="r_handphone">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_handphone">@Html.Raw(s_employee.handphone.Caption)</span></td>
+		<td data-name="handphone" @Html.Raw(s_employee.handphone.CellAttributes)>
+<span id="el_s_employee_handphone">
+<span @Html.Raw(s_employee.handphone.ViewAttributes)>
+@Html.Raw(s_employee.handphone.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.handphone.Visible (end) *@
+@if (s_employee._email.Visible) { @* s_employee._email.Visible (begin) *@
+	<tr id="r__email">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee__email">@Html.Raw(s_employee._email.Caption)</span></td>
+		<td data-name="_email" @Html.Raw(s_employee._email.CellAttributes)>
+<span id="el_s_employee__email">
+<span @Html.Raw(s_employee._email.ViewAttributes)>
+@Html.Raw(s_employee._email.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee._email.Visible (end) *@
+@if (s_employee.dob.Visible) { @* s_employee.dob.Visible (begin) *@
+	<tr id="r_dob">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_dob">@Html.Raw(s_employee.dob.Caption)</span></td>
+		<td data-name="dob" @Html.Raw(s_employee.dob.CellAttributes)>
+<span id="el_s_employee_dob">
+<span @Html.Raw(s_employee.dob.ViewAttributes)>
+@Html.Raw(s_employee.dob.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.dob.Visible (end) *@
+@if (s_employee.children.Visible) { @* s_employee.children.Visible (begin) *@
+	<tr id="r_children">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_children">@Html.Raw(s_employee.children.Caption)</span></td>
+		<td data-name="children" @Html.Raw(s_employee.children.CellAttributes)>
+<span id="el_s_employee_children">
+<span @Html.Raw(s_employee.children.ViewAttributes)>
+@Html.Raw(s_employee.children.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.children.Visible (end) *@
+@if (s_employee.datejoin.Visible) { @* s_employee.datejoin.Visible (begin) *@
+	<tr id="r_datejoin">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_datejoin">@Html.Raw(s_employee.datejoin.Caption)</span></td>
+		<td data-name="datejoin" @Html.Raw(s_employee.datejoin.CellAttributes)>
+<span id="el_s_employee_datejoin">
+<span @Html.Raw(s_employee.datejoin.ViewAttributes)>
+@Html.Raw(s_employee.datejoin.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.datejoin.Visible (end) *@
+@if (s_employee.dateresign.Visible) { @* s_employee.dateresign.Visible (begin) *@
+	<tr id="r_dateresign">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_dateresign">@Html.Raw(s_employee.dateresign.Caption)</span></td>
+		<td data-name="dateresign" @Html.Raw(s_employee.dateresign.CellAttributes)>
+<span id="el_s_employee_dateresign">
+<span @Html.Raw(s_employee.dateresign.ViewAttributes)>
+@Html.Raw(s_employee.dateresign.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.dateresign.Visible (end) *@
+@if (s_employee.marriedstatus.Visible) { @* s_employee.marriedstatus.Visible (begin) *@
+	<tr id="r_marriedstatus">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_marriedstatus">@Html.Raw(s_employee.marriedstatus.Caption)</span></td>
+		<td data-name="marriedstatus" @Html.Raw(s_employee.marriedstatus.CellAttributes)>
+<span id="el_s_employee_marriedstatus">
+<span @Html.Raw(s_employee.marriedstatus.ViewAttributes)>
+@Html.Raw(s_employee.marriedstatus.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.marriedstatus.Visible (end) *@
+@if (s_employee.Id_dept.Visible) { @* s_employee.Id_dept.Visible (begin) *@
+	<tr id="r_Id_dept">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_Id_dept">@Html.Raw(s_employee.Id_dept.Caption)</span></td>
+		<td data-name="Id_dept" @Html.Raw(s_employee.Id_dept.CellAttributes)>
+<span id="el_s_employee_Id_dept">
+<span @Html.Raw(s_employee.Id_dept.ViewAttributes)>
+@Html.Raw(s_employee.Id_dept.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.Id_dept.Visible (end) *@
+@if (s_employee.Id_position.Visible) { @* s_employee.Id_position.Visible (begin) *@
+	<tr id="r_Id_position">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_Id_position">@Html.Raw(s_employee.Id_position.Caption)</span></td>
+		<td data-name="Id_position" @Html.Raw(s_employee.Id_position.CellAttributes)>
+<span id="el_s_employee_Id_position">
+<span @Html.Raw(s_employee.Id_position.ViewAttributes)>
+@Html.Raw(s_employee.Id_position.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.Id_position.Visible (end) *@
+@if (s_employee.Id_race.Visible) { @* s_employee.Id_race.Visible (begin) *@
+	<tr id="r_Id_race">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_Id_race">@Html.Raw(s_employee.Id_race.Caption)</span></td>
+		<td data-name="Id_race" @Html.Raw(s_employee.Id_race.CellAttributes)>
+<span id="el_s_employee_Id_race">
+<span @Html.Raw(s_employee.Id_race.ViewAttributes)>
+@Html.Raw(s_employee.Id_race.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.Id_race.Visible (end) *@
+@if (s_employee.photopath.Visible) { @* s_employee.photopath.Visible (begin) *@
+	<tr id="r_photopath">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_photopath">@Html.Raw(s_employee.photopath.Caption)</span></td>
+		<td data-name="photopath" @Html.Raw(s_employee.photopath.CellAttributes)>
+<span id="el_s_employee_photopath">
+<span @Html.Raw(s_employee.photopath.ViewAttributes)>
+@Html.Raw(s_employee.photopath.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.photopath.Visible (end) *@
+@if (s_employee.report_to.Visible) { @* s_employee.report_to.Visible (begin) *@
+	<tr id="r_report_to">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_report_to">@Html.Raw(s_employee.report_to.Caption)</span></td>
+		<td data-name="report_to" @Html.Raw(s_employee.report_to.CellAttributes)>
+<span id="el_s_employee_report_to">
+<span @Html.Raw(s_employee.report_to.ViewAttributes)>
+@Html.Raw(s_employee.report_to.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.report_to.Visible (end) *@
+@if (s_employee.login_effectivedate.Visible) { @* s_employee.login_effectivedate.Visible (begin) *@
+	<tr id="r_login_effectivedate">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_login_effectivedate">@Html.Raw(s_employee.login_effectivedate.Caption)</span></td>
+		<td data-name="login_effectivedate" @Html.Raw(s_employee.login_effectivedate.CellAttributes)>
+<span id="el_s_employee_login_effectivedate">
+<span @Html.Raw(s_employee.login_effectivedate.ViewAttributes)>
+@Html.Raw(s_employee.login_effectivedate.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.login_effectivedate.Visible (end) *@
+@if (s_employee.login_disableddate.Visible) { @* s_employee.login_disableddate.Visible (begin) *@
+	<tr id="r_login_disableddate">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_login_disableddate">@Html.Raw(s_employee.login_disableddate.Caption)</span></td>
+		<td data-name="login_disableddate" @Html.Raw(s_employee.login_disableddate.CellAttributes)>
+<span id="el_s_employee_login_disableddate">
+<span @Html.Raw(s_employee.login_disableddate.ViewAttributes)>
+@Html.Raw(s_employee.login_disableddate.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.login_disableddate.Visible (end) *@
+@if (s_employee.UserLevelId.Visible) { @* s_employee.UserLevelId.Visible (begin) *@
+	<tr id="r_UserLevelId">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_UserLevelId">@Html.Raw(s_employee.UserLevelId.Caption)</span></td>
+		<td data-name="UserLevelId" @Html.Raw(s_employee.UserLevelId.CellAttributes)>
+<span id="el_s_employee_UserLevelId">
+<span @Html.Raw(s_employee.UserLevelId.ViewAttributes)>
+@Html.Raw(s_employee.UserLevelId.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.UserLevelId.Visible (end) *@
+@if (s_employee._Username.Visible) { @* s_employee._Username.Visible (begin) *@
+	<tr id="r__Username">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee__Username">@Html.Raw(s_employee._Username.Caption)</span></td>
+		<td data-name="_Username" @Html.Raw(s_employee._Username.CellAttributes)>
+<span id="el_s_employee__Username">
+<span @Html.Raw(s_employee._Username.ViewAttributes)>
+@Html.Raw(s_employee._Username.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee._Username.Visible (end) *@
+@if (s_employee.password.Visible) { @* s_employee.password.Visible (begin) *@
+	<tr id="r_password">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_password">@Html.Raw(s_employee.password.Caption)</span></td>
+		<td data-name="password" @Html.Raw(s_employee.password.CellAttributes)>
+<span id="el_s_employee_password">
+<span @Html.Raw(s_employee.password.ViewAttributes)>
+@Html.Raw(s_employee.password.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_employee.password.Visible (end) *@
+@if (s_employee.active.Visible) { @* s_employee.active.Visible (begin) *@
+	<tr id="r_active">
+		<td class="@s_employee_View.TableLeftColumnClass"><span id="elh_s_employee_active">@Html.Raw(s_employee.active.Caption)</span></td>
+		<td data-name="active" @Html.Raw(s_employee.active.CellAttributes)>
+<span id="el_s_employee_active">
+<span @Html.Raw(s_employee.active.ViewAttributes)>
+<input type="checkbox" value="@s_employee.active.GetViewValue()" disabled checked="@ConvertToBool(s_employee.active.CurrentValue)"></span>
+</span>
+</td>
+	</tr>
+} @* s_employee.active.Visible (end) *@
+</table>
+@{ s_employee_View.CloseRecordset(); }
+</form>
+@s_employee_View.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_employee.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<configuration date="2019/07/11" author="e.World Technology Ltd.">
+  <project id="{8543F230-11C6-4105-B51C-8D87C21BE659}" file="C:\Users\User\Documents\ASPNETMaker\Projects\SampleProject.agx" name="SampleProject" product="ASPNETMaker" version="16.0" datetime="2019/07/11 18:34:17" languagefolder="wwwroot/lang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
+    <table id="s_armaster" name="s_armaster" caption="s armaster" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_dodetltest" name="s_dodetltest" caption="s dodetltest" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_dohdrtest" name="s_dohdrtest" caption="s dohdrtest" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_employee" name="s_employee" caption="s employee" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_services" name="s_services" caption="s services" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_servicetype" name="s_servicetype" caption="s servicetype" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_taxmaster" name="s_taxmaster" caption="s taxmaster" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="UserLevelPermissions" name="UserLevelPermissions" caption="User Level Permissions" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="UserLevels" name="UserLevels" caption="User Levels" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_currency" name="s_currency" caption="s currency" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_argltrx" name="s_argltrx" caption="s argltrx" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_artrans" name="s_artrans" caption="s artrans" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_glchart" name="s_glchart" caption="s glchart" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="s_glhistory" name="s_glhistory" caption="s glhistory" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+  </project>
+</configuration>

@@ -1,0 +1,771 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_armaster_View.Page_Render();
+
+	// Check action result
+	if (s_armaster_View.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+@if (!s_armaster.IsExport()) {
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "view";
+var fs_armasterview = currentForm = new ew.Form("fs_armasterview", "view");
+
+// Form_CustomValidate event
+fs_armasterview.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_armasterview.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_armasterview.lists["x_skip_stmt"] = @Html.Raw(s_armaster_View.skip_stmt.Lookup.ToClientList());
+fs_armasterview.lists["x_skip_stmt"].options = @Html.Raw(ConvertToJson(s_armaster_View.skip_stmt.Options(false))); // DN
+fs_armasterview.lists["x_stop_sale"] = @Html.Raw(s_armaster_View.stop_sale.Lookup.ToClientList());
+fs_armasterview.lists["x_stop_sale"].options = @Html.Raw(ConvertToJson(s_armaster_View.stop_sale.Options(false))); // DN
+fs_armasterview.lists["x_opn_item"] = @Html.Raw(s_armaster_View.opn_item.Lookup.ToClientList());
+fs_armasterview.lists["x_opn_item"].options = @Html.Raw(ConvertToJson(s_armaster_View.opn_item.Options(false))); // DN
+fs_armasterview.lists["x_approved"] = @Html.Raw(s_armaster_View.approved.Lookup.ToClientList());
+fs_armasterview.lists["x_approved"].options = @Html.Raw(ConvertToJson(s_armaster_View.approved.Options(false))); // DN
+fs_armasterview.lists["x_oversea"] = @Html.Raw(s_armaster_View.oversea.Lookup.ToClientList());
+fs_armasterview.lists["x_oversea"].options = @Html.Raw(ConvertToJson(s_armaster_View.oversea.Options(false))); // DN
+fs_armasterview.lists["x_sellpriceDOM"] = @Html.Raw(s_armaster_View.sellpriceDOM.Lookup.ToClientList());
+fs_armasterview.lists["x_sellpriceDOM"].options = @Html.Raw(ConvertToJson(s_armaster_View.sellpriceDOM.Options(false))); // DN
+
+// Form object for search
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+}
+@if (!s_armaster.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+	@s_armaster_View.ExportOptions.RenderBody()
+	@s_armaster_View.OtherOptions.RenderBody()
+	<div class="clearfix"></div>
+</div>
+}
+@s_armaster_View.ShowPageHeader()
+@s_armaster_View.ShowMessages()
+<form name="fs_armasterview" id="fs_armasterview" class="form-inline ew-form ew-view-form" method="post">
+@if (s_armaster_View.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="modal" value="@ConvertToInt(s_armaster_View.IsModal)">
+<table class="table table-striped table-sm ew-view-table">
+@if (s_armaster.Id.Visible) { @* s_armaster.Id.Visible (begin) *@
+	<tr id="r_Id">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_Id">@Html.Raw(s_armaster.Id.Caption)</span></td>
+		<td data-name="Id" @Html.Raw(s_armaster.Id.CellAttributes)>
+<span id="el_s_armaster_Id">
+<span @Html.Raw(s_armaster.Id.ViewAttributes)>
+@Html.Raw(s_armaster.Id.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.Id.Visible (end) *@
+@if (s_armaster.dbcode.Visible) { @* s_armaster.dbcode.Visible (begin) *@
+	<tr id="r_dbcode">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_dbcode">@Html.Raw(s_armaster.dbcode.Caption)</span></td>
+		<td data-name="dbcode" @Html.Raw(s_armaster.dbcode.CellAttributes)>
+<span id="el_s_armaster_dbcode">
+<span @Html.Raw(s_armaster.dbcode.ViewAttributes)>
+@Html.Raw(s_armaster.dbcode.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.dbcode.Visible (end) *@
+@if (s_armaster.name.Visible) { @* s_armaster.name.Visible (begin) *@
+	<tr id="r_name">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_name">@Html.Raw(s_armaster.name.Caption)</span></td>
+		<td data-name="name" @Html.Raw(s_armaster.name.CellAttributes)>
+<span id="el_s_armaster_name">
+<span @Html.Raw(s_armaster.name.ViewAttributes)>
+@Html.Raw(s_armaster.name.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.name.Visible (end) *@
+@if (s_armaster.name2.Visible) { @* s_armaster.name2.Visible (begin) *@
+	<tr id="r_name2">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_name2">@Html.Raw(s_armaster.name2.Caption)</span></td>
+		<td data-name="name2" @Html.Raw(s_armaster.name2.CellAttributes)>
+<span id="el_s_armaster_name2">
+<span @Html.Raw(s_armaster.name2.ViewAttributes)>
+@Html.Raw(s_armaster.name2.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.name2.Visible (end) *@
+@if (s_armaster.short_name.Visible) { @* s_armaster.short_name.Visible (begin) *@
+	<tr id="r_short_name">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_short_name">@Html.Raw(s_armaster.short_name.Caption)</span></td>
+		<td data-name="short_name" @Html.Raw(s_armaster.short_name.CellAttributes)>
+<span id="el_s_armaster_short_name">
+<span @Html.Raw(s_armaster.short_name.ViewAttributes)>
+@Html.Raw(s_armaster.short_name.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.short_name.Visible (end) *@
+@if (s_armaster.add1.Visible) { @* s_armaster.add1.Visible (begin) *@
+	<tr id="r_add1">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_add1">@Html.Raw(s_armaster.add1.Caption)</span></td>
+		<td data-name="add1" @Html.Raw(s_armaster.add1.CellAttributes)>
+<span id="el_s_armaster_add1">
+<span @Html.Raw(s_armaster.add1.ViewAttributes)>
+@Html.Raw(s_armaster.add1.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.add1.Visible (end) *@
+@if (s_armaster.add2.Visible) { @* s_armaster.add2.Visible (begin) *@
+	<tr id="r_add2">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_add2">@Html.Raw(s_armaster.add2.Caption)</span></td>
+		<td data-name="add2" @Html.Raw(s_armaster.add2.CellAttributes)>
+<span id="el_s_armaster_add2">
+<span @Html.Raw(s_armaster.add2.ViewAttributes)>
+@Html.Raw(s_armaster.add2.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.add2.Visible (end) *@
+@if (s_armaster.add3.Visible) { @* s_armaster.add3.Visible (begin) *@
+	<tr id="r_add3">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_add3">@Html.Raw(s_armaster.add3.Caption)</span></td>
+		<td data-name="add3" @Html.Raw(s_armaster.add3.CellAttributes)>
+<span id="el_s_armaster_add3">
+<span @Html.Raw(s_armaster.add3.ViewAttributes)>
+@Html.Raw(s_armaster.add3.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.add3.Visible (end) *@
+@if (s_armaster.add4.Visible) { @* s_armaster.add4.Visible (begin) *@
+	<tr id="r_add4">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_add4">@Html.Raw(s_armaster.add4.Caption)</span></td>
+		<td data-name="add4" @Html.Raw(s_armaster.add4.CellAttributes)>
+<span id="el_s_armaster_add4">
+<span @Html.Raw(s_armaster.add4.ViewAttributes)>
+@Html.Raw(s_armaster.add4.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.add4.Visible (end) *@
+@if (s_armaster.area.Visible) { @* s_armaster.area.Visible (begin) *@
+	<tr id="r_area">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_area">@Html.Raw(s_armaster.area.Caption)</span></td>
+		<td data-name="area" @Html.Raw(s_armaster.area.CellAttributes)>
+<span id="el_s_armaster_area">
+<span @Html.Raw(s_armaster.area.ViewAttributes)>
+@Html.Raw(s_armaster.area.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.area.Visible (end) *@
+@if (s_armaster.postcode.Visible) { @* s_armaster.postcode.Visible (begin) *@
+	<tr id="r_postcode">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_postcode">@Html.Raw(s_armaster.postcode.Caption)</span></td>
+		<td data-name="postcode" @Html.Raw(s_armaster.postcode.CellAttributes)>
+<span id="el_s_armaster_postcode">
+<span @Html.Raw(s_armaster.postcode.ViewAttributes)>
+@Html.Raw(s_armaster.postcode.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.postcode.Visible (end) *@
+@if (s_armaster.state.Visible) { @* s_armaster.state.Visible (begin) *@
+	<tr id="r_state">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_state">@Html.Raw(s_armaster.state.Caption)</span></td>
+		<td data-name="state" @Html.Raw(s_armaster.state.CellAttributes)>
+<span id="el_s_armaster_state">
+<span @Html.Raw(s_armaster.state.ViewAttributes)>
+@Html.Raw(s_armaster.state.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.state.Visible (end) *@
+@if (s_armaster.country.Visible) { @* s_armaster.country.Visible (begin) *@
+	<tr id="r_country">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_country">@Html.Raw(s_armaster.country.Caption)</span></td>
+		<td data-name="country" @Html.Raw(s_armaster.country.CellAttributes)>
+<span id="el_s_armaster_country">
+<span @Html.Raw(s_armaster.country.ViewAttributes)>
+@Html.Raw(s_armaster.country.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.country.Visible (end) *@
+@if (s_armaster.tel1.Visible) { @* s_armaster.tel1.Visible (begin) *@
+	<tr id="r_tel1">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_tel1">@Html.Raw(s_armaster.tel1.Caption)</span></td>
+		<td data-name="tel1" @Html.Raw(s_armaster.tel1.CellAttributes)>
+<span id="el_s_armaster_tel1">
+<span @Html.Raw(s_armaster.tel1.ViewAttributes)>
+@Html.Raw(s_armaster.tel1.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.tel1.Visible (end) *@
+@if (s_armaster.tel2.Visible) { @* s_armaster.tel2.Visible (begin) *@
+	<tr id="r_tel2">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_tel2">@Html.Raw(s_armaster.tel2.Caption)</span></td>
+		<td data-name="tel2" @Html.Raw(s_armaster.tel2.CellAttributes)>
+<span id="el_s_armaster_tel2">
+<span @Html.Raw(s_armaster.tel2.ViewAttributes)>
+@Html.Raw(s_armaster.tel2.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.tel2.Visible (end) *@
+@if (s_armaster.phone1.Visible) { @* s_armaster.phone1.Visible (begin) *@
+	<tr id="r_phone1">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_phone1">@Html.Raw(s_armaster.phone1.Caption)</span></td>
+		<td data-name="phone1" @Html.Raw(s_armaster.phone1.CellAttributes)>
+<span id="el_s_armaster_phone1">
+<span @Html.Raw(s_armaster.phone1.ViewAttributes)>
+@Html.Raw(s_armaster.phone1.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.phone1.Visible (end) *@
+@if (s_armaster.phone2.Visible) { @* s_armaster.phone2.Visible (begin) *@
+	<tr id="r_phone2">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_phone2">@Html.Raw(s_armaster.phone2.Caption)</span></td>
+		<td data-name="phone2" @Html.Raw(s_armaster.phone2.CellAttributes)>
+<span id="el_s_armaster_phone2">
+<span @Html.Raw(s_armaster.phone2.ViewAttributes)>
+@Html.Raw(s_armaster.phone2.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.phone2.Visible (end) *@
+@if (s_armaster.fax.Visible) { @* s_armaster.fax.Visible (begin) *@
+	<tr id="r_fax">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_fax">@Html.Raw(s_armaster.fax.Caption)</span></td>
+		<td data-name="fax" @Html.Raw(s_armaster.fax.CellAttributes)>
+<span id="el_s_armaster_fax">
+<span @Html.Raw(s_armaster.fax.ViewAttributes)>
+@Html.Raw(s_armaster.fax.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.fax.Visible (end) *@
+@if (s_armaster._email.Visible) { @* s_armaster._email.Visible (begin) *@
+	<tr id="r__email">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster__email">@Html.Raw(s_armaster._email.Caption)</span></td>
+		<td data-name="_email" @Html.Raw(s_armaster._email.CellAttributes)>
+<span id="el_s_armaster__email">
+<span @Html.Raw(s_armaster._email.ViewAttributes)>
+@Html.Raw(s_armaster._email.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster._email.Visible (end) *@
+@if (s_armaster.ptc1.Visible) { @* s_armaster.ptc1.Visible (begin) *@
+	<tr id="r_ptc1">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_ptc1">@Html.Raw(s_armaster.ptc1.Caption)</span></td>
+		<td data-name="ptc1" @Html.Raw(s_armaster.ptc1.CellAttributes)>
+<span id="el_s_armaster_ptc1">
+<span @Html.Raw(s_armaster.ptc1.ViewAttributes)>
+@Html.Raw(s_armaster.ptc1.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.ptc1.Visible (end) *@
+@if (s_armaster.ptc.Visible) { @* s_armaster.ptc.Visible (begin) *@
+	<tr id="r_ptc">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_ptc">@Html.Raw(s_armaster.ptc.Caption)</span></td>
+		<td data-name="ptc" @Html.Raw(s_armaster.ptc.CellAttributes)>
+<span id="el_s_armaster_ptc">
+<span @Html.Raw(s_armaster.ptc.ViewAttributes)>
+@Html.Raw(s_armaster.ptc.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.ptc.Visible (end) *@
+@if (s_armaster.ptc2.Visible) { @* s_armaster.ptc2.Visible (begin) *@
+	<tr id="r_ptc2">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_ptc2">@Html.Raw(s_armaster.ptc2.Caption)</span></td>
+		<td data-name="ptc2" @Html.Raw(s_armaster.ptc2.CellAttributes)>
+<span id="el_s_armaster_ptc2">
+<span @Html.Raw(s_armaster.ptc2.ViewAttributes)>
+@Html.Raw(s_armaster.ptc2.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.ptc2.Visible (end) *@
+@if (s_armaster.ar_grp.Visible) { @* s_armaster.ar_grp.Visible (begin) *@
+	<tr id="r_ar_grp">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_ar_grp">@Html.Raw(s_armaster.ar_grp.Caption)</span></td>
+		<td data-name="ar_grp" @Html.Raw(s_armaster.ar_grp.CellAttributes)>
+<span id="el_s_armaster_ar_grp">
+<span @Html.Raw(s_armaster.ar_grp.ViewAttributes)>
+@Html.Raw(s_armaster.ar_grp.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.ar_grp.Visible (end) *@
+@if (s_armaster.term_code.Visible) { @* s_armaster.term_code.Visible (begin) *@
+	<tr id="r_term_code">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_term_code">@Html.Raw(s_armaster.term_code.Caption)</span></td>
+		<td data-name="term_code" @Html.Raw(s_armaster.term_code.CellAttributes)>
+<span id="el_s_armaster_term_code">
+<span @Html.Raw(s_armaster.term_code.ViewAttributes)>
+@Html.Raw(s_armaster.term_code.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.term_code.Visible (end) *@
+@if (s_armaster.pterm_code.Visible) { @* s_armaster.pterm_code.Visible (begin) *@
+	<tr id="r_pterm_code">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_pterm_code">@Html.Raw(s_armaster.pterm_code.Caption)</span></td>
+		<td data-name="pterm_code" @Html.Raw(s_armaster.pterm_code.CellAttributes)>
+<span id="el_s_armaster_pterm_code">
+<span @Html.Raw(s_armaster.pterm_code.ViewAttributes)>
+@Html.Raw(s_armaster.pterm_code.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.pterm_code.Visible (end) *@
+@if (s_armaster.cr_limit.Visible) { @* s_armaster.cr_limit.Visible (begin) *@
+	<tr id="r_cr_limit">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_cr_limit">@Html.Raw(s_armaster.cr_limit.Caption)</span></td>
+		<td data-name="cr_limit" @Html.Raw(s_armaster.cr_limit.CellAttributes)>
+<span id="el_s_armaster_cr_limit">
+<span @Html.Raw(s_armaster.cr_limit.ViewAttributes)>
+@Html.Raw(s_armaster.cr_limit.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.cr_limit.Visible (end) *@
+@if (s_armaster.CurrencyCode.Visible) { @* s_armaster.CurrencyCode.Visible (begin) *@
+	<tr id="r_CurrencyCode">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_CurrencyCode">@Html.Raw(s_armaster.CurrencyCode.Caption)</span></td>
+		<td data-name="CurrencyCode" @Html.Raw(s_armaster.CurrencyCode.CellAttributes)>
+<span id="el_s_armaster_CurrencyCode">
+<span @Html.Raw(s_armaster.CurrencyCode.ViewAttributes)>
+@Html.Raw(s_armaster.CurrencyCode.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.CurrencyCode.Visible (end) *@
+@if (s_armaster.slsman.Visible) { @* s_armaster.slsman.Visible (begin) *@
+	<tr id="r_slsman">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_slsman">@Html.Raw(s_armaster.slsman.Caption)</span></td>
+		<td data-name="slsman" @Html.Raw(s_armaster.slsman.CellAttributes)>
+<span id="el_s_armaster_slsman">
+<span @Html.Raw(s_armaster.slsman.ViewAttributes)>
+@Html.Raw(s_armaster.slsman.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.slsman.Visible (end) *@
+@if (s_armaster.ytd_sale.Visible) { @* s_armaster.ytd_sale.Visible (begin) *@
+	<tr id="r_ytd_sale">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_ytd_sale">@Html.Raw(s_armaster.ytd_sale.Caption)</span></td>
+		<td data-name="ytd_sale" @Html.Raw(s_armaster.ytd_sale.CellAttributes)>
+<span id="el_s_armaster_ytd_sale">
+<span @Html.Raw(s_armaster.ytd_sale.ViewAttributes)>
+@Html.Raw(s_armaster.ytd_sale.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.ytd_sale.Visible (end) *@
+@if (s_armaster.ytd_cost.Visible) { @* s_armaster.ytd_cost.Visible (begin) *@
+	<tr id="r_ytd_cost">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_ytd_cost">@Html.Raw(s_armaster.ytd_cost.Caption)</span></td>
+		<td data-name="ytd_cost" @Html.Raw(s_armaster.ytd_cost.CellAttributes)>
+<span id="el_s_armaster_ytd_cost">
+<span @Html.Raw(s_armaster.ytd_cost.ViewAttributes)>
+@Html.Raw(s_armaster.ytd_cost.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.ytd_cost.Visible (end) *@
+@if (s_armaster.ytd_disc.Visible) { @* s_armaster.ytd_disc.Visible (begin) *@
+	<tr id="r_ytd_disc">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_ytd_disc">@Html.Raw(s_armaster.ytd_disc.Caption)</span></td>
+		<td data-name="ytd_disc" @Html.Raw(s_armaster.ytd_disc.CellAttributes)>
+<span id="el_s_armaster_ytd_disc">
+<span @Html.Raw(s_armaster.ytd_disc.ViewAttributes)>
+@Html.Raw(s_armaster.ytd_disc.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.ytd_disc.Visible (end) *@
+@if (s_armaster.ctrl_acct.Visible) { @* s_armaster.ctrl_acct.Visible (begin) *@
+	<tr id="r_ctrl_acct">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_ctrl_acct">@Html.Raw(s_armaster.ctrl_acct.Caption)</span></td>
+		<td data-name="ctrl_acct" @Html.Raw(s_armaster.ctrl_acct.CellAttributes)>
+<span id="el_s_armaster_ctrl_acct">
+<span @Html.Raw(s_armaster.ctrl_acct.ViewAttributes)>
+@Html.Raw(s_armaster.ctrl_acct.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.ctrl_acct.Visible (end) *@
+@if (s_armaster.ctrl_dept.Visible) { @* s_armaster.ctrl_dept.Visible (begin) *@
+	<tr id="r_ctrl_dept">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_ctrl_dept">@Html.Raw(s_armaster.ctrl_dept.Caption)</span></td>
+		<td data-name="ctrl_dept" @Html.Raw(s_armaster.ctrl_dept.CellAttributes)>
+<span id="el_s_armaster_ctrl_dept">
+<span @Html.Raw(s_armaster.ctrl_dept.ViewAttributes)>
+@Html.Raw(s_armaster.ctrl_dept.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.ctrl_dept.Visible (end) *@
+@if (s_armaster.acct_code.Visible) { @* s_armaster.acct_code.Visible (begin) *@
+	<tr id="r_acct_code">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_acct_code">@Html.Raw(s_armaster.acct_code.Caption)</span></td>
+		<td data-name="acct_code" @Html.Raw(s_armaster.acct_code.CellAttributes)>
+<span id="el_s_armaster_acct_code">
+<span @Html.Raw(s_armaster.acct_code.ViewAttributes)>
+@Html.Raw(s_armaster.acct_code.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.acct_code.Visible (end) *@
+@if (s_armaster.acct_dept.Visible) { @* s_armaster.acct_dept.Visible (begin) *@
+	<tr id="r_acct_dept">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_acct_dept">@Html.Raw(s_armaster.acct_dept.Caption)</span></td>
+		<td data-name="acct_dept" @Html.Raw(s_armaster.acct_dept.CellAttributes)>
+<span id="el_s_armaster_acct_dept">
+<span @Html.Raw(s_armaster.acct_dept.ViewAttributes)>
+@Html.Raw(s_armaster.acct_dept.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.acct_dept.Visible (end) *@
+@if (s_armaster.skip_stmt.Visible) { @* s_armaster.skip_stmt.Visible (begin) *@
+	<tr id="r_skip_stmt">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_skip_stmt">@Html.Raw(s_armaster.skip_stmt.Caption)</span></td>
+		<td data-name="skip_stmt" @Html.Raw(s_armaster.skip_stmt.CellAttributes)>
+<span id="el_s_armaster_skip_stmt">
+<span @Html.Raw(s_armaster.skip_stmt.ViewAttributes)>
+<input type="checkbox" value="@s_armaster.skip_stmt.GetViewValue()" disabled checked="@ConvertToBool(s_armaster.skip_stmt.CurrentValue)"></span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.skip_stmt.Visible (end) *@
+@if (s_armaster.stop_sale.Visible) { @* s_armaster.stop_sale.Visible (begin) *@
+	<tr id="r_stop_sale">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_stop_sale">@Html.Raw(s_armaster.stop_sale.Caption)</span></td>
+		<td data-name="stop_sale" @Html.Raw(s_armaster.stop_sale.CellAttributes)>
+<span id="el_s_armaster_stop_sale">
+<span @Html.Raw(s_armaster.stop_sale.ViewAttributes)>
+<input type="checkbox" value="@s_armaster.stop_sale.GetViewValue()" disabled checked="@ConvertToBool(s_armaster.stop_sale.CurrentValue)"></span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.stop_sale.Visible (end) *@
+@if (s_armaster.opn_item.Visible) { @* s_armaster.opn_item.Visible (begin) *@
+	<tr id="r_opn_item">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_opn_item">@Html.Raw(s_armaster.opn_item.Caption)</span></td>
+		<td data-name="opn_item" @Html.Raw(s_armaster.opn_item.CellAttributes)>
+<span id="el_s_armaster_opn_item">
+<span @Html.Raw(s_armaster.opn_item.ViewAttributes)>
+<input type="checkbox" value="@s_armaster.opn_item.GetViewValue()" disabled checked="@ConvertToBool(s_armaster.opn_item.CurrentValue)"></span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.opn_item.Visible (end) *@
+@if (s_armaster.status.Visible) { @* s_armaster.status.Visible (begin) *@
+	<tr id="r_status">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_status">@Html.Raw(s_armaster.status.Caption)</span></td>
+		<td data-name="status" @Html.Raw(s_armaster.status.CellAttributes)>
+<span id="el_s_armaster_status">
+<span @Html.Raw(s_armaster.status.ViewAttributes)>
+@Html.Raw(s_armaster.status.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.status.Visible (end) *@
+@if (s_armaster.tax_desc.Visible) { @* s_armaster.tax_desc.Visible (begin) *@
+	<tr id="r_tax_desc">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_tax_desc">@Html.Raw(s_armaster.tax_desc.Caption)</span></td>
+		<td data-name="tax_desc" @Html.Raw(s_armaster.tax_desc.CellAttributes)>
+<span id="el_s_armaster_tax_desc">
+<span @Html.Raw(s_armaster.tax_desc.ViewAttributes)>
+@Html.Raw(s_armaster.tax_desc.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.tax_desc.Visible (end) *@
+@if (s_armaster.stax.Visible) { @* s_armaster.stax.Visible (begin) *@
+	<tr id="r_stax">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_stax">@Html.Raw(s_armaster.stax.Caption)</span></td>
+		<td data-name="stax" @Html.Raw(s_armaster.stax.CellAttributes)>
+<span id="el_s_armaster_stax">
+<span @Html.Raw(s_armaster.stax.ViewAttributes)>
+@Html.Raw(s_armaster.stax.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.stax.Visible (end) *@
+@if (s_armaster.remark.Visible) { @* s_armaster.remark.Visible (begin) *@
+	<tr id="r_remark">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_remark">@Html.Raw(s_armaster.remark.Caption)</span></td>
+		<td data-name="remark" @Html.Raw(s_armaster.remark.CellAttributes)>
+<span id="el_s_armaster_remark">
+<span @Html.Raw(s_armaster.remark.ViewAttributes)>
+@Html.Raw(s_armaster.remark.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.remark.Visible (end) *@
+@if (s_armaster.inv_fmt.Visible) { @* s_armaster.inv_fmt.Visible (begin) *@
+	<tr id="r_inv_fmt">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_inv_fmt">@Html.Raw(s_armaster.inv_fmt.Caption)</span></td>
+		<td data-name="inv_fmt" @Html.Raw(s_armaster.inv_fmt.CellAttributes)>
+<span id="el_s_armaster_inv_fmt">
+<span @Html.Raw(s_armaster.inv_fmt.ViewAttributes)>
+@Html.Raw(s_armaster.inv_fmt.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.inv_fmt.Visible (end) *@
+@if (s_armaster.do_fmt.Visible) { @* s_armaster.do_fmt.Visible (begin) *@
+	<tr id="r_do_fmt">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_do_fmt">@Html.Raw(s_armaster.do_fmt.Caption)</span></td>
+		<td data-name="do_fmt" @Html.Raw(s_armaster.do_fmt.CellAttributes)>
+<span id="el_s_armaster_do_fmt">
+<span @Html.Raw(s_armaster.do_fmt.ViewAttributes)>
+@Html.Raw(s_armaster.do_fmt.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.do_fmt.Visible (end) *@
+@if (s_armaster.Ship_Code.Visible) { @* s_armaster.Ship_Code.Visible (begin) *@
+	<tr id="r_Ship_Code">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_Ship_Code">@Html.Raw(s_armaster.Ship_Code.Caption)</span></td>
+		<td data-name="Ship_Code" @Html.Raw(s_armaster.Ship_Code.CellAttributes)>
+<span id="el_s_armaster_Ship_Code">
+<span @Html.Raw(s_armaster.Ship_Code.ViewAttributes)>
+@Html.Raw(s_armaster.Ship_Code.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.Ship_Code.Visible (end) *@
+@if (s_armaster.custtype.Visible) { @* s_armaster.custtype.Visible (begin) *@
+	<tr id="r_custtype">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_custtype">@Html.Raw(s_armaster.custtype.Caption)</span></td>
+		<td data-name="custtype" @Html.Raw(s_armaster.custtype.CellAttributes)>
+<span id="el_s_armaster_custtype">
+<span @Html.Raw(s_armaster.custtype.ViewAttributes)>
+@Html.Raw(s_armaster.custtype.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.custtype.Visible (end) *@
+@if (s_armaster.Acct_BillAcct.Visible) { @* s_armaster.Acct_BillAcct.Visible (begin) *@
+	<tr id="r_Acct_BillAcct">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_Acct_BillAcct">@Html.Raw(s_armaster.Acct_BillAcct.Caption)</span></td>
+		<td data-name="Acct_BillAcct" @Html.Raw(s_armaster.Acct_BillAcct.CellAttributes)>
+<span id="el_s_armaster_Acct_BillAcct">
+<span @Html.Raw(s_armaster.Acct_BillAcct.ViewAttributes)>
+@Html.Raw(s_armaster.Acct_BillAcct.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.Acct_BillAcct.Visible (end) *@
+@if (s_armaster.bill_flag.Visible) { @* s_armaster.bill_flag.Visible (begin) *@
+	<tr id="r_bill_flag">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_bill_flag">@Html.Raw(s_armaster.bill_flag.Caption)</span></td>
+		<td data-name="bill_flag" @Html.Raw(s_armaster.bill_flag.CellAttributes)>
+<span id="el_s_armaster_bill_flag">
+<span @Html.Raw(s_armaster.bill_flag.ViewAttributes)>
+@Html.Raw(s_armaster.bill_flag.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.bill_flag.Visible (end) *@
+@if (s_armaster.payment_code.Visible) { @* s_armaster.payment_code.Visible (begin) *@
+	<tr id="r_payment_code">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_payment_code">@Html.Raw(s_armaster.payment_code.Caption)</span></td>
+		<td data-name="payment_code" @Html.Raw(s_armaster.payment_code.CellAttributes)>
+<span id="el_s_armaster_payment_code">
+<span @Html.Raw(s_armaster.payment_code.ViewAttributes)>
+@Html.Raw(s_armaster.payment_code.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.payment_code.Visible (end) *@
+@if (s_armaster.stax_pct.Visible) { @* s_armaster.stax_pct.Visible (begin) *@
+	<tr id="r_stax_pct">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_stax_pct">@Html.Raw(s_armaster.stax_pct.Caption)</span></td>
+		<td data-name="stax_pct" @Html.Raw(s_armaster.stax_pct.CellAttributes)>
+<span id="el_s_armaster_stax_pct">
+<span @Html.Raw(s_armaster.stax_pct.ViewAttributes)>
+@Html.Raw(s_armaster.stax_pct.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.stax_pct.Visible (end) *@
+@if (s_armaster.db_part.Visible) { @* s_armaster.db_part.Visible (begin) *@
+	<tr id="r_db_part">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_db_part">@Html.Raw(s_armaster.db_part.Caption)</span></td>
+		<td data-name="db_part" @Html.Raw(s_armaster.db_part.CellAttributes)>
+<span id="el_s_armaster_db_part">
+<span @Html.Raw(s_armaster.db_part.ViewAttributes)>
+@Html.Raw(s_armaster.db_part.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.db_part.Visible (end) *@
+@if (s_armaster.b_code.Visible) { @* s_armaster.b_code.Visible (begin) *@
+	<tr id="r_b_code">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_b_code">@Html.Raw(s_armaster.b_code.Caption)</span></td>
+		<td data-name="b_code" @Html.Raw(s_armaster.b_code.CellAttributes)>
+<span id="el_s_armaster_b_code">
+<span @Html.Raw(s_armaster.b_code.ViewAttributes)>
+@Html.Raw(s_armaster.b_code.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.b_code.Visible (end) *@
+@if (s_armaster.lmw_no.Visible) { @* s_armaster.lmw_no.Visible (begin) *@
+	<tr id="r_lmw_no">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_lmw_no">@Html.Raw(s_armaster.lmw_no.Caption)</span></td>
+		<td data-name="lmw_no" @Html.Raw(s_armaster.lmw_no.CellAttributes)>
+<span id="el_s_armaster_lmw_no">
+<span @Html.Raw(s_armaster.lmw_no.ViewAttributes)>
+@Html.Raw(s_armaster.lmw_no.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.lmw_no.Visible (end) *@
+@if (s_armaster.cs_code.Visible) { @* s_armaster.cs_code.Visible (begin) *@
+	<tr id="r_cs_code">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_cs_code">@Html.Raw(s_armaster.cs_code.Caption)</span></td>
+		<td data-name="cs_code" @Html.Raw(s_armaster.cs_code.CellAttributes)>
+<span id="el_s_armaster_cs_code">
+<span @Html.Raw(s_armaster.cs_code.ViewAttributes)>
+@Html.Raw(s_armaster.cs_code.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.cs_code.Visible (end) *@
+@if (s_armaster.approved.Visible) { @* s_armaster.approved.Visible (begin) *@
+	<tr id="r_approved">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_approved">@Html.Raw(s_armaster.approved.Caption)</span></td>
+		<td data-name="approved" @Html.Raw(s_armaster.approved.CellAttributes)>
+<span id="el_s_armaster_approved">
+<span @Html.Raw(s_armaster.approved.ViewAttributes)>
+<input type="checkbox" value="@s_armaster.approved.GetViewValue()" disabled checked="@ConvertToBool(s_armaster.approved.CurrentValue)"></span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.approved.Visible (end) *@
+@if (s_armaster.oversea.Visible) { @* s_armaster.oversea.Visible (begin) *@
+	<tr id="r_oversea">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_oversea">@Html.Raw(s_armaster.oversea.Caption)</span></td>
+		<td data-name="oversea" @Html.Raw(s_armaster.oversea.CellAttributes)>
+<span id="el_s_armaster_oversea">
+<span @Html.Raw(s_armaster.oversea.ViewAttributes)>
+<input type="checkbox" value="@s_armaster.oversea.GetViewValue()" disabled checked="@ConvertToBool(s_armaster.oversea.CurrentValue)"></span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.oversea.Visible (end) *@
+@if (s_armaster.defa_disc_pct.Visible) { @* s_armaster.defa_disc_pct.Visible (begin) *@
+	<tr id="r_defa_disc_pct">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_defa_disc_pct">@Html.Raw(s_armaster.defa_disc_pct.Caption)</span></td>
+		<td data-name="defa_disc_pct" @Html.Raw(s_armaster.defa_disc_pct.CellAttributes)>
+<span id="el_s_armaster_defa_disc_pct">
+<span @Html.Raw(s_armaster.defa_disc_pct.ViewAttributes)>
+@Html.Raw(s_armaster.defa_disc_pct.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.defa_disc_pct.Visible (end) *@
+@if (s_armaster.sellpriceDOM.Visible) { @* s_armaster.sellpriceDOM.Visible (begin) *@
+	<tr id="r_sellpriceDOM">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_sellpriceDOM">@Html.Raw(s_armaster.sellpriceDOM.Caption)</span></td>
+		<td data-name="sellpriceDOM" @Html.Raw(s_armaster.sellpriceDOM.CellAttributes)>
+<span id="el_s_armaster_sellpriceDOM">
+<span @Html.Raw(s_armaster.sellpriceDOM.ViewAttributes)>
+<input type="checkbox" value="@s_armaster.sellpriceDOM.GetViewValue()" disabled checked="@ConvertToBool(s_armaster.sellpriceDOM.CurrentValue)"></span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.sellpriceDOM.Visible (end) *@
+@if (s_armaster.id_upd.Visible) { @* s_armaster.id_upd.Visible (begin) *@
+	<tr id="r_id_upd">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_id_upd">@Html.Raw(s_armaster.id_upd.Caption)</span></td>
+		<td data-name="id_upd" @Html.Raw(s_armaster.id_upd.CellAttributes)>
+<span id="el_s_armaster_id_upd">
+<span @Html.Raw(s_armaster.id_upd.ViewAttributes)>
+@Html.Raw(s_armaster.id_upd.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.id_upd.Visible (end) *@
+@if (s_armaster.dt_upd.Visible) { @* s_armaster.dt_upd.Visible (begin) *@
+	<tr id="r_dt_upd">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_dt_upd">@Html.Raw(s_armaster.dt_upd.Caption)</span></td>
+		<td data-name="dt_upd" @Html.Raw(s_armaster.dt_upd.CellAttributes)>
+<span id="el_s_armaster_dt_upd">
+<span @Html.Raw(s_armaster.dt_upd.ViewAttributes)>
+@Html.Raw(s_armaster.dt_upd.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.dt_upd.Visible (end) *@
+@if (s_armaster.com_regno.Visible) { @* s_armaster.com_regno.Visible (begin) *@
+	<tr id="r_com_regno">
+		<td class="@s_armaster_View.TableLeftColumnClass"><span id="elh_s_armaster_com_regno">@Html.Raw(s_armaster.com_regno.Caption)</span></td>
+		<td data-name="com_regno" @Html.Raw(s_armaster.com_regno.CellAttributes)>
+<span id="el_s_armaster_com_regno">
+<span @Html.Raw(s_armaster.com_regno.ViewAttributes)>
+@Html.Raw(s_armaster.com_regno.GetViewValue())</span>
+</span>
+</td>
+	</tr>
+} @* s_armaster.com_regno.Visible (end) *@
+</table>
+@{ s_armaster_View.CloseRecordset(); }
+</form>
+@s_armaster_View.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+@if (!s_armaster.IsExport()) {
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
+}

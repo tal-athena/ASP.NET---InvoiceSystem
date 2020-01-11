@@ -1,0 +1,375 @@
+@{
+
+	// Layout
+	Layout = "_Layout";
+
+	// View
+	View = this;
+	SetupLoginStatus(); // Setup login status
+	SetClientVar("login", LoginStatus);
+
+	// Global Page Rendering event
+	Page_Rendering();
+
+	// Page Render event
+	s_dohdrtest_Add.Page_Render();
+
+	// Check action result
+	if (s_dohdrtest_Add.ActionResult is EmptyResult) { // Terminate page
+		return;
+	}
+
+	#pragma warning disable 168
+
+	// Local variables (Temp data)
+	string sqlWrk, filterWrk, whereWrk, curVal;
+	List<Dictionary<string, object>> rswrk;
+	string[] arWrk;
+	List<object> listWrk;
+	Func<string> lookupFilter;
+
+	#pragma warning restore 168
+
+}
+<script>
+
+// Form object
+var CurrentPageID = ew.PAGE_ID = "add";
+var fs_dohdrtestadd = currentForm = new ew.Form("fs_dohdrtestadd", "add");
+
+// Validate form
+fs_dohdrtestadd.validate = function() {
+	if (!this.validateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.getForm(), $fobj = $(fobj);
+	if ($fobj.find("#confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.formKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = ["insert", "gridinsert"].includes($fobj.find("#action").val()) && $k[0];
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+	@if (s_dohdrtest_Add.dt_rec.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_dt_rec");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.dt_rec.RequiredErrorMessage.Replace("%s", s_dohdrtest.dt_rec.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_dt_rec");
+		if (elm && !ew.checkDateDef(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.dt_rec.ErrorMessage))");
+	@if (s_dohdrtest_Add.do_no.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_do_no");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.do_no.RequiredErrorMessage.Replace("%s", s_dohdrtest.do_no.Caption)))");
+		</text>
+	}
+	@if (s_dohdrtest_Add.dbcode.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_dbcode");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.dbcode.RequiredErrorMessage.Replace("%s", s_dohdrtest.dbcode.Caption)))");
+		</text>
+	}
+	@if (s_dohdrtest_Add.slsman.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_slsman");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.slsman.RequiredErrorMessage.Replace("%s", s_dohdrtest.slsman.Caption)))");
+		</text>
+	}
+	@if (s_dohdrtest_Add.fileno.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_fileno");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.fileno.RequiredErrorMessage.Replace("%s", s_dohdrtest.fileno.Caption)))");
+		</text>
+	}
+	@if (s_dohdrtest_Add.TrxUserId.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_TrxUserId");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.TrxUserId.RequiredErrorMessage.Replace("%s", s_dohdrtest.TrxUserId.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_TrxUserId");
+		if (elm && !ew.checkInteger(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.TrxUserId.ErrorMessage))");
+	@if (s_dohdrtest_Add.CurrencyCode.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_CurrencyCode");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.CurrencyCode.RequiredErrorMessage.Replace("%s", s_dohdrtest.CurrencyCode.Caption)))");
+		</text>
+	}
+	@if (s_dohdrtest_Add.ex_rate.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_ex_rate");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.ex_rate.RequiredErrorMessage.Replace("%s", s_dohdrtest.ex_rate.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_ex_rate");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.ex_rate.ErrorMessage))");
+	@if (s_dohdrtest_Add.do_amount_original.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_do_amount_original");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.do_amount_original.RequiredErrorMessage.Replace("%s", s_dohdrtest.do_amount_original.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_do_amount_original");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.do_amount_original.ErrorMessage))");
+	@if (s_dohdrtest_Add.do_amount_loca.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_do_amount_loca");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.do_amount_loca.RequiredErrorMessage.Replace("%s", s_dohdrtest.do_amount_loca.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_do_amount_loca");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.do_amount_loca.ErrorMessage))");
+	@if (s_dohdrtest_Add.rounding_adj.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_rounding_adj");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.rounding_adj.RequiredErrorMessage.Replace("%s", s_dohdrtest.rounding_adj.Caption)))");
+		</text>
+	}
+		elm = this.getElements("x" + infix + "_rounding_adj");
+		if (elm && !ew.checkNumber(elm.value))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.rounding_adj.ErrorMessage))");
+	@if (s_dohdrtest_Add.ar_gl_acct.Required) {
+		<text>
+		elm = this.getElements("x" + infix + "_ar_gl_acct");
+		if (elm && !ew.isHidden(elm) && !ew.hasValue(elm))
+			return this.onError(elm, "@Html.Raw(JsEncode(s_dohdrtest.ar_gl_acct.RequiredErrorMessage.Replace("%s", s_dohdrtest.ar_gl_acct.Caption)))");
+		</text>
+	}
+
+		// Fire Form_CustomValidate event
+		if (!this.Form_CustomValidate(fobj))
+			return false;
+	}
+
+	// Process detail forms
+	var dfs = $fobj.find("input[name='detailpage']").get();
+	for (var i = 0; i < dfs.length; i++) {
+		var df = dfs[i], val = df.value;
+		if (val && ew.forms[val])
+			if (!ew.forms[val].validate())
+				return false;
+	}
+	return true;
+}
+
+// Form_CustomValidate event
+fs_dohdrtestadd.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+	// Your custom validation code here, return false if invalid.
+	return true;
+}
+
+// Use JavaScript validation or not remove PROJ.ProgramLanguage
+fs_dohdrtestadd.validateRequired = @ConvertToJson(Config.ClientValidate);
+
+// Dynamic selection lists
+fs_dohdrtestadd.lists["x_dbcode"] = @Html.Raw(s_dohdrtest_Add.dbcode.Lookup.ToClientList());
+fs_dohdrtestadd.lists["x_dbcode"].options = @Html.Raw(ConvertToJson(s_dohdrtest_Add.dbcode.LookupOptions));
+fs_dohdrtestadd.autoSuggests["x_dbcode"] = @Html.Raw(ConvertToJson(new Dictionary<string, string> { {"data", "ajax=autosuggest"} }));
+fs_dohdrtestadd.lists["x_CurrencyCode"] = @Html.Raw(s_dohdrtest_Add.CurrencyCode.Lookup.ToClientList());
+fs_dohdrtestadd.lists["x_CurrencyCode"].options = @Html.Raw(ConvertToJson(s_dohdrtest_Add.CurrencyCode.LookupOptions));
+fs_dohdrtestadd.autoSuggests["x_CurrencyCode"] = @Html.Raw(ConvertToJson(new Dictionary<string, string> { {"data", "ajax=autosuggest"} }));
+
+// Form object for search
+</script>
+<script>
+
+// Write your client script here, no need to add script tags.
+</script>
+@s_dohdrtest_Add.ShowPageHeader()
+@s_dohdrtest_Add.ShowMessages()
+<form name="fs_dohdrtestadd" id="fs_dohdrtestadd" class="@s_dohdrtest_Add.FormClassName" action="@AppPath(CurrentPageName())" method="post">
+@if (s_dohdrtest_Add.CheckToken) {
+	@Html.AntiForgeryToken()
+}
+<input type="hidden" name="t" value="s_dohdrtest">
+<input type="hidden" name="action" id="action" value="insert">
+<input type="hidden" name="modal" value="@ConvertToInt(s_dohdrtest_Add.IsModal)">
+<div class="ew-add-div"><!-- page* -->
+@if (s_dohdrtest.dt_rec.Visible) { // dt_rec.Visible (begin)
+	<div id="r_dt_rec" class="form-group row">
+		<label id="elh_s_dohdrtest_dt_rec" for="x_dt_rec" class="@s_dohdrtest_Add.LeftColumnClass">@Html.Raw(s_dohdrtest.dt_rec.Caption)@Html.Raw(s_dohdrtest.dt_rec.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dohdrtest_Add.RightColumnClass"><div @Html.Raw(s_dohdrtest.dt_rec.CellAttributes)>
+<span id="el_s_dohdrtest_dt_rec">
+<input type="text" data-table="s_dohdrtest" data-field="x_dt_rec" name="x_dt_rec" id="x_dt_rec" placeholder="@s_dohdrtest.dt_rec.PlaceHolder" value="@s_dohdrtest.dt_rec.EditValue" @Html.Raw(s_dohdrtest.dt_rec.EditAttributes)>
+</span>
+@Html.Raw(s_dohdrtest.dt_rec.CustomMessage)</div></div>
+	</div>
+} @* dt_rec.Visible (end) *@
+@if (s_dohdrtest.do_no.Visible) { // do_no.Visible (begin)
+	<div id="r_do_no" class="form-group row">
+		<label id="elh_s_dohdrtest_do_no" for="x_do_no" class="@s_dohdrtest_Add.LeftColumnClass">@Html.Raw(s_dohdrtest.do_no.Caption)@Html.Raw(s_dohdrtest.do_no.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dohdrtest_Add.RightColumnClass"><div @Html.Raw(s_dohdrtest.do_no.CellAttributes)>
+<span id="el_s_dohdrtest_do_no">
+<input type="text" data-table="s_dohdrtest" data-field="x_do_no" name="x_do_no" id="x_do_no" size="30" maxlength="15" placeholder="@s_dohdrtest.do_no.PlaceHolder" value="@s_dohdrtest.do_no.EditValue" @Html.Raw(s_dohdrtest.do_no.EditAttributes)>
+</span>
+@Html.Raw(s_dohdrtest.do_no.CustomMessage)</div></div>
+	</div>
+} @* do_no.Visible (end) *@
+@if (s_dohdrtest.dbcode.Visible) { // dbcode.Visible (begin)
+	<div id="r_dbcode" class="form-group row">
+		<label id="elh_s_dohdrtest_dbcode" class="@s_dohdrtest_Add.LeftColumnClass">@Html.Raw(s_dohdrtest.dbcode.Caption)@Html.Raw(s_dohdrtest.dbcode.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dohdrtest_Add.RightColumnClass"><div @Html.Raw(s_dohdrtest.dbcode.CellAttributes)>
+<span id="el_s_dohdrtest_dbcode">
+<span>@{ s_dohdrtest.dbcode.EditAttrs.Prepend("onchange", "ew.autoFill(this);"); }</span>
+<span id="as_x_dbcode" class="text-nowrap" style="z-index: 8960">
+	<div class="input-group mb-3">
+		<input type="text" class="form-control" name="sv_x_dbcode" id="sv_x_dbcode" value="@RemoveHtml(Convert.ToString(s_dohdrtest.dbcode.EditValue))" size="30" maxlength="10" placeholder="@s_dohdrtest.dbcode.PlaceHolder" data-placeholder="@s_dohdrtest.dbcode.PlaceHolder"@s_dohdrtest.dbcode.EditAttributes>
+		<div class="input-group-append">
+			<button type="button" title="@HtmlEncode(Language.Phrase("LookupLink", true).Replace("%s", RemoveHtml(s_dohdrtest.dbcode.Caption)))" onclick="ew.modalLookupShow({lnk:this,el:'x_dbcode',m:0,n:10,srch:false});" class="ew-lookup-btn btn btn-default"@((s_dohdrtest.dbcode.ReadOnly || s_dohdrtest.dbcode.Disabled) ? " disabled" : "")><i class="fa fa-search ew-icon"></i></button>
+		</div>
+	</div>
+</span>
+<input type="hidden" data-table="s_dohdrtest" data-field="x_dbcode" data-multiple="0" data-lookup="1" data-value-separator="@s_dohdrtest.dbcode.DisplayValueSeparatorAttribute" name="x_dbcode" id="x_dbcode" value="@(s_dohdrtest.dbcode.CurrentValue)" onchange="@s_dohdrtest.dbcode.EditAttrs.Extract("onchange")">
+<script>
+fs_dohdrtestadd.createAutoSuggest({"id":"x_dbcode","forceSelect":true});
+</script>
+@Html.Raw(s_dohdrtest.dbcode.Lookup.GetParamTag("p_x_dbcode"))
+</span>
+@Html.Raw(s_dohdrtest.dbcode.CustomMessage)</div></div>
+	</div>
+} @* dbcode.Visible (end) *@
+@if (s_dohdrtest.slsman.Visible) { // slsman.Visible (begin)
+	<div id="r_slsman" class="form-group row">
+		<label id="elh_s_dohdrtest_slsman" for="x_slsman" class="@s_dohdrtest_Add.LeftColumnClass">@Html.Raw(s_dohdrtest.slsman.Caption)@Html.Raw(s_dohdrtest.slsman.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dohdrtest_Add.RightColumnClass"><div @Html.Raw(s_dohdrtest.slsman.CellAttributes)>
+<span id="el_s_dohdrtest_slsman">
+<input type="text" data-table="s_dohdrtest" data-field="x_slsman" name="x_slsman" id="x_slsman" size="30" maxlength="15" placeholder="@s_dohdrtest.slsman.PlaceHolder" value="@s_dohdrtest.slsman.EditValue" @Html.Raw(s_dohdrtest.slsman.EditAttributes)>
+</span>
+@Html.Raw(s_dohdrtest.slsman.CustomMessage)</div></div>
+	</div>
+} @* slsman.Visible (end) *@
+@if (s_dohdrtest.fileno.Visible) { // fileno.Visible (begin)
+	<div id="r_fileno" class="form-group row">
+		<label id="elh_s_dohdrtest_fileno" for="x_fileno" class="@s_dohdrtest_Add.LeftColumnClass">@Html.Raw(s_dohdrtest.fileno.Caption)@Html.Raw(s_dohdrtest.fileno.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dohdrtest_Add.RightColumnClass"><div @Html.Raw(s_dohdrtest.fileno.CellAttributes)>
+<span id="el_s_dohdrtest_fileno">
+<input type="text" data-table="s_dohdrtest" data-field="x_fileno" name="x_fileno" id="x_fileno" size="30" maxlength="20" placeholder="@s_dohdrtest.fileno.PlaceHolder" value="@s_dohdrtest.fileno.EditValue" @Html.Raw(s_dohdrtest.fileno.EditAttributes)>
+</span>
+@Html.Raw(s_dohdrtest.fileno.CustomMessage)</div></div>
+	</div>
+} @* fileno.Visible (end) *@
+@if (s_dohdrtest.TrxUserId.Visible) { // TrxUserId.Visible (begin)
+	<div id="r_TrxUserId" class="form-group row">
+		<label id="elh_s_dohdrtest_TrxUserId" for="x_TrxUserId" class="@s_dohdrtest_Add.LeftColumnClass">@Html.Raw(s_dohdrtest.TrxUserId.Caption)@Html.Raw(s_dohdrtest.TrxUserId.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dohdrtest_Add.RightColumnClass"><div @Html.Raw(s_dohdrtest.TrxUserId.CellAttributes)>
+<span id="el_s_dohdrtest_TrxUserId">
+<input type="text" data-table="s_dohdrtest" data-field="x_TrxUserId" name="x_TrxUserId" id="x_TrxUserId" size="30" placeholder="@s_dohdrtest.TrxUserId.PlaceHolder" value="@s_dohdrtest.TrxUserId.EditValue" @Html.Raw(s_dohdrtest.TrxUserId.EditAttributes)>
+</span>
+@Html.Raw(s_dohdrtest.TrxUserId.CustomMessage)</div></div>
+	</div>
+} @* TrxUserId.Visible (end) *@
+@if (s_dohdrtest.CurrencyCode.Visible) { // CurrencyCode.Visible (begin)
+	<div id="r_CurrencyCode" class="form-group row">
+		<label id="elh_s_dohdrtest_CurrencyCode" class="@s_dohdrtest_Add.LeftColumnClass">@Html.Raw(s_dohdrtest.CurrencyCode.Caption)@Html.Raw(s_dohdrtest.CurrencyCode.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dohdrtest_Add.RightColumnClass"><div @Html.Raw(s_dohdrtest.CurrencyCode.CellAttributes)>
+<span id="el_s_dohdrtest_CurrencyCode">
+<span>@{ s_dohdrtest.CurrencyCode.EditAttrs.Prepend("onchange", "ew.autoFill(this);"); }</span>
+<span id="as_x_CurrencyCode" class="text-nowrap" style="z-index: 8920">
+	<input type="text" class="form-control" name="sv_x_CurrencyCode" id="sv_x_CurrencyCode" value="@RemoveHtml(Convert.ToString(s_dohdrtest.CurrencyCode.EditValue))" size="30" maxlength="5" placeholder="@s_dohdrtest.CurrencyCode.PlaceHolder" data-placeholder="@s_dohdrtest.CurrencyCode.PlaceHolder"@s_dohdrtest.CurrencyCode.EditAttributes>
+</span>
+<input type="hidden" data-table="s_dohdrtest" data-field="x_CurrencyCode" data-value-separator="@s_dohdrtest.CurrencyCode.DisplayValueSeparatorAttribute" name="x_CurrencyCode" id="x_CurrencyCode" value="@(s_dohdrtest.CurrencyCode.CurrentValue)" onchange="@s_dohdrtest.CurrencyCode.EditAttrs.Extract("onchange")">
+<script>
+fs_dohdrtestadd.createAutoSuggest({"id":"x_CurrencyCode","forceSelect":true});
+</script>
+@Html.Raw(s_dohdrtest.CurrencyCode.Lookup.GetParamTag("p_x_CurrencyCode"))
+</span>
+@Html.Raw(s_dohdrtest.CurrencyCode.CustomMessage)</div></div>
+	</div>
+} @* CurrencyCode.Visible (end) *@
+@if (s_dohdrtest.ex_rate.Visible) { // ex_rate.Visible (begin)
+	<div id="r_ex_rate" class="form-group row">
+		<label id="elh_s_dohdrtest_ex_rate" for="x_ex_rate" class="@s_dohdrtest_Add.LeftColumnClass">@Html.Raw(s_dohdrtest.ex_rate.Caption)@Html.Raw(s_dohdrtest.ex_rate.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dohdrtest_Add.RightColumnClass"><div @Html.Raw(s_dohdrtest.ex_rate.CellAttributes)>
+<span id="el_s_dohdrtest_ex_rate">
+<input type="text" data-table="s_dohdrtest" data-field="x_ex_rate" name="x_ex_rate" id="x_ex_rate" size="30" placeholder="@s_dohdrtest.ex_rate.PlaceHolder" value="@s_dohdrtest.ex_rate.EditValue" @Html.Raw(s_dohdrtest.ex_rate.EditAttributes)>
+</span>
+@Html.Raw(s_dohdrtest.ex_rate.CustomMessage)</div></div>
+	</div>
+} @* ex_rate.Visible (end) *@
+@if (s_dohdrtest.do_amount_original.Visible) { // do_amount_original.Visible (begin)
+	<div id="r_do_amount_original" class="form-group row">
+		<label id="elh_s_dohdrtest_do_amount_original" for="x_do_amount_original" class="@s_dohdrtest_Add.LeftColumnClass">@Html.Raw(s_dohdrtest.do_amount_original.Caption)@Html.Raw(s_dohdrtest.do_amount_original.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dohdrtest_Add.RightColumnClass"><div @Html.Raw(s_dohdrtest.do_amount_original.CellAttributes)>
+<span id="el_s_dohdrtest_do_amount_original">
+<input type="text" data-table="s_dohdrtest" data-field="x_do_amount_original" name="x_do_amount_original" id="x_do_amount_original" size="30" placeholder="@s_dohdrtest.do_amount_original.PlaceHolder" value="@s_dohdrtest.do_amount_original.EditValue" @Html.Raw(s_dohdrtest.do_amount_original.EditAttributes)>
+</span>
+@Html.Raw(s_dohdrtest.do_amount_original.CustomMessage)</div></div>
+	</div>
+} @* do_amount_original.Visible (end) *@
+@if (s_dohdrtest.do_amount_loca.Visible) { // do_amount_loca.Visible (begin)
+	<div id="r_do_amount_loca" class="form-group row">
+		<label id="elh_s_dohdrtest_do_amount_loca" for="x_do_amount_loca" class="@s_dohdrtest_Add.LeftColumnClass">@Html.Raw(s_dohdrtest.do_amount_loca.Caption)@Html.Raw(s_dohdrtest.do_amount_loca.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dohdrtest_Add.RightColumnClass"><div @Html.Raw(s_dohdrtest.do_amount_loca.CellAttributes)>
+<span id="el_s_dohdrtest_do_amount_loca">
+<input type="text" data-table="s_dohdrtest" data-field="x_do_amount_loca" name="x_do_amount_loca" id="x_do_amount_loca" size="30" placeholder="@s_dohdrtest.do_amount_loca.PlaceHolder" value="@s_dohdrtest.do_amount_loca.EditValue" @Html.Raw(s_dohdrtest.do_amount_loca.EditAttributes)>
+</span>
+@Html.Raw(s_dohdrtest.do_amount_loca.CustomMessage)</div></div>
+	</div>
+} @* do_amount_loca.Visible (end) *@
+@if (s_dohdrtest.rounding_adj.Visible) { // rounding_adj.Visible (begin)
+	<div id="r_rounding_adj" class="form-group row">
+		<label id="elh_s_dohdrtest_rounding_adj" for="x_rounding_adj" class="@s_dohdrtest_Add.LeftColumnClass">@Html.Raw(s_dohdrtest.rounding_adj.Caption)@Html.Raw(s_dohdrtest.rounding_adj.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dohdrtest_Add.RightColumnClass"><div @Html.Raw(s_dohdrtest.rounding_adj.CellAttributes)>
+<span id="el_s_dohdrtest_rounding_adj">
+<input type="text" data-table="s_dohdrtest" data-field="x_rounding_adj" name="x_rounding_adj" id="x_rounding_adj" size="30" placeholder="@s_dohdrtest.rounding_adj.PlaceHolder" value="@s_dohdrtest.rounding_adj.EditValue" @Html.Raw(s_dohdrtest.rounding_adj.EditAttributes)>
+</span>
+@Html.Raw(s_dohdrtest.rounding_adj.CustomMessage)</div></div>
+	</div>
+} @* rounding_adj.Visible (end) *@
+@if (s_dohdrtest.ar_gl_acct.Visible) { // ar_gl_acct.Visible (begin)
+	<div id="r_ar_gl_acct" class="form-group row">
+		<label id="elh_s_dohdrtest_ar_gl_acct" for="x_ar_gl_acct" class="@s_dohdrtest_Add.LeftColumnClass">@Html.Raw(s_dohdrtest.ar_gl_acct.Caption)@Html.Raw(s_dohdrtest.ar_gl_acct.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+		<div class="@s_dohdrtest_Add.RightColumnClass"><div @Html.Raw(s_dohdrtest.ar_gl_acct.CellAttributes)>
+<span id="el_s_dohdrtest_ar_gl_acct">
+<input type="text" data-table="s_dohdrtest" data-field="x_ar_gl_acct" name="x_ar_gl_acct" id="x_ar_gl_acct" size="30" maxlength="10" placeholder="@s_dohdrtest.ar_gl_acct.PlaceHolder" value="@s_dohdrtest.ar_gl_acct.EditValue" @Html.Raw(s_dohdrtest.ar_gl_acct.EditAttributes)>
+</span>
+@Html.Raw(s_dohdrtest.ar_gl_acct.CustomMessage)</div></div>
+	</div>
+} @* ar_gl_acct.Visible (end) *@
+</div><!-- /page* -->
+@{ s_dohdrtest_Add.CloseRecordset(); }
+@if (s_dohdrtest_Add.CurrentDetailTables.Contains("s_dodetltest") && s_dodetltest.DetailAdd) {
+	if (!Empty(s_dohdrtest_Add.CurrentDetailTable)) {
+		<h4 class="ew-detail-caption">@Html.Raw(Language.TablePhrase("s_dodetltest", "TblCaption"))</h4>
+	}
+		@await Html.PartialAsync("s_dodetltestgrid")
+	View = this;
+}
+@if (!s_dohdrtest_Add.IsModal) {
+<div class="form-group row"><!-- buttons .form-group -->
+	<div class="@s_dohdrtest_Add.OffsetColumnClass"><!-- buttons offset -->
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("AddBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(s_dohdrtest_Add.ReturnUrl)"> @Html.Raw(Language.Phrase("CancelBtn"))</button>
+	</div><!-- /buttons offset -->
+</div><!-- /buttons .form-group -->
+}
+</form>
+@s_dohdrtest_Add.ShowPageFooter()
+@ShowDebugMessage()
+@ElapsedTime()
+<script>
+
+// Write your table-specific startup script here
+// document.write("page loaded");
+
+</script>
