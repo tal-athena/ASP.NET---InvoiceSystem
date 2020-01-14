@@ -46,6 +46,7 @@ namespace AspNetMaker2019
 			// Memory cache
 			services.AddMemoryCache();
 
+
 			// Add framework services
 			services
 				.AddMvc()
