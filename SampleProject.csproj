@@ -13,7 +13,7 @@
 		<PackageReference Include="AngleSharp" Version="0.9.11"/>
 		<PackageReference Include="System.Drawing.Common" Version="4.5.1"/>
 		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="7.10.0"/>
-		<PackageReference Include="HtmlSanitizer" Version="4.0.199"/>
+		<PackageReference Include="HtmlSanitizer" Version="5.0.372"/>
 		<PackageReference Include="MimeDetective.InMemory" Version="0.1.0.1"/>
 		<PackageReference Include="System.Data.SqlClient" Version="4.5.1"/>
 	</ItemGroup>
